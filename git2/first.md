@@ -1,0 +1,4 @@
+linijka1
+linijka2
+linijka3
+linjka4
