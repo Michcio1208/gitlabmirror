@@ -1,4 +1,10 @@
-linijka1 zmiana w main
-linijka2 zmiana w main
+
+
+
+
+linijka1 po zmianie w nowy
+linijka2 po zmianie w now
+
+
 linijka3
 linjka4
