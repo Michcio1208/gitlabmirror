@@ -3,6 +3,7 @@ echo "Podaj sciezke: "
 read p
 echo "podaj rozszerzenie: "
 read e
-find "$HOME/$p" -name "*$e" -exec cp {} $HOME\backup \;
+mkdir -p "$HOME/backup"
+find "$HOME/$p" -name "*.$e" -exec cp {} "$HOME/backup" \;
 echo "Skopiowano"
 
