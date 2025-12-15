@@ -1,8 +1,6 @@
-Oto gotowe sprawozdanie w formacie Markdown. Zostało przygotowane zgodnie z wymogami laboratorium  oraz wykorzystuje uproszczony kod dla zadań 3 i 4, oparty wyłącznie na materiałach z wykładu (zdjęcia).
 
-Możesz skopiować poniższą treść do pliku o nazwie np. `Sprawozdanie_Lab9.md`.
 
----
+--- 
 
 #Sprawozdanie: Wstęp do informatyki - Laboratorium nr 9**Temat:** Skrypty powłoki systemowej **Data:** Grudzień 2025 
 **Autor:** [Twoje Imię i Nazwisko]
