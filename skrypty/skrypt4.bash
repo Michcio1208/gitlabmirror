@@ -15,7 +15,7 @@ then
     arg1=$(expr $1 + 2)
     arg2=$(expr $2 + 2)
     arg3=$(expr $3 + 2)
-    echo "Wywolanie 2 (argumenty + 2); $arg1 $arg2 $arg3:"
+    echo "Wywolanie 2 (argumenty + 2); $arg1 $arg2 $arg3):"
     python3 skrypt3.py $arg1 $arg2 $arg3
     arg1=$(expr $1 + 3)
     arg2=$(expr $2 + 3)
