@@ -1,55 +1,62 @@
-"""Bardzo prosty skrypt dopasowany do pliku GUS.
-Użycie:
-  python zad3_prosty.py [sciezka/do/pliku.csv]
-Jeśli nie podasz ścieżki, skrypt użyje:
-  python1/rocznewskaznikicentowarowiuslugkonsumpcyjnychod1950roku.csv
-"""
-import sys
-import os
-import math
+import numpy             # Wymagane w zadaniu 
+import matplotlib.pyplot as plt  # Wymagane w zadaniu [cite: 32]
 
+# -- KROK 1: Wczytanie danych (najprostsza metoda bez modułu csv) --
+# Tworzymy pusty słownik, tak jak w materiałach: empy_dict = {}
+dane_inflacja = {}
 
-def parse_line(line):
-    # pomijamy nagłówek i rozdzielamy po średnikach
-    if line.strip().startswith('Nazwa') or line.strip().startswith('Wska'):
-        return None, None
-    parts = [p.strip() for p in line.split(';')]
-    if len(parts) < 5:
-        return None, None
-    try:
-        y = int(parts[3])
-        v = float(parts[4].replace(',', '.'))
-    except Exception:
-        return None, None
-    return y, v
+# Otwieramy plik. Zakładamy, że plik nazywa się 'inflacja.csv' i jest w tym samym folderze.
+# Używamy kodowania 'utf-8' lub 'latin-1' (zależy od pliku GUS).
+plik = open('inflacja.csv', 'r') 
 
+# Wczytujemy wszystkie linie do listy
+linie = plik.readlines()
+plik.close() # Pamiętamy o zamknięciu pliku
 
-def main():
-    if len(sys.argv) < 2:
-        path = os.path.join(os.path.dirname(__file__), 'rocznewskaznikicentowarowiuslugkonsumpcyjnychod1950roku.csv')
-    else:
-        path = sys.argv[1]
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            data = {y: v for (y, v) in (parse_line(line) for line in f) if y is not None}
-    except FileNotFoundError:
-        print(f"Plik nie znaleziony: {path}")
-        return
+# Przechodzimy przez pętlę (pomijamy pierwszą linię, jeśli to nagłówek)
+for linia in linie[1:]: # slicing [1:] pomija nagłówek
+    linia = linia.strip() # usuwamy białe znaki z końca/początku
+    
+    # Zakładamy, że dane w GUS są oddzielone średnikiem (np. 2023;11.4)
+    # Metoda split tworzy listę elementów
+    elementy = linia.split(';') 
+    
+    if len(elementy) >= 2:
+        # Pobieramy rok (indeks 0) i wskaźnik (indeks 1)
+        rok = int(elementy[0])
+        
+        # W plikach polskich separatorem jest często przecinek, zamieniamy na kropkę
+        wartosc_napis = elementy[1].replace(',', '.')
+        wskaznik = float(wartosc_napis)
+        
+        # Zapisujemy do słownika: klucz to rok, wartość to wskaźnik 
+        dane_inflacja[rok] = wskaznik
 
-    if not data:
-        print("Brak danych w pliku.")
-        return
+print("Wczytano dane:", dane_inflacja)
 
-    values = list(data.values())
-    n = len(values)
-    mean = sum(values) / n
-    var = sum((x - mean) ** 2 for x in values) / n
-    std = math.sqrt(var)
+# -- KROK 2: Obliczenia (Numpy) --
+# Pobieramy same wartości ze słownika, aby policzyć średnią
+lista_wartosci = list(dane_inflacja.values())
 
-    years_sorted = sorted(data.keys())
-    print(f"Wczytano: {n} rekordów ({years_sorted[0]}-{years_sorted[-1]})")
-    print(f"Średnia: {mean:.4f}, Odch.std: {std:.4f}")
+# Obliczamy średnią i odchylenie standardowe 
+srednia = numpy.mean(lista_wartosci)
+odchylenie = numpy.std(lista_wartosci)
 
+print(f"Średnia inflacja: {srednia:.2f}")
+print(f"Odchylenie standardowe: {odchylenie:.2f}")
 
-if __name__ == '__main__':
-    main()
+# -- KROK 3: Wykres (Matplotlib) --
+# Potrzebujemy listy lat (oś X) i wskaźników (oś Y)
+# Metoda keys() zwraca klucze, values() zwraca wartości
+lata = list(dane_inflacja.keys())
+wartosci = list(dane_inflacja.values())
+
+# Rysujemy wykres linią ciągłą w kolorze czerwonym [cite: 33]
+plt.plot(lata, wartosci, color='red', linestyle='-')
+
+# Dodajemy tytuł i opisy osi [cite: 33]
+plt.title("Wskaźnik inflacji na przestrzeni lat")
+plt.xlabel("Rok")
+plt.ylabel("Wartość wskaźnika")
+
+plt.show() # Wyświetlenie wykresu [cite: 32]
