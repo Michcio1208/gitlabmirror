@@ -16,17 +16,16 @@ def extract_vowels(text: str):
     return [ch for ch in text if ch in POLISH_VOWELS]
 
 
-if __name__ == "__main__":
-    # Przykładowe dane (można je zmienić)
-    celsius = [0, 20, 37, 100]
-    fahrenheit = celsius_to_fahrenheit(celsius)
-    print("Celsius:", celsius)
-    print("Fahrenheit:", [round(x, 2) for x in fahrenheit])
 
-    # Przykładowy tekst (można zastąpić dłuższym tekstem)
-    text = "Jak był Stefek Burczymucha - ja nikogo się nie boję!"
-    vowels = extract_vowels(text)
-    print("\nTekst:\n", text)
-    print("Lista samogłosek:")
-    print(vowels)
-    print("Połączone:", ''.join(vowels))
+celsius = [0, 20, 37, 100]
+fahrenheit = celsius_to_fahrenheit(celsius)
+print("Celsius:", celsius)
+print("Fahrenheit:", [round(x, 2) for x in fahrenheit])
+
+# Przykładowy tekst (można zastąpić dłuższym tekstem)
+text = "Jak był Stefek Burczymucha - ja nikogo się nie boję!"
+vowels = extract_vowels(text)
+print("\nTekst:\n", text)
+print("Lista samogłosek:")
+print(vowels)
+print("Połączone:", ''.join(vowels))
