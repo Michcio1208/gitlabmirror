@@ -7,7 +7,7 @@ dane_inflacja = {}
 
 # Otwieramy plik. Zakładamy, że plik nazywa się 'inflacja.csv' i jest w tym samym folderze.
 # Używamy kodowania 'utf-8' lub 'latin-1' (zależy od pliku GUS).
-plik = open('inflacja.csv', 'r') 
+plik = open('rocznewskaznikicentowarowiuslugkonsumpcyjnychod1950roku.csv', 'r') 
 
 # Wczytujemy wszystkie linie do listy
 linie = plik.readlines()
