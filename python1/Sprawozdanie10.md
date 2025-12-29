@@ -1,0 +1,13 @@
+# Sprawozdanie z laboratoriów: Programowanie w języku Python
+
+## Opis działania skryptu zadanie4.py
+
+Pierwszy z analizowanych programów skupia się na operacjach na listach oraz przetwarzaniu ciągów znaków przy użyciu tzw. wyrażeń listowych (list comprehensions). Kod został podzielony na dwa etapy. W pierwszej części zdefiniowano listę `temp`, przechowującą cztery wartości liczbowe reprezentujące temperaturę w stopniach Celsjusza. Następnie, wykorzystując skrócony zapis pętli wewnątrz nowej listy, przeliczono każdą wartość na stopnie Fahrenheita zgodnie ze wzorem matematycznym mnożącym stopnie Celsjusza przez 1.8 (9/5) i dodającym 32. Wyniki tych operacji, zarówno lista źródłowa, jak i przeliczona, są wypisywane na standardowe wyjście konsoli.
+
+Druga część skryptu dotyczy analizy tekstu. Do zmiennej `tekst` przypisano fragment wiersza „Stefek Burczymucha”. Głównym zadaniem tej sekcji jest wyodrębnienie wszystkich samogłosek występujących w podanym fragmencie. W tym celu program iteruje znak po znaku przez cały ciąg tekstowy i sprawdza, czy dany znak znajduje się w zdefiniowanym łańcuchu samogłosek (uwzględniającym zarówno małe, jak i wielkie litery oraz polskie znaki diakrytyczne). Znaki spełniające ten warunek są gromadzone w liście `samogloski`. Działanie programu kończy się wyświetleniem pełnego tekstu wiersza oraz wygenerowanej listy samogłosek.
+
+## Opis działania skryptu zad3_simple.py
+
+Drugi skrypt realizuje zadanie z zakresu analizy i wizualizacji danych, wykorzystując zewnętrzne biblioteki: pandas, matplotlib oraz numpy. Proces rozpoczyna się od wczytania danych z pliku `inflacja.csv`. Ze względu na polski format pliku, przy imporcie zdefiniowano separator jako średnik oraz ustawiono kodowanie znaków na `cp1250`. Kluczowym etapem przetwarzania danych jest konwersja kolumny z wartościami inflacji. Ponieważ dane wejściowe zawierają przecinki jako separator dziesiętny, program najpierw zamienia je na kropki, a następnie konwertuje typ danych z tekstowego na zmiennoprzecinkowy (float), zapisując wynik w nowej kolumnie `Wartość_liczba`.
+
+Po uporządkowaniu danych chronologicznie według roku, skrypt przystępuje do obliczeń statystycznych. Za pomocą biblioteki numpy wyznaczana jest średnia arytmetyczna inflacji oraz jej odchylenie standardowe dla próby. Wyniki te są prezentowane w konsoli w sekcji wyników. Ostatnim etapem działania programu jest wizualizacja danych. Tworzony jest wykres liniowy o wymiarach 10 na 6 cali, gdzie na osi X przedstawione są lata, a na osi Y wartości inflacji. Wykres został sformatowany przy użyciu czerwonej linii, dodano do niego siatkę pomocniczą, legendę oraz tytuły osi i całego wykresu. Całość jest wyświetlana w nowym oknie graficznym.
