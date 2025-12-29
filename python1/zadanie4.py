@@ -1,0 +1,11 @@
+temp=[1,36,100,155]
+f_temp=[(9/5)*c+32 for c in temp]
+print("celcjusz: ",temp)
+print("fahrenhajt: ",f_temp)
+
+
+tekst = "Jak był Stefek Burczymucha…— Ja nikogo się nie boję! Choćby niedźwiedź… to dostoję! Wilki?.. Ja ich całą zgraję Pozabijam i pokraję! Te hijeny, te lamparty, To są dla mnie czyste żarty! A pantery i tygrysy Na sztyk wezmę u swej spisy! Lew!… Cóż lew jest? — kociak duży! Naczytałem się podróży! I znam tego jegomości, Co zły tylko kiedy pości. Szakal, wilk?… Straszna nowina! To jest tylko większa psina!… (Brysia mijam zaś zdaleka, Bo nie lubię, gdy kto szczeka!) Komu zechcę, to dam radę! Zaraz na ocean jadę, I nie będę Stefkem chyba, Jak nie chwycę wieloryba! tak przez dzień boży cały Zuch nasz trąbi swe pochwały. Aż raz usnął gdzieś na sianie… Wtem się budzi niespodzianie, Patrzy, a tu jakieś zwierzę Do śniadania mu się bierze. Jak nie zerwie się na nogi, Jak nie wrzaśnie z wielkiej trwogi — Pędzi, jakby chart ze smyczy… — Tygrys, tato! tygrys! — krzyczy. — Tygrys?… ojciec się zapyta. — Ach, lew może!… miał kopyta Straszne! Trzy czy cztery nogi, Paszczę taką! Przytem rogi… — Gdzież to było? — Tam na sianie, Właśnie porwał mi śniadanie… Idzie ojciec, służba cała, Patrzą… a tu myszka mała, Polna myszka siedzi sobie I ząbkami serek skrobie!… " 
+samogloski=[ch for ch in tekst if ch in "aeiouyąęóAEIOUYĄĘÓ"]
+print("Tekst:\n", tekst)
+print("Lista samogłosek:")
+print(samogloski)
