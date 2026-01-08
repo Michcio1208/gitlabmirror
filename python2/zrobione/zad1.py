@@ -1,3 +1,5 @@
+## Autor: Michał Krystecki 342906
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -16,12 +18,21 @@ img_corridor = plt.imread('corridor.png')
 fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
 axs[0, 0].imshow(img_cat)
+axs[0, 0].set_title("Lewy Górny: Kot")
+axs[0, 0].axis('off')
+
 axs[0, 1].plot(x_param, y_param)
 axs[0, 1].grid(True)
+axs[0, 1].set_title("Prawy Górny: Krzywa parametryczna")
 
 axs[1, 0].plot(x_sig, y_sig)
 axs[1, 0].grid(True)
+axs[1, 0].set_title("Lewy Dolny: Funkcja sigmoidalna")
 
 axs[1, 1].imshow(img_corridor)
+axs[1, 1].set_title("Prawy Dolny: Korytarz")
+axs[1, 1].axis('off')
 
+fig.suptitle('Zadanie 1: Obrazy i Funkcje')
+plt.tight_layout()
 plt.show()

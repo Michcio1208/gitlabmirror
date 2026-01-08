@@ -1,3 +1,5 @@
+## Autor: Michał Krystecki 342906
+
 def gnome_sort(arr):
     n = len(arr)
     i = 1
@@ -17,4 +19,5 @@ def gnome_sort(arr):
 
 if __name__ == '__main__':
     data = [34, 2, 10, -5, 8, 100, 1]
-    print(gnome_sort(data))
+    print("Nieposortowana lista:", data)
+    print("Posortowana lista:", gnome_sort(data))

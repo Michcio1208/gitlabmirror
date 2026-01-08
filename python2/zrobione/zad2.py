@@ -1,3 +1,5 @@
+## Autor: Michał Krystecki 342906
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -8,12 +10,15 @@ y_sin = A * np.exp(-lambda_coeff * x) * np.sin(x)
 y_env_upper = A * np.exp(-lambda_coeff * x)
 y_env_lower = -A * np.exp(-lambda_coeff * x)
 
+plt.figure(figsize=(10, 6))
+
 plt.plot(x, y_sin, label='Tłumiona sinusoida', linestyle='-')
-plt.plot(x, y_env_upper, label='Obwiednia', linestyle='--')
-plt.plot(x, y_env_lower, linestyle='--')
+plt.plot(x, y_env_upper, label=r'Obwiednia: $e^{-0.022x}$', color='red', linestyle='--')
+plt.plot(x, y_env_lower, color='red', linestyle='--')
 
 plt.title("Wykres tłumionej sinusoidy")
-plt.xlabel("t")
-plt.ylabel("A")
+plt.xlabel("Czas (t)")
+plt.ylabel("Amplituda")
 plt.legend()
-plt.show()
+plt.grid(True)
+plt.show() 
