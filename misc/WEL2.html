@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEL Exam Master - Interaktywne Rozwiązania</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1f2937; }
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 300px; 
+            max-height: 400px; 
+        }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
+        .interactive-area { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; }
+        input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; background: #d1d5db; border-radius: 5px; outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #3b82f6; border-radius: 50%; cursor: pointer; }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals with Scientific Blue/Green Accents -->
+    <!-- Application Structure Plan: Dashboard layout organized by Exam Problem topics. 
+         1. MOS Transistor Physics (Visualizing Channel Pinch-off).
+         2. Transient States (RC Discharge Visualization).
+         3. Circuit Analysis (Steady State Logic).
+         4. Digital Theory (Comparison & Calculation).
+         Justification: Grouping by topic allows the user to focus on one theoretical concept at a time, connecting the abstract exam question to dynamic behavior described in lectures. -->
+    <!-- Visualization & Content Choices:
+         1. MOS Canvas: Custom HTML5 Canvas drawing to visualize the channel shape changing with voltage (Lecture 7). Goal: Inform & Change.
+         2. RC Chart: Chart.js Line chart to show exponential decay. Goal: Change & relationships.
+         3. Circuit Logic: Interactive toggle to show equivalent circuits for t=infinity (Lecture 10). Goal: Inform.
+         4. Digital Cards: Interactive list for Analog vs Digital pros/cons (Lecture 13). Goal: Organize.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="font-bold text-xl text-blue-600">WEL Exam Master</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <button onclick="scrollToSection('mos')" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Tranzystory MOS</button>
+                        <button onclick="scrollToSection('rc')" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Stany Nieustalone (RC)</button>
+                        <button onclick="scrollToSection('rl')" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Obwody (RL)</button>
+                        <button onclick="scrollToSection('digital')" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Cyfrowe vs Analogowe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-gray-900">Rozwiązania i Analiza Zadań WEL 23Z</h1>
+            <p class="mt-2 text-gray-600">Interaktywna analiza zadań z pliku <code>WEL_23Z_2_2_key.pdf</code> w oparciu o materiał z wykładów 7-13. Zmień parametry, aby zrozumieć fizykę i matematykę stojącą za rozwiązaniami.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-12">
+
+        <!-- SEKCJA 1: MOS Transistor (Zadanie A) -->
+        <section id="mos" class="card p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-2">1. Kształt Kanału Tranzystora NMOS (Zadanie A)</h2>
+                <p class="text-gray-600 mb-4">
+                    W zadaniu A (arkusz str. 1) pytano o kształt kanału dla $U_T=3V$ i $u_{GS}=7V$. 
+                    Zgodnie z <strong>Wykładem 7</strong>, tranzystor działa jako opór sterowany napięciem (zakres liniowy) lub źródło prądowe (nasycenie).
+                    Kluczowe jest napięcie $u_{GD} = u_{GS} - u_{DS}$. Jeśli spadnie poniżej $U_T$, kanał przy drenie zanika ("pinch-off").
+                </p>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 text-sm">
+                    <strong>Zadanie testowe:</strong> Dla $u_{GS}=7V$ i $U_T=3V$. Jeśli $u_{DS}$ jest duże, kanał zwęża się przy drenie (prawa strona).
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Controls -->
+                <div class="interactive-area space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Napięcie Bramka-Źródło ($u_{GS}$)</label>
+                        <input type="range" id="mos-ugs" min="0" max="10" step="0.1" value="7" oninput="updateMosVis()">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1"><span>0V</span><span id="val-ugs">7V</span><span>10V</span></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Napięcie Dren-Źródło ($u_{DS}$)</label>
+                        <input type="range" id="mos-uds" min="0" max="10" step="0.1" value="5" oninput="updateMosVis()">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1"><span>0V</span><span id="val-uds">5V</span><span>10V</span></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Napięcie Progowe ($U_T$)</label>
+                        <input type="range" id="mos-ut" min="1" max="5" step="0.1" value="3" oninput="updateMosVis()">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1"><span>1V</span><span id="val-ut">3V</span><span>5V</span></div>
+                    </div>
+                    
+                    <div id="mos-status" class="p-3 rounded-md font-mono text-sm bg-gray-200">
+                        Status...
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="flex flex-col items-center justify-center bg-white border rounded-lg p-4">
+                    <canvas id="mosCanvas" width="400" height="200" class="border border-gray-200 w-full max-w-[400px]"></canvas>
+                    <p class="text-xs text-gray-400 mt-2 text-center">Schematyczna wizualizacja przekroju kanału (Źródło - Lewa, Dren - Prawa)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA 2: Stany Nieustalone RC (Zadanie E) -->
+        <section id="rc" class="card p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-green-800 mb-2">2. Rozładowanie Kondensatora (Zadanie E)</h2>
+                <p class="text-gray-600 mb-4">
+                    Zadanie dotyczyło czasu potrzebnego na spadek napięcia z 2024V do 506V, wiedząc, że spadek do 1012V (połowa) zajął 2s.
+                    <strong>Wykład 9</strong> wprowadza pojęcie stałej czasowej $\tau$ i wykładniczego zaniku $u(t) = U_0 e^{-t/\tau}$.
+                    Warto zauważyć: spadek o połowę to stały okres czasu ($t_{1/2} \approx 0.69\tau$).
+                </p>
+                <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4 text-sm">
+                    <strong>Logika rozwiązania:</strong><br>
+                    2024V $\to$ 1012V (50%) = 2 sekundy.<br>
+                    1012V $\to$ 506V (kolejne 50% z obecnej wartości) = kolejne 2 sekundy.<br>
+                    <strong>Razem: 4 sekundy.</strong>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Inputs -->
+                <div class="interactive-area md:col-span-1 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Napięcie Początkowe ($U_0$)</label>
+                        <input type="number" id="rc-u0" value="2024" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Napięcie Docelowe ($U_{target}$)</label>
+                        <input type="number" id="rc-target" value="506" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Czas połowicznego zaniku ($T_{1/2}$)</label>
+                        <input type="number" id="rc-thalf" value="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border">
+                        <p class="text-xs text-gray-500 mt-1">Czas potrzebny na spadek o 50%</p>
+                    </div>
+                    <button onclick="calculateRC()" class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">Oblicz i Rysuj</button>
+                    <div id="rc-result" class="font-bold text-lg text-center text-green-800 mt-4">
+                        Wynik: ?
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="md:col-span-2 flex flex-col items-center">
+                    <div class="chart-container">
+                        <canvas id="rcChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA 3: Obwody RL (Zadanie F) -->
+        <section id="rl" class="card p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-purple-800 mb-2">3. Stan Ustalony w Obwodzie z Cewką (Zadanie F)</h2>
+                <p class="text-gray-600 mb-4">
+                    Zadanie pyta o asymptotyczną wartość napięcia ($t \to \infty$). 
+                    <strong>Wykład 10</strong> (Metoda uproszczona) mówi, że w stanie ustalonym dla prądu stałego (DC):
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li><strong>Kondensator</strong> jest przerwą (rozwarcie).</li>
+                        <li><strong>Cewka (Indukcyjność)</strong> jest zwarciem (kawałek przewodu).</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <!-- Simulation Visual -->
+                <div class="interactive-area relative h-64 bg-white border rounded-lg flex items-center justify-center">
+                    <!-- Basic Circuit Visualization using HTML/Tailwind borders -->
+                    <div class="relative w-64 h-40 border-2 border-gray-800 rounded p-4">
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm font-bold">Resistor R</div>
+                        <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white px-2 text-sm font-bold flex flex-col items-center">
+                            <span id="l-label">Cewka L</span>
+                            <div id="l-symbol" class="w-12 h-4 border-b-4 border-dotted border-purple-600 rounded-full mt-1 transition-all duration-500"></div>
+                        </div>
+                        <div class="absolute left-0 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-1">
+                            <div class="w-8 h-8 rounded-full border-2 border-black flex items-center justify-center font-bold">J</div>
+                        </div>
+                        <div class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 bg-white px-1">
+                             <!-- Open terminals -->
+                             <div class="h-4 w-4 rounded-full border border-gray-400"></div>
+                        </div>
+                        
+                        <!-- Measurement overlay -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div id="voltmeter" class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded shadow opacity-0 transition-opacity duration-300">
+                                U = 0V
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logic Control -->
+                <div class="space-y-4">
+                    <p class="text-lg font-medium">Analiza stanu $t \to \infty$:</p>
+                    <div class="flex space-x-4">
+                        <button onclick="setRLState('transient')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500">Stan Nieustalony</button>
+                        <button onclick="setRLState('steady')" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">Stan Ustalony (t → ∞)</button>
+                    </div>
+                    <div id="rl-explanation" class="text-sm bg-purple-50 p-4 rounded border border-purple-200">
+                        Wybierz stan, aby zobaczyć zachowanie elementu L.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA 4: Systemy Cyfrowe (Teoria) -->
+        <section id="digital" class="card p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-indigo-800 mb-2">4. Systemy Analogowe vs Cyfrowe (Zadanie B)</h2>
+                <p class="text-gray-600 mb-4">
+                    Zadanie B odnosiło się do różnic między systemami (Wykład 13).
+                    Poniżej interaktywna tabela weryfikująca tezy z wykładu.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <h3 class="font-bold text-gray-700">Cechy Systemów Cyfrowych</h3>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-white border hover:bg-indigo-50 cursor-pointer rounded transition" onclick="toggleFact(this, 'true')">
+                            <span class="font-bold mr-2">?</span> Łatwiejsze projektowanie (automatyzacja)
+                            <div class="hidden mt-2 text-sm text-green-600 font-medium">PRAWDA (Wykład 13)</div>
+                        </div>
+                        <div class="p-3 bg-white border hover:bg-indigo-50 cursor-pointer rounded transition" onclick="toggleFact(this, 'true')">
+                            <span class="font-bold mr-2">?</span> Łatwiejsza rekonfiguracja (programowalność)
+                            <div class="hidden mt-2 text-sm text-green-600 font-medium">PRAWDA (FPGA, Procesory)</div>
+                        </div>
+                        <div class="p-3 bg-white border hover:bg-indigo-50 cursor-pointer rounded transition" onclick="toggleFact(this, 'true')">
+                            <span class="font-bold mr-2">?</span> Łatwiejsze nagrywanie danych
+                            <div class="hidden mt-2 text-sm text-green-600 font-medium">PRAWDA (Pamięci cyfrowe)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="font-bold text-gray-700">Mity i Ciekawostki</h3>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-white border hover:bg-red-50 cursor-pointer rounded transition" onclick="toggleFact(this, 'false')">
+                            <span class="font-bold mr-2">?</span> Zawsze mniejszy pobór mocy niż analogowe
+                            <div class="hidden mt-2 text-sm text-red-600 font-medium">FAŁSZ. Systemy analogowe mogą być pasywne (0W).</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-gray-100 rounded">
+                        <h4 class="font-bold text-sm mb-2">Kalkulator Stanów (Zadanie D)</h4>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="bits-input" value="8" min="1" max="64" class="w-16 p-1 border rounded" oninput="calcBits()">
+                            <span>bitów = </span>
+                            <span id="bits-output" class="font-mono font-bold text-indigo-600">256</span>
+                            <span>kombinacji</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Wzór: $2^N$</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+            <p>Opracowano na podstawie materiałów wykładowych "Wstęp do elektroniki i elektrotechniki" (WEL).</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- SEKCJA 1: MOS Logic ---
+        const canvas = document.getElementById('mosCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawMos(ugs, uds, ut) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Parametry rysowania
+            const w = canvas.width;
+            const h = canvas.height;
+            const groundY = h - 20;
+            const oxideY = h - 60;
+            const gateY = h - 80;
+            
+            // 1. Podłoże (Substrate)
+            ctx.fillStyle = '#e5e7eb'; // Light gray
+            ctx.fillRect(50, oxideY, w - 100, groundY - oxideY);
+            
+            // 2. Źródło (Source) i Dren (Drain) - n+ regions
+            ctx.fillStyle = '#1f2937'; // Dark gray
+            ctx.fillRect(30, oxideY, 40, groundY - oxideY + 10); // Source
+            ctx.fillRect(w - 70, oxideY, 40, groundY - oxideY + 10); // Drain
+            
+            // Labels
+            ctx.fillStyle = 'black';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('S (0V)', 35, oxideY - 5);
+            ctx.fillText(`D (${uds}V)`, w - 70, oxideY - 5);
+            ctx.fillText(`G (${ugs}V)`, w/2 - 20, gateY - 5);
+            
+            // 3. Tlenek (Oxide)
+            ctx.fillStyle = '#fbbf24'; // Yellowish insulator
+            ctx.fillRect(70, gateY + 5, w - 140, oxideY - (gateY + 5));
+            
+            // 4. Bramka (Gate)
+            ctx.fillStyle = '#374151';
+            ctx.fillRect(70, gateY, w - 140, 5);
+
+            // 5. KANAŁ (Channel) - The Core Visualization
+            // Logic: Channel depth depends on V_local - Vt.
+            // At Source: Depth ~ Ugs - Ut
+            // At Drain: Depth ~ Ugd - Ut = (Ugs - Uds) - Ut
+            
+            const maxDepth = 30;
+            let depthSource = 0;
+            let depthDrain = 0;
+            
+            if (ugs > ut) {
+                depthSource = Math.min(maxDepth, (ugs - ut) * 5);
+            }
+            
+            // Ugd = Ugs - Uds
+            let ugd = ugs - uds;
+            if (ugd > ut) {
+                depthDrain = Math.min(maxDepth, (ugd - ut) * 5);
+            } else {
+                depthDrain = 0; // Pinch off!
+            }
+            
+            if (depthSource > 0) {
+                ctx.fillStyle = '#ef4444'; // Red channel (electrons)
+                ctx.beginPath();
+                ctx.moveTo(70, oxideY);
+                ctx.lineTo(70, oxideY + depthSource); // Depth at source
+                ctx.lineTo(w - 70, oxideY + depthDrain); // Depth at drain
+                ctx.lineTo(w - 70, oxideY);
+                ctx.fill();
+            }
+            
+            // Pinch off indication
+            if (depthSource > 0 && depthDrain <= 0.1) {
+                ctx.fillStyle = 'red';
+                ctx.fillText('PINCH OFF', w - 120, oxideY + 40);
+            }
+        }
+
+        function updateMosVis() {
+            const ugs = parseFloat(document.getElementById('mos-ugs').value);
+            const uds = parseFloat(document.getElementById('mos-uds').value);
+            const ut = parseFloat(document.getElementById('mos-ut').value);
+            
+            document.getElementById('val-ugs').innerText = ugs + 'V';
+            document.getElementById('val-uds').innerText = uds + 'V';
+            document.getElementById('val-ut').innerText = ut + 'V';
+            
+            const statusEl = document.getElementById('mos-status');
+            
+            let statusText = "";
+            let saturation = false;
+            
+            if (ugs < ut) {
+                statusText = "STAN BLOKADY (Cut-off). Brak kanału.";
+                statusEl.className = "p-3 rounded-md font-mono text-sm bg-gray-200 text-gray-500";
+            } else {
+                if ((ugs - ut) > uds) {
+                    statusText = "ZAKRES LINIOWY (Trioda). Kanał ciągły.";
+                    statusEl.className = "p-3 rounded-md font-mono text-sm bg-blue-100 text-blue-800";
+                } else {
+                    statusText = "NASYCENIE (Saturation). Pinch-off przy drenie.";
+                    statusEl.className = "p-3 rounded-md font-mono text-sm bg-red-100 text-red-800";
+                    saturation = true;
+                }
+            }
+            statusEl.innerHTML = `<strong>${statusText}</strong><br>Warunek nasycenia: $u_{DS} \\ge u_{GS} - U_T$<br> ${uds}V ${saturation ? '≥' : '<'} ${(ugs - ut).toFixed(1)}V`;
+
+            drawMos(ugs, uds, ut);
+        }
+
+        // --- SEKCJA 2: RC Chart ---
+        let rcChartInstance = null;
+
+        function calculateRC() {
+            const u0 = parseFloat(document.getElementById('rc-u0').value);
+            const target = parseFloat(document.getElementById('rc-target').value);
+            const thalf = parseFloat(document.getElementById('rc-thalf').value);
+            
+            // Formula: u(t) = u0 * (1/2)^(t/thalf)
+            // Need to solve for t: target/u0 = 0.5^(t/thalf)
+            // log(target/u0) = (t/thalf) * log(0.5)
+            // t = thalf * [ log(target/u0) / log(0.5) ]
+            
+            let resultTime = 0;
+            if (target > 0 && u0 > 0 && target <= u0) {
+                 resultTime = thalf * (Math.log(target/u0) / Math.log(0.5));
+            } else {
+                resultTime = 0;
+            }
+
+            document.getElementById('rc-result').innerText = `Czas: ${resultTime.toFixed(2)} s`;
+            
+            // Generate Data for Chart
+            const labels = [];
+            const data = [];
+            const maxTime = Math.ceil(resultTime * 1.5) || 10;
+            
+            for(let t=0; t<=maxTime; t+=0.1) {
+                labels.push(t.toFixed(1));
+                const val = u0 * Math.pow(0.5, t/thalf);
+                data.push(val);
+            }
+
+            const ctxChart = document.getElementById('rcChart').getContext('2d');
+            
+            if (rcChartInstance) {
+                rcChartInstance.destroy();
+            }
+
+            rcChartInstance = new Chart(ctxChart, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Napięcie u(t)',
+                        data: data,
+                        borderColor: 'rgb(22, 163, 74)',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        fill: true,
+                        pointRadius: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    yMin: target,
+                                    yMax: target,
+                                    borderColor: 'red',
+                                    borderWidth: 2,
+                                    label: { content: 'Target', enabled: true }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Czas [s]' } },
+                        y: { title: { display: true, text: 'Napięcie [V]' } }
+                    }
+                }
+            });
+        }
+
+        // --- SEKCJA 3: RL Logic ---
+        function setRLState(state) {
+            const lSymbol = document.getElementById('l-symbol');
+            const lLabel = document.getElementById('l-label');
+            const explanation = document.getElementById('rl-explanation');
+            const voltmeter = document.getElementById('voltmeter');
+
+            if (state === 'steady') {
+                // Steady State behavior: Inductor acts as Short Circuit
+                lSymbol.className = "w-full h-1 bg-purple-600 mt-2 transition-all duration-500"; // Solid wire
+                lSymbol.style.border = "none";
+                lLabel.innerText = "Cewka (Zwarcie)";
+                explanation.innerHTML = "<strong>Stan Ustalony (t → ∞):</strong> Dla prądu stałego cewka idealna nie stawia oporu ($X_L = 2\\pi f L$, dla DC $f=0 \Rightarrow X_L=0$). Napięcie na idealnej cewce $u_L = L \\frac{di}{dt} = 0$. <br>Zatem całe napięcie odkłada się na rezystorze (lub prąd płynie jak przez drut).";
+                voltmeter.innerText = "U_L = 0V";
+                voltmeter.classList.remove('opacity-0');
+            } else {
+                // Transient behavior
+                lSymbol.className = "w-12 h-4 border-b-4 border-dotted border-purple-600 rounded-full mt-1 transition-all duration-500"; // Coil symbol
+                lLabel.innerText = "Cewka L";
+                explanation.innerHTML = "<strong>Stan Nieustalony:</strong> Prąd się zmienia, cewka indukuje napięcie przeciwdziałające zmianom. $u_L(t) \\neq 0$.";
+                voltmeter.classList.add('opacity-0');
+            }
+        }
+
+        // --- SEKCJA 4: Digital Helpers ---
+        function toggleFact(el, isTrue) {
+            const detail = el.querySelector('div');
+            detail.classList.toggle('hidden');
+        }
+
+        function calcBits() {
+            const n = document.getElementById('bits-input').value;
+            const res = Math.pow(2, n);
+            document.getElementById('bits-output').innerText = res.toLocaleString();
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Init
+        window.onload = function() {
+            updateMosVis();
+            calculateRC();
+        };
+
+    </script>
+</body>
+</html>
