@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktywny Przewodnik POMAK | Montaż Elektroniczny</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* Stone 100 - Warm Neutral */
+            color: #1c1917; /* Stone 900 */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e7e5e4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a8a29e; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #78716c; 
+        }
+
+        /* Chart Container Rules - MANDATORY */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Animation utilities */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-active {
+            background-color: #e7e5e4; /* Stone 200 */
+            border-left: 4px solid #0d9488; /* Teal 600 */
+            font-weight: 600;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutral (Stone background) with Teal accents for technical precision and Slate for text. -->
+    <!-- Application Structure Plan: The app uses a Dashboard Layout. Left sidebar for navigation (collapsible on mobile). 
+         Content is divided into 4 logical modules: 
+         1. 'Materiały' (Materials) - Comparative analysis of PCB substrates.
+         2. 'Fizyka' (Physics) - Interactive explanations of thermal concepts basic to assembly.
+         3. 'Procesy' (Processes) - Manufacturing workflows (PCB, Soldering, Microassembly).
+         4. 'Quiz' - Self-assessment based on the source questions.
+         Why? This flow moves from "What we use" to "How it works physically" to "How we build it", ending with verification. -->
+    <!-- Visualization & Content Choices: 
+         1. Materials: Chart.js Bar Chart comparing Thermal Conductivity of FR-4 vs Ceramics to highlight why ceramics are used in microelectronics (Goal: Compare).
+         2. Physics: Interactive HTML5 Canvas particle simulation to visually demonstrate 'Kinetic Temperature' (Goal: Change/Inform).
+         3. Processes: Chart.js Line Chart simulating a Reflow Profile with interactive phases to explain soldering (Goal: Inform/Change).
+         4. Content: Accordions and Cards for text density management. NO SVG or Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased h-screen flex overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden fixed w-full z-50 bg-stone-100 border-b border-stone-200 flex justify-between items-center p-4">
+        <h1 class="text-lg font-bold text-stone-800">POMAK Guide</h1>
+        <button id="mobile-menu-btn" class="text-stone-600 focus:outline-none p-2 border border-stone-300 rounded">
+            Menu
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="bg-white w-64 flex-shrink-0 border-r border-stone-200 flex flex-col h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 fixed md:relative z-40 pt-16 md:pt-0">
+        <div class="p-6 border-b border-stone-100 hidden md:block">
+            <h1 class="text-2xl font-bold text-stone-800 tracking-tight">POMAK<span class="text-teal-600">.edu</span></h1>
+            <p class="text-xs text-stone-500 mt-1">Podstawy Montażu</p>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li>
+                    <button onclick="navigate('dashboard')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 hover:text-teal-700 transition-colors nav-active" data-target="dashboard">
+                        Wstęp i Przegląd
+                    </button>
+                </li>
+                <li>
+                    <button onclick="navigate('materials')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 hover:text-teal-700 transition-colors" data-target="materials">
+                        1. Materiały i Podłoża
+                    </button>
+                </li>
+                <li>
+                    <button onclick="navigate('physics')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 hover:text-teal-700 transition-colors" data-target="physics">
+                        2. Fizyka Ciepła
+                    </button>
+                </li>
+                <li>
+                    <button onclick="navigate('processes')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 hover:text-teal-700 transition-colors" data-target="processes">
+                        3. Procesy i Montaż
+                    </button>
+                </li>
+                <li>
+                    <button onclick="navigate('quiz')" class="nav-item w-full text-left px-6 py-3 text-stone-600 hover:bg-stone-50 hover:text-teal-700 transition-colors" data-target="quiz">
+                        Sprawdź Wiedzę (Quiz)
+                    </button>
+                </li>
+            </ul>
+        </nav>
+        <div class="p-4 border-t border-stone-100 bg-stone-50">
+            <p class="text-xs text-stone-400 text-center">Na podstawie pytań egzaminacyjnych POMAK</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto bg-stone-50 pt-16 md:pt-0 relative w-full" id="main-content">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="dashboard" class="p-6 md:p-10 max-w-7xl mx-auto fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Witaj w interaktywnym skrypcie</h2>
+                <p class="text-stone-600 max-w-2xl">
+                    Ten panel służy do nauki i powtórzenia materiału z zakresu Podstaw Montażu Aparatury Elektronicznej (POMAK).
+                    Wybierz moduł z menu, aby zgłębić wiedzę o materiałach, fizyce procesów oraz technologiach montażu.
+                </p>
+            </div>
+
+            <!-- Quick Stats/Overview Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 card-hover cursor-pointer" onclick="navigate('materials')">
+                    <div class="text-teal-600 font-bold text-sm uppercase mb-2">Materiały</div>
+                    <h3 class="text-xl font-semibold mb-2">Laminaty i Ceramika</h3>
+                    <p class="text-sm text-stone-500">Poznaj różnice między FR-4 a podłożami ceramicznymi AlN czy BeO.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 card-hover cursor-pointer" onclick="navigate('physics')">
+                    <div class="text-indigo-600 font-bold text-sm uppercase mb-2">Fizyka</div>
+                    <h3 class="text-xl font-semibold mb-2">Termodynamika</h3>
+                    <p class="text-sm text-stone-500">Kinetyczna teoria ciepła, konwekcja, radiacja i bariery hydrodynamiczne.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 card-hover cursor-pointer" onclick="navigate('processes')">
+                    <div class="text-amber-600 font-bold text-sm uppercase mb-2">Technologia</div>
+                    <h3 class="text-xl font-semibold mb-2">Lutowanie i SMT</h3>
+                    <p class="text-sm text-stone-500">Profile lutownicze, wady montażu, flip-chip i wire bonding.</p>
+                </div>
+            </div>
+
+            <div class="bg-teal-900 rounded-2xl p-8 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-bold mb-4">Gotowy na test?</h3>
+                    <p class="mb-6 text-teal-100 max-w-lg">Sprawdź swoją wiedzę rozwiązując quiz oparty na 23 pytaniach egzaminacyjnych.</p>
+                    <button onclick="navigate('quiz')" class="bg-white text-teal-900 px-6 py-2 rounded-lg font-semibold hover:bg-teal-50 transition-colors">
+                        Rozpocznij Quiz
+                    </button>
+                </div>
+                <!-- Decorative Circle -->
+                <div class="absolute -right-10 -bottom-20 w-64 h-64 bg-teal-800 rounded-full opacity-50"></div>
+            </div>
+        </section>
+
+        <!-- MATERIALS VIEW -->
+        <section id="materials" class="p-6 md:p-10 max-w-7xl mx-auto hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Materiały i Podłoża</h2>
+                <p class="text-stone-600">
+                    Wybór odpowiedniego materiału podłoża jest kluczowy dla niezawodności urządzenia. 
+                    W tej sekcji porównujemy popularne laminaty PCB z zaawansowaną ceramiką stosowaną w mikroelektronice.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Data Visualization Column -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col">
+                    <h3 class="text-lg font-semibold mb-4 text-stone-800">Przewodność Cieplna: Laminaty vs Ceramika</h3>
+                    <p class="text-sm text-stone-500 mb-4">Dlaczego w mikroelektronice używamy ceramiki? Zobacz różnicę w odprowadzaniu ciepła.</p>
+                    <div class="flex-grow flex items-center justify-center">
+                        <div class="chart-container">
+                            <canvas id="materialsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-stone-400 text-center">
+                        Wartości przybliżone [W/mK]. FR-4 jest izolatorem cieplnym w porównaniu do ceramiki.
+                    </div>
+                </div>
+
+                <!-- Content Column -->
+                <div class="space-y-6">
+                    <!-- Laminates Card -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-bold text-teal-700 mb-3 border-b border-stone-100 pb-2">Laminaty PCB</h3>
+                        <ul class="space-y-3 text-sm text-stone-700">
+                            <li><strong class="text-stone-900">FR-4:</strong> Żywica epoksydowa + włókno szklane. Standard przemysłowy.</li>
+                            <li><strong class="text-stone-900">FR-2/FR-3:</strong> Papierowo-fenolowe. Tanie, do prostej elektroniki użytkowej.</li>
+                            <li><strong class="text-stone-900">Teflon (PTFE):</strong> Niskie straty dielektryczne. Kluczowe dla w.cz. (wysokich częstotliwości).</li>
+                            <li><strong class="text-stone-900">Parametry:</strong>
+                                <ul class="list-disc pl-5 mt-1 text-stone-500">
+                                    <li><strong>Tg (Temp. zeszklenia):</strong> Zmiana ze stanu twardego w plastyczny.</li>
+                                    <li><strong>CTE:</strong> Rozszerzalność cieplna (ważna w osi Z dla przelotek).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Ceramics Card -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-bold text-amber-700 mb-3 border-b border-stone-100 pb-2">Ceramika (Mikroelektronika)</h3>
+                        <ul class="space-y-3 text-sm text-stone-700">
+                            <li><strong class="text-stone-900">Alumina (Al₂O₃):</strong> Tlenek glinu. Standardowe podłoże hybrydowe.</li>
+                            <li><strong class="text-stone-900">Azotek Glinu (AlN):</strong> Bardzo wysoka przewodność cieplna.</li>
+                            <li><strong class="text-stone-900">Tlenek Berylu (BeO):</strong> Świetne ciepło, ale toksyczny.</li>
+                            <li><strong class="text-stone-900">Kluczowe cechy:</strong> Stabilność wymiarowa, gładkość powierzchni, dopasowanie CTE do krzemu.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHYSICS VIEW -->
+        <section id="physics" class="p-6 md:p-10 max-w-7xl mx-auto hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Fizyka Procesów Cieplnych</h2>
+                <p class="text-stone-600">
+                    Zrozumienie temperatury i przepływu ciepła jest niezbędne do zaprojektowania poprawnego procesu lutowania.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Interactive Kinetic Temp Simulation -->
+                <div class="bg-stone-900 rounded-xl p-6 shadow-md text-white flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-teal-400">Symulator Temperatury Kinetycznej</h3>
+                        <span class="text-xs bg-stone-700 px-2 py-1 rounded">Interaktywny</span>
+                    </div>
+                    <p class="text-sm text-stone-400 mb-4">
+                        Temperatura kinetyczna to miara średniej energii ruchu cząsteczek. Zwiększ "Energię Termiczną", aby zobaczyć efekt.
+                    </p>
+                    
+                    <div class="chart-container bg-black border border-stone-700 rounded-lg overflow-hidden mb-4 relative" style="height: 250px;">
+                        <canvas id="particleCanvas"></canvas>
+                    </div>
+
+                    <div class="mt-auto">
+                        <label class="block text-xs uppercase tracking-wide text-stone-500 mb-2">Poziom Energii Termicznej</label>
+                        <input type="range" id="tempSlider" min="1" max="10" value="2" class="w-full h-2 bg-stone-700 rounded-lg appearance-none cursor-pointer accent-teal-500">
+                        <div class="flex justify-between text-xs text-stone-500 mt-1">
+                            <span>Zimno (Niska energia)</span>
+                            <span>Gorąco (Wysoka energia)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Heat Transfer Theory -->
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-lg border border-stone-200 hover:border-teal-400 transition-colors">
+                        <h4 class="font-bold text-lg mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center mr-3 text-sm">1</span>
+                            Kondukcja (Przewodzenie)
+                        </h4>
+                        <p class="text-sm text-stone-600">Przekazywanie energii przez bezpośredni kontakt ciał stałych. Opisuje to Prawo Fouriera. Kluczowe przy lutowaniu ręcznym (grot dotyka pola).</p>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-lg border border-stone-200 hover:border-teal-400 transition-colors">
+                        <h4 class="font-bold text-lg mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mr-3 text-sm">2</span>
+                            Konwekcja
+                        </h4>
+                        <p class="text-sm text-stone-600">Ruch ciepła wraz z ruchem materii (gazu/cieczy). Wymuszona wentylatorami w piecach rozpływowych zapewnia równomierne grzanie.</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-lg border border-stone-200 hover:border-teal-400 transition-colors">
+                        <h4 class="font-bold text-lg mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center mr-3 text-sm">3</span>
+                            Radiacja (Promieniowanie)
+                        </h4>
+                        <p class="text-sm text-stone-600">Transport energii falami elektromagnetycznymi (IR). Działa nawet w próżni. Wykorzystywana w piecach IR i termowizji.</p>
+                    </div>
+
+                    <div class="bg-stone-100 p-4 rounded border border-stone-200">
+                        <h4 class="font-bold text-sm text-stone-700">Ważne pojęcie: Bariera Hydrodynamiczna</h4>
+                        <p class="text-xs text-stone-500 mt-1">Cienka warstwa "nieruchomego" płynu przy powierzchni ciała stałego. Utrudnia mycie podzespołów i wymianę ciepła.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROCESSES VIEW -->
+        <section id="processes" class="p-6 md:p-10 max-w-7xl mx-auto hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Procesy Wytwarzania i Montażu</h2>
+                <p class="text-stone-600">
+                    Od trawienia ścieżek po zaawansowany montaż Flip-Chip.
+                </p>
+            </div>
+
+            <!-- Tab Navigation for Processes -->
+            <div class="flex space-x-2 border-b border-stone-200 mb-6 overflow-x-auto">
+                <button class="px-4 py-2 text-sm font-medium text-teal-600 border-b-2 border-teal-600 focus:outline-none process-tab-btn" onclick="switchProcessTab('pcb', this)">PCB Fabrykacja</button>
+                <button class="px-4 py-2 text-sm font-medium text-stone-500 hover:text-stone-700 focus:outline-none process-tab-btn" onclick="switchProcessTab('soldering', this)">Lutowanie</button>
+                <button class="px-4 py-2 text-sm font-medium text-stone-500 hover:text-stone-700 focus:outline-none process-tab-btn" onclick="switchProcessTab('assembly', this)">Montaż Zaawansowany</button>
+            </div>
+
+            <!-- PCB FAB TAB -->
+            <div id="pcb-tab" class="process-content">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 mb-6">
+                    <h3 class="text-xl font-bold mb-4">Metoda Subtraktywna (Fotolitografia)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-2 text-center text-xs">
+                        <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                            <div class="font-bold text-lg mb-1">1</div>
+                            Fotorezyst na laminacie
+                        </div>
+                        <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                            <div class="font-bold text-lg mb-1">2</div>
+                            Naświetlanie (Maska)
+                        </div>
+                        <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                            <div class="font-bold text-lg mb-1">3</div>
+                            Wywoływanie
+                        </div>
+                        <div class="p-3 bg-red-50 rounded border border-red-100 text-red-800">
+                            <div class="font-bold text-lg mb-1">4</div>
+                            Trawienie Miedzi
+                        </div>
+                        <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                            <div class="font-bold text-lg mb-1">5</div>
+                            Stripping (Usuwanie)
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-stone-600">
+                        <p><strong>Wielowarstwowe PCB:</strong> Powstają przez prasowanie (laminację) "rdzeni" (wewnętrznych warstw wytrawionych) przekładanych prepregiem (żywicą w fazie B), a następnie wiercenie i metalizację przelotek.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOLDERING TAB -->
+            <div id="soldering-tab" class="process-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Profile Chart -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-lg font-bold mb-2">Profil Lutowania Rozpływowego</h3>
+                        <p class="text-xs text-stone-500 mb-4">Typowy profil dla stopu SAC (Bezołowiowy). Najedź na wykres.</p>
+                        <div class="chart-container">
+                            <canvas id="reflowChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Comparison & Issues -->
+                    <div class="space-y-4">
+                        <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                            <h4 class="font-bold text-indigo-800 text-sm mb-2">Fala vs Rozpływ</h4>
+                            <ul class="text-xs space-y-2 text-indigo-900">
+                                <li><strong>Fala:</strong> "Fontanna" cyny. Główne do THT.</li>
+                                <li><strong>Rozpływ:</strong> Pasta + Piec. Główne do SMT.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-rose-50 p-4 rounded-lg border border-rose-100">
+                            <h4 class="font-bold text-rose-800 text-sm mb-2">Typowe Wady</h4>
+                            <div class="text-xs space-y-1 text-rose-900">
+                                <p><strong>Zimny Lut:</strong> Matowy, brak połączenia.</p>
+                                <p><strong>Mostek:</strong> Zwarcie dwóch pól.</p>
+                                <p><strong>Tombstoning:</strong> Element "wstaje" pionowo.</p>
+                                <p><strong>Wiskersy:</strong> Cienkie wąsy cynowe.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                            <h4 class="font-bold text-amber-800 text-sm mb-2">Topnik & Eutektyk</h4>
+                            <p class="text-xs text-amber-900 mb-1"><strong>Topnik:</strong> Usuwa tlenki, poprawia zwilżanie.</p>
+                            <p class="text-xs text-amber-900"><strong>Stop Eutektyczny:</strong> Topi się w jednej, najniższej temp. (np. Sn63Pb37).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ASSEMBLY TAB -->
+            <div id="assembly-tab" class="process-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-lg font-bold text-stone-800 mb-3">Flip-Chip</h3>
+                        <p class="text-sm text-stone-600 mb-3">
+                            Chip odwrócony "do góry nogami". Łączony bezpośrednio wypustkami (bumps) do podłoża.
+                        </p>
+                        <ul class="text-sm list-disc pl-5 text-stone-500">
+                            <li>Najkrótsza droga sygnału (dobre dla w.cz.).</li>
+                            <li>Wysoka gęstość upakowania.</li>
+                            <li>Droższe wdrożenie niż Wire Bonding.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-lg font-bold text-stone-800 mb-3">Wire Bonding (Montaż Drutowy)</h3>
+                        <p class="text-sm text-stone-600 mb-3">
+                            Klasyczne łączenie chipa złotym drutem.
+                        </p>
+                        <ul class="text-sm list-disc pl-5 text-stone-500">
+                            <li>Elastyczność (łatwa zmiana projektu).</li>
+                            <li>Tanie oprzyrządowanie.</li>
+                            <li>Wolniejszy proces (sekwencyjny).</li>
+                            <li>Większa indukcyjność (drut to cewka).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 md:col-span-2">
+                        <h3 class="text-lg font-bold text-stone-800 mb-2">Klej Anizotropowy (ACF)</h3>
+                        <p class="text-sm text-stone-600">
+                            Specjalny materiał łączący, który przewodzi prąd <strong>tylko w osi Z</strong> (docisku), a izoluje w płaszczyźnie X-Y. Używany np. do łączenia taśm flex z ekranami LCD (Flex-on-Glass).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ VIEW -->
+        <section id="quiz" class="p-6 md:p-10 max-w-3xl mx-auto hidden fade-in">
+            <div class="mb-8 border-b border-stone-200 pb-4">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Sprawdź Wiedzę</h2>
+                <div class="flex justify-between items-end">
+                    <p class="text-stone-600">Odpowiedz na pytania, aby przetestować zrozumienie materiału.</p>
+                    <div id="quiz-score" class="text-2xl font-bold text-teal-600 hidden">Wynik: 0/0</div>
+                </div>
+            </div>
+
+            <div id="quiz-container" class="space-y-6">
+                <!-- Question Card Template -->
+                <div class="bg-white p-8 rounded-xl shadow-md border border-stone-200 text-center py-12">
+                    <button onclick="startQuiz()" class="bg-teal-600 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-teal-700 transition shadow-lg">Rozpocznij Test</button>
+                </div>
+            </div>
+            
+            <div id="quiz-controls" class="mt-6 flex justify-between hidden">
+                <button id="prev-q" class="text-stone-500 hover:text-stone-800 disabled:opacity-30">Poprzednie</button>
+                <button id="next-q" class="bg-stone-800 text-white px-4 py-2 rounded hover:bg-stone-900">Następne</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- DATA STORE ---
+        
+        // Questions based on Source Report
+        const quizData = [
+            { q: "Który laminat jest najczęściej stosowany w standardowej elektronice?", options: ["Teflon", "FR-4", "Ceramika", "Papier"], answer: 1, explanation: "FR-4 (żywica epoksydowa + włókno szklane) to standard przemysłowy." },
+            { q: "Jaka cecha jest kluczowa dla ceramiki w mikroelektronice?", options: ["Niska cena", "Elastyczność", "Wysoka przewodność cieplna", "Łatwość wiercenia"], answer: 2, explanation: "Ceramika (Alumina, AlN) świetnie odprowadza ciepło z układów scalonych." },
+            { q: "Czym jest temperatura kinetyczna?", options: ["Temp. topnienia lutowia", "Miara energii ruchu cząsteczek", "Temp. otoczenia", "Temp. zamarzania"], answer: 1, explanation: "To miara średniej energii kinetycznej ruchu postępowego cząsteczek." },
+            { q: "Prawo Fouriera opisuje zjawisko:", options: ["Konwekcji", "Radiacji", "Przewodnictwa (Kondukcji)", "Parowania"], answer: 2, explanation: "Prawo Fouriera dotyczy przepływu ciepła przez przewodzenie w ciałach stałych." },
+            { q: "Co to jest stop eutektyczny?", options: ["Stop o najwyższej temp. topnienia", "Stop o jednym punkcie topnienia (najniższym)", "Stop z dodatkiem złota", "Stop, który nie przewodzi prądu"], answer: 1, explanation: "Eutektyk topi się i krzepnie w jednej, stałej temperaturze bez fazy ciastowatej." },
+            { q: "Jaka jest funkcja topnika?", options: ["Chłodzenie spoiny", "Usuwanie tlenków i poprawa zwilżalności", "Zwiększanie rezystancji", "Tworzenie obudowy"], answer: 1, explanation: "Topnik usuwa tlenki z powierzchni metali i ułatwia zwilżanie lutowiem." },
+            { q: "Wada 'Tombstoning' (efekt nagrobkowy) polega na:", options: ["Zmatowieniu lutu", "Pęknięciu płytki", "Pionowym podniesieniu się elementu", "Zwarciu nóżek"], answer: 2, explanation: "Nierówne siły napięcia powierzchniowego stawiają element dęba." },
+            { q: "Metoda montażu bez użycia drutów (bondingowych) to:", options: ["Wire Bonding", "Flip-Chip", "THT", "Lutowanie ręczne"], answer: 1, explanation: "Flip-Chip łączy strukturę 'do góry nogami' bezpośrednio przez wypustki (bumps)." },
+            { q: "Klej anizotropowy (ACF) przewodzi prąd:", options: ["We wszystkich kierunkach", "Tylko w osi Z (docisku)", "Tylko w poziomie", "Nie przewodzi wcale"], answer: 1, explanation: "Przewodzi tylko w osi ściskania (Z), izolując sąsiednie ścieżki." }
+        ];
+
+        // --- CHART JS CONFIG ---
+        
+        let materialsChart, reflowChart;
+
+        function initCharts() {
+            // 1. Materials Chart
+            const ctxMat = document.getElementById('materialsChart').getContext('2d');
+            materialsChart = new Chart(ctxMat, {
+                type: 'bar',
+                data: {
+                    labels: ['FR-4 (Laminat)', 'Alumina (Ceramika)', 'AlN (Azotek Glinu)', 'BeO (Tlenek Berylu)'],
+                    datasets: [{
+                        label: 'Przewodność Cieplna [W/mK]',
+                        data: [0.3, 25, 170, 260],
+                        backgroundColor: [
+                            'rgba(120, 113, 108, 0.5)', // Stone
+                            'rgba(217, 119, 6, 0.6)',   // Amber
+                            'rgba(13, 148, 136, 0.6)',  // Teal
+                            'rgba(225, 29, 72, 0.6)'    // Rose
+                        ],
+                        borderColor: [
+                            'rgba(120, 113, 108, 1)',
+                            'rgba(217, 119, 6, 1)',
+                            'rgba(13, 148, 136, 1)',
+                            'rgba(225, 29, 72, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            type: 'logarithmic', // Using log scale because differences are huge
+                            title: { display: true, text: 'W/mK (Skala Logarytmiczna)' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' W/mK - ' + (context.parsed.y > 10 ? 'Wysoka (Ceramika)' : 'Niska (Izolator)');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Reflow Profile Chart
+            const ctxReflow = document.getElementById('reflowChart').getContext('2d');
+            reflowChart = new Chart(ctxReflow, {
+                type: 'line',
+                data: {
+                    labels: ['0s', '60s', '120s', '150s', '180s', '210s', '240s', '300s'],
+                    datasets: [{
+                        label: 'Temperatura Profilu [°C]',
+                        data: [25, 150, 170, 200, 217, 245, 217, 50],
+                        borderColor: '#dc2626', // Red 600
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        annotation: {
+                            // Note: Annotation plugin not loaded to keep simple, using tooltips
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.parsed.y + '°C';
+                                    if (context.parsed.x < 2) return label + ' (Podgrzewanie)';
+                                    if (context.parsed.x < 4) return label + ' (Aktywacja Topnika)';
+                                    if (context.parsed.x < 6) return label + ' (Reflow - Topnienie)';
+                                    return label + ' (Chłodzenie)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Temperatura [°C]' },
+                            suggestedMax: 260
+                        },
+                        x: {
+                            title: { display: true, text: 'Czas' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- PARTICLE SIMULATION (Kinetic Temp) ---
+        let animationId;
+        function initParticleSim() {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            const slider = document.getElementById('tempSlider');
+            
+            // Resize canvas to container
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            const particles = [];
+            const particleCount = 50;
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 2;
+                    this.vy = (Math.random() - 0.5) * 2;
+                    this.size = 3;
+                }
+
+                update(speedMultiplier) {
+                    this.x += this.vx * speedMultiplier;
+                    this.y += this.vy * speedMultiplier;
+
+                    // Bounce
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    // Color shifts from Blue (Cold) to Red (Hot)
+                    const speed = parseFloat(slider.value);
+                    const r = Math.min(255, speed * 25);
+                    const b = Math.max(0, 255 - speed * 25);
+                    ctx.fillStyle = `rgb(${r}, 50, ${b})`;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Background grid effect
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                for(let i=0; i<canvas.width; i+=40) { ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); }
+                for(let i=0; i<canvas.height; i+=40) { ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); }
+                ctx.stroke();
+
+                const speedMult = parseFloat(slider.value) * 0.8;
+                
+                particles.forEach(p => {
+                    p.update(speedMult);
+                    p.draw();
+                });
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            animate();
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                 canvas.width = canvas.parentElement.clientWidth;
+                 canvas.height = canvas.parentElement.clientHeight;
+            });
+        }
+
+
+        // --- NAVIGATION LOGIC ---
+        function navigate(targetId) {
+            // 1. Hide all sections
+            document.querySelectorAll('main > section').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // 2. Show target
+            const target = document.getElementById(targetId);
+            if(target) {
+                target.classList.remove('hidden');
+                // Trigger re-render of charts if hidden previously to fix size
+                if(targetId === 'materials' && materialsChart) materialsChart.resize();
+                if(targetId === 'processes' && reflowChart) reflowChart.resize();
+            }
+
+            // 3. Update Nav UI
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('nav-active', 'bg-stone-50', 'text-teal-700', 'font-semibold');
+                el.classList.add('text-stone-600');
+                if(el.dataset.target === targetId) {
+                    el.classList.add('nav-active', 'text-teal-700');
+                    el.classList.remove('text-stone-600');
+                }
+            });
+
+            // 4. Mobile: close menu
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+            }
+
+            // 5. Init specific logic
+            if(targetId === 'physics') {
+                if(!animationId) initParticleSim(); 
+            }
+        }
+
+        // --- TAB LOGIC ---
+        function switchProcessTab(tabName, btnElement) {
+            // Hide all contents
+            document.querySelectorAll('.process-content').forEach(el => el.classList.add('hidden'));
+            // Show target
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // Update buttons
+            document.querySelectorAll('.process-tab-btn').forEach(btn => {
+                btn.classList.remove('text-teal-600', 'border-b-2', 'border-teal-600');
+                btn.classList.add('text-stone-500');
+            });
+            btnElement.classList.remove('text-stone-500');
+            btnElement.classList.add('text-teal-600', 'border-b-2', 'border-teal-600');
+
+            if(tabName === 'soldering' && reflowChart) reflowChart.resize();
+        }
+
+        // --- QUIZ LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+
+        function startQuiz() {
+            currentQIndex = 0;
+            score = 0;
+            document.getElementById('quiz-score').classList.add('hidden');
+            document.getElementById('quiz-controls').classList.remove('hidden');
+            document.getElementById('quiz-controls').classList.add('flex');
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('quiz-container');
+            const q = quizData[currentQIndex];
+            
+            let html = `
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 fade-in">
+                    <div class="text-xs text-stone-400 uppercase tracking-widest mb-2">Pytanie ${currentQIndex + 1} / ${quizData.length}</div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-6">${q.q}</h3>
+                    <div class="space-y-3">
+            `;
+            
+            q.options.forEach((opt, idx) => {
+                html += `
+                    <button onclick="checkAnswer(${idx}, this)" class="w-full text-left p-4 rounded-lg border border-stone-200 hover:bg-stone-50 transition-colors quiz-opt-btn">
+                        ${opt}
+                    </button>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <div id="explanation-box" class="hidden mt-4 p-4 bg-stone-100 rounded text-sm text-stone-700 border-l-4 border-stone-400">
+                        <p><strong>Wyjaśnienie:</strong> ${q.explanation}</p>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Update buttons state
+            document.getElementById('prev-q').disabled = currentQIndex === 0;
+            document.getElementById('next-q').innerText = currentQIndex === quizData.length - 1 ? 'Zakończ' : 'Następne';
+            document.getElementById('next-q').onclick = nextQuestion;
+        }
+
+        function checkAnswer(selectedIdx, btn) {
+            // Disable all buttons
+            document.querySelectorAll('.quiz-opt-btn').forEach(b => b.disabled = true);
+            
+            const q = quizData[currentQIndex];
+            const correctIdx = q.answer;
+            
+            if(selectedIdx === correctIdx) {
+                btn.classList.add('bg-teal-100', 'border-teal-500', 'text-teal-800');
+                score++;
+            } else {
+                btn.classList.add('bg-rose-100', 'border-rose-500', 'text-rose-800');
+                // Highlight correct
+                document.querySelectorAll('.quiz-opt-btn')[correctIdx].classList.add('bg-teal-50', 'border-teal-300');
+            }
+            
+            document.getElementById('explanation-box').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if(currentQIndex < quizData.length - 1) {
+                currentQIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const container = document.getElementById('quiz-container');
+            const percent = Math.round((score / quizData.length) * 100);
+            
+            let msg = percent > 70 ? "Świetna robota! Jesteś gotowy na egzamin." : "Warto powtórzyć materiał.";
+            let color = percent > 70 ? "text-teal-600" : "text-amber-600";
+
+            container.innerHTML = `
+                <div class="bg-white p-10 rounded-xl shadow-md border border-stone-200 text-center fade-in">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-2">Quiz Zakończony</h3>
+                    <div class="text-6xl font-bold ${color} my-6">${percent}%</div>
+                    <p class="text-stone-600 mb-6">Twój wynik: ${score} z ${quizData.length} poprawnych.<br>${msg}</p>
+                    <button onclick="navigate('dashboard')" class="text-stone-500 hover:text-stone-800 underline">Wróć do menu</button>
+                    <button onclick="startQuiz()" class="ml-4 bg-stone-800 text-white px-6 py-2 rounded hover:bg-stone-900">Spróbuj ponownie</button>
+                </div>
+            `;
+            document.getElementById('quiz-controls').classList.add('hidden');
+        }
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('-translate-x-full');
+            });
+        });
+
+    </script>
+</body>
+</html>
