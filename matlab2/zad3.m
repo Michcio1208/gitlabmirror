@@ -1,0 +1,21 @@
+clear variables
+clc
+close all
+function F = Fibonacci(N) 
+    if N < 1 
+        F = [];
+        return;
+    end
+    
+    F = zeros(1, N);
+    F(1) = 1;
+    if N > 1
+        F(2) = 1;
+    end
+    
+    for k = 3:N
+        F(k) = F(k-1) + F(k-2);
+    end
+end
+x = input('Podaj liczbę elementów ciągu Fibonacciego do wygenerowania: ');
+Fibonacci(x)
