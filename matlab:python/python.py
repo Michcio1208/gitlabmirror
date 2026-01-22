@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 1. Wczytanie danych [cite: 78]
+# 1. Wczytanie danych
 # Plik zawiera jedną liczbę w linii, wczytujemy do tablicy numpy
 data = np.loadtxt('covid1.txt')
 
