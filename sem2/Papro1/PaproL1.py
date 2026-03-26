@@ -35,7 +35,7 @@ def zadanie3(arr):
 
 
 def main():
-    AKTYWNE_ZADANIE = "zad1"  # zad1 / zad2 / zad3
+    AKTYWNE_ZADANIE = "zad3"  # zad1 / zad2 / zad3
 
     # Które zadanie będzie rozwiązywane
     if AKTYWNE_ZADANIE == 'zad1':
@@ -83,6 +83,40 @@ def main():
         nsize = [10, 100, 500, 1000, 2000, 3000, 5000]
         times = []
 
+       # Aktualne częstotliwość taktowania w MHz
+        cpu_freq = psutil.cpu_freq().current
+        # Konwersja na Hz (konwersja cykle na sekundę)
+        cpu_hz = cpu_freq * 1_000_000
+        print(f"Aktualne taktowanie procesora: {cpu_hz / 1e9:.2f} GHz")
+        print(f"Czas jednej opeacji procesora: {1/cpu_hz *1e9:.4f} ns")
+
+        n_for_time = 1_000_000
+        start = time.perf_counter()
+        zadanie1(n_for_time)
+        end = time.perf_counter()
+        total_time = end - start
+        time_per_iteration = total_time / n_for_time
+
+        print(f"Jedna iteracja trwa: {time_per_iteration * 1e9:.4f} ns")
+        # Ile cykli procesora zajmuje jedna iteracja w Pythonie
+        cycles_per_iter = time_per_iteration / (1 / cpu_hz)
+        print(f"Jedna iteracja to ok. {int(cycles_per_iter)} cykli procesora")
+
+        for n_val in nsize:
+            start = time.perf_counter()
+            zadanie2(n_val)
+            end = time.perf_counter()
+            total_time = end - start
+            times.append(total_time)
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(nsize, times, marker='o', linestyle='-', label='Czas wykonania')
+        plt.title('Zależność czasu od rozmiaru danych (n)')
+        plt.xlabel('Wartość n')
+        plt.ylabel('Czas [s] ')
+        plt.grid(True, which='both', ls='-', alpha=0.5)
+        plt.legend()
+        plt.show()
         # Narysować czas w funkcji rozmiaru danych wejściowych
 
     if AKTYWNE_ZADANIE == "zad3":
