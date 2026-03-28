@@ -35,7 +35,7 @@ def zadanie3(arr):
 
 
 def main():
-    AKTYWNE_ZADANIE = "zad3"  # zad1 / zad2 / zad3
+    AKTYWNE_ZADANIE = "zad1"  # zad1 / zad2 / zad3
 
     # Które zadanie będzie rozwiązywane
     if AKTYWNE_ZADANIE == 'zad1':
