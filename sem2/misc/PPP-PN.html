@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rozwiązania Zadań: Fizyka Złączy Półprzewodnikowych i Diod</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root { --primary-color: #2c3e50; --secondary-color: #e74c3c; --bg-light: #ecf0f1; --border-color: #bdc3c7; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 1100px; margin: 0 auto; padding: 20px; background-color: #fcfcfc; }
+        h1 { color: var(--primary-color); border-bottom: 3px solid var(--secondary-color); padding-bottom: 10px; text-align: center; }
+        h2 { color: var(--primary-color); border-bottom: 2px solid var(--bg-light); padding-bottom: 5px; margin-top: 40px; }
+       .nav-bar { background: var(--primary-color); padding: 15px; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: space-around; }
+       .nav-bar a { color: white; text-decoration: none; font-weight: bold; letter-spacing: 1px; transition: color 0.3s; }
+       .nav-bar a:hover { color: var(--secondary-color); }
+       .task-container { background: white; padding: 25px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 5px solid var(--primary-color); }
+       .task-title { font-weight: bold; color: var(--secondary-color); font-size: 1.4em; margin-bottom: 15px; display: block; }
+       .formula-card { background: #e8f4f8; border: 1px solid #bce8f1; padding: 15px; margin: 20px 0; border-radius: 5px; font-family: 'Courier New', Courier, monospace; overflow-x: auto; }
+       .formula-legend { font-size: 0.9em; margin-top: 10px; padding-left: 20px; border-left: 3px solid #3498db; }
+       .table-custom { width: 100%; border-collapse: collapse; margin-top: 20px; }
+       .table-custom th,.table-custom td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+       .table-custom th { background-color: var(--primary-color); color: white; }
+       .table-custom tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="#zadania-wstepne">Zadania Wstępne (C-V)</a>
+        <a href="#zadania-cz1">Seria Cz1 (Długości bazy)</a>
+        <a href="#zadania-cz2">Seria Cz2 (Efekty zaawansowane)</a>
+        <a href="#karta-wzorow">Karta Wzorów (Podstrona)</a>
+    </nav>
+
+    <h1>Raport Techniczny: Symulacja Złącz Półprzewodnikowych</h1>
+    <p style="text-align: center; color: #7f8c8d;">Kompleksowa analiza numeryczna z użyciem fizyki ciał stałych. Generacja z plików PDF.</p>
+
+    <h2 id="zadania-wstepne">Rozwiązania Zadań Wstępnych (Zjawiska Fizyczne i Elektrostatyka)</h2>
+
+    <section class="task-container" id="zad-w4">
+        <span class="task-title">Zadanie W4 i W6: Identyfikacja Profilu Złącza i Wyznaczenie Napięcia Dyfuzyjnego</span>
+        <p>Eksperymentalne wyznaczanie parametrów złącza opiera się na inwersji pomiaru pojemności. Dla złącza skokowego (m=0.5), zależność napięciowa jest zlinearyzowana.</p>
+        
+        <div class="formula-card">
+            $$C_j = \frac{\epsilon_s A}{d} \propto (U_D - U)^{-m}$$           $$U_D = \frac{U_{R2} - \left(\frac{C_{j1}}{C_{j2}}\right)^2 U_{R1}}{\left(\frac{C_{j1}}{C_{j2}}\right)^2 - 1}$$
+            
+            <div class="formula-legend">
+                <strong>Oznaczenia we wzorze:</strong><br>
+                \( C_j \) - Pojemność złączowa (zaporowa) [F]<br>
+                \( \epsilon_s \) - Przenikalność dielektryczna półprzewodnika [F/cm]<br>
+                \( A \) - Powierzchnia przekroju złącza [cm²]<br>
+                \( d \) - Grubość warstwy zaporowej [cm]<br>
+                \( U_D \) - Napięcie dyfuzyjne (gradientowe) na barierze [V]<br>
+                \( U_R \) - Zewnętrzne napięcie polaryzacji zaporowej [V]<br>
+                \( m \) - Współczynnik gradientowy profilu domieszkowania (niemianowany)
+            </div>
+        </div>
+        <p><strong>Rozwiązanie Zad 6:</strong> Podstawiając \(C_{j1} = 64pF\), \(C_{j2} = 32pF\), \(U_{R1} = 1V\) oraz \(U_{R2} = 6V\), stosunek pojemności wynosi 2. Wynik wynosi \( U_D = 0.66 \text{ V} \).</p>
+    </section>
+
+    <h2 id="zadania-cz1">Rozwiązania Zadań Seria 1 (Składowe Prądu i Domieszkowanie)</h2>
+
+    <section class="task-container" id="zad-1-4">
+        <span class="task-title">Zadanie 4: Składowe Prądu w Krzemowym Złączu Asymetrycznym</span>
+        <p>Dominacja nośników determinowana jest relacją domieszkowania bazy i emitera. Asymetria decyduje, że niemal cały prąd przenoszą dziury. Wartość napięcia wylicza się z inwersji równania diodowego.</p>
+        
+        <div class="formula-card">
+            $$I_{sq} = I_{sp[qn]} + I_{sn[qp]}$$           $$U = V_T \ln\left(\frac{I_q}{I_{sq}}\right)$$           $$\Delta p(x) = p_{0n} \left \exp\left(-\frac{x}{L_p}\right)$$
+            
+            <div class="formula-legend">
+                <strong>Oznaczenia we wzorze:</strong><br>
+                \( I_{sq} \) - Całkowity prąd nasycenia w obszarach quasi-neutralnych [A]<br>
+                \( V_T \) - Potencjał cieplny równy \(kT/q\) [V]<br>
+                \( \Delta p(x) \) - Koncentracja nadmiarowych nośników (dziur) względem położenia \(x\) [cm⁻³]<br>
+                \( L_p \) - Długość drogi dyfuzji nośników mniejszościowych [cm]
+            </div>
+        </div>
+        <p><strong>Rozwiązanie:</strong> Składowa dziurowa wynosi ok. \(34.7 \text{ pA}\), elektronowa \(3.5 \text{ fA}\). Dla wygenerowania \(1 \text{ mA}\), napięcie \(U \approx 0.43 \text{ V}\).</p>
+    </section>
+
+    <section class="task-container" id="zad-1-5">
+        <span class="task-title">Zadanie 5: Prąd Generacji w Warstwie Zaporowej (Si vs Ge)</span>
+        <p>Stosunek mechanizmów generacyjnych wyraża przewagę prądu SRH lub dyfuzyjnego w zależności od parametru \(n_i\).</p>
+        
+        <div class="formula-card">
+            $$\frac{I_{sw}}{I_{sq}} = \frac{1}{n_i L_p} \sqrt{\frac{\epsilon_s N_d}{2q}(U_D + U_R)}$$
+            
+            <div class="formula-legend">
+                <strong>Oznaczenia we wzorze:</strong><br>
+                \( I_{sw} \) - Prąd generacji z warstwy zaporowej [A]<br>
+                \( n_i \) - Koncentracja samoistna materiału [cm⁻³]<br>
+                \( q \) - Ładunek elementarny elektronu [C]
+            </div>
+        </div>
+        <p><strong>Rozwiązanie:</strong> Wynik dla germanu: \(\approx 0.83\) (dominuje prąd dyfuzyjny z QNR). Wynik dla krzemu: \(\approx 3191\) (całkowita dominacja obszaru zubożonego).</p>
+    </section>
+
+    <h2 id="zadania-cz2">Rozwiązania Zadań Seria 2 (Zjawiska Zaawansowane i Optymalizacja)</h2>
+
+    <section class="task-container" id="zad-2-10">
+        <span class="task-title">Zadania 10-14: Przesunięcia Napięciowe Charakterystyk</span>
+        <p>Zróżnicowanie profilu domieszkowania bądź geometrii bazy złącza modyfikuje amplitudę prądu nasycenia, a co za tym idzie, przesuwa punkt dominacji składowej quasi-neutralnej względem zaporowej.</p>
+        
+        <div class="formula-card">
+            $$I = I_{sq}\left + I_{sw}\left$$           $$U_x \approx 2 V_T \ln\left( \frac{I_{sw}}{I_{sq}} \right)$$           $$\Delta U = 2V_T \ln\left( \sqrt{\frac{N_{d2}}{N_{d1}}} \right)$$
+            
+            <div class="formula-legend">
+                <strong>Oznaczenia we wzorze:</strong><br>
+                \( U_x \) - Krytyczne napięcie polaryzacji dla wyrównania się prądów \(I_q\) i \(I_w\) [V]<br>
+                \( \Delta U \) - Przesunięcie napięciowe izoprądowe charakterystyki [V]<br>
+                \( n \) - Współczynnik idealności krzywej SRH, w przybliżeniu \(\approx 2\)<br>
+                \( N_{d1}, N_{d2} \) - Koncentracje donorów analizowanych struktur [cm⁻³]
+            </div>
+        </div>
+        <p><strong>Rozwiązanie:</strong> Napięcie krzyżowania wynosi \(U_{x1} = 345 \text{ mV}\) przy \(I_{x1} = 1 \mu A\). Dla proporcji stężeń \(N_{d2}=400N_{d1}\), wzrost napięcia o \(150 \text{ mV}\).</p>
+    </section>
+
+    <section class="task-container" id="zad-2-18">
+        <span class="task-title">Zadanie 17 i 18: Termika i Dioda Logarytmiczna</span>
+        <p>Liniowość na skali logarytmicznej w diodach ASIC narzuca drastyczne wymagania co do stężeń i czystości materiałowej bazy z powodu prądów pasożytniczych termicznych i generacyjnych.</p>
+        
+        <div class="formula-card">
+            $$\left( \frac{\partial U_F}{\partial T} \right)_{I_F=const} < 0 \quad \text{oraz} \quad R_s = \rho \frac{w}{A}$$
+            
+            <div class="formula-legend">
+                <strong>Oznaczenia we wzorze:</strong><br>
+                \( T \) - Temperatura termodynamiczna złącza [K]<br>
+                \( R_s \) - Rezystancja szeregowa bazy (pasożytnicza) [\(\Omega\)]<br>
+                \( w \) - Grubość bazy [cm]
+            </div>
+        </div>
+        <p><strong>Rozwiązanie:</strong> Konieczna wymiana materiału na węższe pasmo (Ge) lub zastosowanie ekstremalnie płytkich i szerokich struktur by zminimalizować spadek napięcia pochodzący z oporności omowej. Rezystancję redukować można również opierając się na zjawisku modulacji przewodności podczas wysokich wstrzykiwań.</p>
+    </section>
+
+    <hr style="border: 2px solid var(--primary-color); margin: 50px 0;">
+    <h2 id="karta-wzorow">KARTA WZORÓW: Fizyka i Inżynieria Złączy (Podstrona)</h2>
+    <p>Oto zestawienie fundamentalnych formuł półprzewodnikowych zaaplikowanych podczas numerycznego procesowania powyższych problemów.</p>
+    
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>Zjawisko / Kategoria Modeli</th>
+                <th>Równanie / Formuła Matematyczna</th>
+                <th>Objaśnienie Oznaczeń w Modelu</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Prawo Działania Mas (Equilibrium)</strong></td>
+                <td>$$n_0 \cdot p_0 = n_i^2$$</td>
+                <td>\(n_0\), \(p_0\) - Koncentracja nośników w równowadze<br>\(n_i\) - Termiczna koncentracja samoistna nośników</td>
+            </tr>
+            <tr>
+                <td><strong>Napięcie Wbudowane (Dyfuzyjne)</strong></td>
+                <td>$$U_D = V_T \ln\left( \frac{N_a N_d}{n_i^2} \right)$$</td>
+                <td>\(V_T\) - Potencjał cieplny kT/q<br>\(N_a\), \(N_d\) - Miejscowa koncentracja jonów akceptorowych i donorowych</td>
+            </tr>
+            <tr>
+                <td><strong>Model Warstwy Zaporowej (Skokowe)</strong></td>
+                <td>$$d = \sqrt{ \frac{2\epsilon_s}{q} \left(\frac{1}{N_a} + \frac{1}{N_d}\right) (U_D - U) }$$</td>
+                <td>\(\epsilon_s\) - Przenikalność dielektryczna<br>\(U\) - Sumaryczne napięcie polaryzacji na barierze</td>
+            </tr>
+            <tr>
+                <td><strong>Równanie Ciągłości Prądu Diody</strong></td>
+                <td>$$J = J_{sq}\left(e^{\frac{U}{V_T}} - 1\right) + J_{sw}\left(e^{\frac{U}{nV_T}} - 1\right)$$</td>
+                <td>\(J_{sq}\) - Mniejszościowa składowa dyfuzyjna (QNR)<br>\(J_{sw}\) - Składowa generacji w strefie przestrzennej</td>
+            </tr>
+            <tr>
+                <td><strong>Składowa Dyfuzyjna (Długa Baza)</strong></td>
+                <td>$$J_{sq} = q \left( \frac{D_p p_{n0}}{L_p} + \frac{D_n n_{0p}}{L_n} \right)$$</td>
+                <td>\(D\) - Współczynnik dyfuzji nośników<br>\(L\) - Obliczona droga dyfuzji nośników (\(\sqrt{D\tau}\))</td>
+            </tr>
+            <tr>
+                <td><strong>Składowa Dyfuzyjna (Krótka Baza)</strong></td>
+                <td>$$J_{sq} = q \left( \frac{D_p p_{n0}}{w_n} + \frac{D_n n_{0p}}{w_p} \right)$$</td>
+                <td>\(w_n\), \(w_p\) - Całkowite wymiary geometryczne bazy lub emitera między metalizacjami</td>
+            </tr>
+            <tr>
+                <td><strong>Rezystywność Przewodnika</strong></td>
+                <td>$$\rho \approx \frac{1}{q (n \mu_n + p \mu_p)}$$</td>
+                <td>\(\mu_n\), \(\mu_p\) - Empiryczna ruchliwość nośników silnie zależna od struktury i temperatury domieszek</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
