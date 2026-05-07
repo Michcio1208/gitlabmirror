@@ -135,14 +135,14 @@ def main():
     #    input("\nNaciśnij Enter...")
     
     # --- SEKCJA 2: Z BLOKADĄ (poprawny) ---
-    for n in [2, 4, 8, 16]:
-        test_safe(n)
-        input("\nNaciśnij Enter...")
+    #for n in [2, 4, 8, 16]:
+     #   test_safe(n)
+     #   input("\nNaciśnij Enter...")
     
     # --- SEKCJA 3: ZŁY WZORZEC ---
-    #for n in [2, 4, 8, 16]:
-     # test_bad_lock(n)
-    #     input("\nNaciśnij Enter...")
+    for n in [2, 4, 8, 16]:
+     test_bad_lock(n)
+     input("\nNaciśnij Enter...")
     
     # ========================================================
     
