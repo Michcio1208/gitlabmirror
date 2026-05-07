@@ -25,7 +25,7 @@ def get_one():
 def increment_race():
     global counter1
     for _ in range(1_000_000):
-        counter1 += get_one()
+        counter1 +=1
 
 
 def test_race(num_threads):
@@ -130,14 +130,14 @@ def main():
     # ========================================================
     
     # --- SEKCJA 1: WYŚCIG ---
-    for n in [2, 4, 8, 16]:
-        test_race(n)
-        input("\nNaciśnij Enter...")
+    #for n in [2, 4, 8, 16]:
+    #    test_race(n)
+    #    input("\nNaciśnij Enter...")
     
     # --- SEKCJA 2: Z BLOKADĄ (poprawny) ---
-    #for n in [2, 4, 8, 16]:
-    #    test_safe(n)
-    #     input("\nNaciśnij Enter...")
+    for n in [2, 4, 8, 16]:
+        test_safe(n)
+        input("\nNaciśnij Enter...")
     
     # --- SEKCJA 3: ZŁY WZORZEC ---
     #for n in [2, 4, 8, 16]:
