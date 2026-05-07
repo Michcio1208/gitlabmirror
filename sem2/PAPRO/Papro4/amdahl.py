@@ -138,8 +138,8 @@ def main():
     # ODKOMENTUJ DOKŁADNIE JEDEN EKSPERYMENT
     # ========================================================
     
-    experiment_1()      # P = 0.95 – zobaczysz, że 16 wątków daje ~10-15x
-    #experiment_2()    # P = 0.70 – zobaczysz, że 16 wątków daje ~3x
+    #experiment_1()      # P = 0.95 – zobaczysz, że 16 wątków daje ~10-15x
+    experiment_2()    # P = 0.70 – zobaczysz, że 16 wątków daje ~3x
     #experiment_3()    # P = 0.50 – zobaczysz, że 16 wątków daje tylko ~2x
     
     # ========================================================
