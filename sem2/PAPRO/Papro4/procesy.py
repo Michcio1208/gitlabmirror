@@ -119,8 +119,8 @@ def main():
     # ODKOMENTUJ DOKŁADNIE JEDEN EKSPERYMENT
     # ========================================
     
-    experiment_threads()      # 1. Wątki – dzielą pamięć i się ścigają
-    #experiment_processes()   # 2. Procesy – NIE dzielą pamięci
+    #experiment_threads()      # 1. Wątki – dzielą pamięć i się ścigają
+    experiment_processes()   # 2. Procesy – NIE dzielą pamięci
     #test_speed()             # 3. Porównanie szybkości
     
     # ========================================
