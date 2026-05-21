@@ -14,6 +14,8 @@ class CreditRiskEvaluator:
     """Odpowiada wyłącznie za algorytm weryfikacji ryzyka bankowego."""
     def weryfikuj_zdolnosc(self, income, amount):
         # Stary algorytm: dochód musi stanowić min. 5% wnioskowanej kwoty
+        if amount > 200000:
+            return False
         if income >= (amount * 0.10):
             return True
         return False

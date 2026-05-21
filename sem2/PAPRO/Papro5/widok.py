@@ -21,7 +21,7 @@ class BankView:
         if not wnioski:
             print("Brak zatwierdzonych wniosków w systemie.")
         for w in wnioski:
-            print(f"Wniosek #{w.id} | Klient: {w.name} | Kwota: {w.requested_amount} PLN | Status: {w.status}")
+            print(f"Wniosek #{w.id} | Identyfikator Klienta: *{w.name}* | Kwota: {w.requested_amount} PLN | Status: {w.status}")
 
     def wyswietl_menu(self):
         print("\n=== KORPORACYJNY SYSTEM BANKOWY v0.46 ===")

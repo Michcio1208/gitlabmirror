@@ -8,7 +8,9 @@ from model import CreditApplication
 class HardwareSecurityController:
     """Integracja z fizycznymi zabezpieczeniami (np. czytnik kart)."""
     def weryfikuj_stanowisko(self):
-        # Symulacja sprawdzania urządzeń peryferyjnych przy wyjściu
+        # Symulacja sprawdzania urządzeń peryferyjnych przy wyjściu 
+        print("\n [BEZPIECZEŃSTWO]: UWAGA!")
+        print("Pamiętaj o zabraniu karty pracowniczej z czytnika biometrycznego!")
         pass
 
 class BankController:
