@@ -14,7 +14,7 @@ plt.figure(figsize=(10, 6))
 
 # Rysowanie linii dla obu stanów
 plt.plot(t_neg, i_neg, label='$i(t) = 2$ A dla $t < 0$', color='blue', linewidth=2.5)
-plt.plot(t_pos, i_pos, label='$i(t) = 1.2 + \\frac{2}{15} e^{-t/3}$ A dla $t \ge 0$', color='red', linewidth=2.5)
+plt.plot(t_pos, i_pos, label=r'$i(t) = 1.2 + \frac{2}{15} e^{-t/3}$ A dla $t \ge 0$', color='red', linewidth=2.5)
 
 # Oznaczenie punktu skoku (t=0)
 plt.plot(0, 2.0, 'bo', markerfacecolor='white', markersize=8) # Koniec przed komutacją (okrąg pusty)
