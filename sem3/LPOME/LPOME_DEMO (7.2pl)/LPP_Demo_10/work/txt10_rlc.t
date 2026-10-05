@@ -1,0 +1,3 @@
+SZEREGOWE POŁĄCZENIE ELEMENTÓW  R, L, C
+
+Badany dwójnik jest szeregowym połączeniem cewki, kondensatora i rezystora. Na wykresach można zaobserwować charakterystykę amplitudową i fazową badanego dwójnika oraz przebiegi czasowe napięcia uL(t), uC(t) i uR(t) dla wybranej częstotliwości. Obok wyświetlone są wartości szczytowe i skuteczne tych napięć oraz wartość szczytowa prądu płynącego przez badany dwójnik. Zależności fazowe między poszczególnymi napięciami ilustruje wykres wskazowy.

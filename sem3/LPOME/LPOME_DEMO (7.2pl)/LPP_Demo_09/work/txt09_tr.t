@@ -1,0 +1,7 @@
+METODA MOSTKOWA (mostek transformatorowy)
+
+Metoda mostkowa polega na takiej regulacji elementów wzorcowych Cw i Rw, aby różnica prądów w obu gałęziach mostka była równa zeru. Zastosowany mostek transformatorowy jest mostkiem symetrycznym, dla którego w stanie równowagi musi zachodzić równość impedancji Zx i Zw. Połączenie elementów wzorcowych powinno odpowiadać przyjętemu schematowi zastępczemu mierzonego kondensatora - wtedy wartości parametrów Cx i Rx odczytywane są bezpośrednio z kondensatora i rezystora wzorcowego (np. dla równoległego schematu zastępczego i równoległego połączenia elementów wzorcowych w stanie równowagi zachodzi równość Cxr=Cw i Rxr=Rw). Jeżeli sposób połączenia wzorców nie odpowiada rozważanemu schematowi zastępczemu, wówczas konieczne jest dokonanie odpowiednich obliczeń.
+
+W praktyce trudno jest zachować idealną symetrię mostka oraz wyeliminować pojemnościowe oddziaływanie na siebie uzwojeń transformatora, na skutek czego sygnał detekowany przez wskaźnik równowagi nigdy nie osiąga wartości zero.
+
+Przedstawiona analiza pokazuje, że aby regulacja elementów wzorcowych efektywnie prowadziła do osiągnięcia minimum wartości sygnału niezrównoważenia, ich początkowe wartości powinny być bliskie stanu równowagi. W przeciwnym przypadku proces równoważenia mostka może być bardzo utrudniony.

@@ -1,0 +1,7 @@
+BADANIE ZBUDOWANEGO WOLTOMIERZA
+
+W woltomierzu z przetwornikiem wartości szczytowej w przypadku idealnym zależność między wartością skuteczną sygnału wejściowego a wychyleniem wskazówki miernika (charakterystyka woltomierza) jest liniowa. Liniowa jest również podziałka takiego woltomierza.
+
+Nieliniowość diody powoduje, że zarówno charakterystyka, jak i podziałka rzeczywistego woltomierza ma charakter nieliniowy. W praktyce charakterystykę woltomierza wyznacza się doświadczalnie, nanosząc na oś X wykresu wartości skuteczne napięcia, zmierzone wzorcowym woltomierzem wartości skutecznych, natomiast na oś Y odpowiadające im wartości wychylenia wskazówki miernika (wyrażone np. w działkach). Na podstawie sporządzonej charakterystyki można następnie wyznaczyć podziałkę zbudowanego woltomierza. Na podziałce zaznacza się działki z ustalonym krokiem napięcia (np. co 0,1V), opisując wartościami działki główne (np. 0; 0,5; 1; 1,5; 2V). Liczba działek i ich opis liczbowy zależą od zakresu budowanego woltomierza.
+
+Wskazanie woltomierza nie powinno zależeć od częstotliwości mierzonego sygnału. Dla woltomierza z przetwornikiem wartości szczytowej warunek ten jest spełniony tylko dla częstotliwości większych od dolnej częstotliwości poprawnej pracy woltomierza, zdefiniowanej jako fd10=10/τ, gdzie τ jest stałą czasową rozładowania kondensatora. Dla mniejszych wartości częstotliwości wskazanie woltomierza maleje. Aby rozszerzyć zakres częstotliwości poprawnej pracy woltomierza z przetwornikiem wartości szczytowej należy zwiększyć wartość pojemności kondensatora.

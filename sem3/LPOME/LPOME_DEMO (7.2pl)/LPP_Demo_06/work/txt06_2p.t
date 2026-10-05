@@ -1,0 +1,5 @@
+PRZETWORNIK DWUPOŁÓWKOWY
+
+Przetwornik dwupołówkowy najczęściej ma postać mostka diodowego (układ Graetza). W przypadku idealnym prąd wyjściowy Ia jest proporcjonalny do modułu sygnału wejściowego. Wartość średnia tego prądu jest więc proporcjonalna do wartości średniej wyprostowanej sygnału wejściowego. Zależność ta obowiązuje niezależnie od składowej stałej sygnału.
+
+W przetworniku rzeczywistym diody zaczynają przewodzić, gdy napięcie na nich przekroczy tzw. napięcie progowe o wartości rzędu 0,3 - 0,7V. Ponieważ w mostku diodowym prąd przepływa zawsze przez dwie diody, więc warunkiem przewodzenia jest przekroczenie podwójnej wartości napięcia progowego. Z tego powodu efektywność przetwarzania (wyrażona jako iloraz wartości średniej prądu wyjściowego w przetworniku rzeczywistym i idealnym) spada przy małych amplitudach sygnału wejściowego. Dodatkowe zmniejszenie efektywności przetwarzania powoduje niezerowa rezystancja przewodzenia diody rzeczywistej.

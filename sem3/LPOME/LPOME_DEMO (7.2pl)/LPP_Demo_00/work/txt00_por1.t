@@ -1,0 +1,3 @@
+PORÓWNAJ UZYSKANE WYNIKI
+
+Program umożliwia porównanie uzyskanych wyników z uwzględnieniem ich niepewności. Korzystając z rozwijanej listy należy wybrać jednostkę, odpowiadającą mierzonej wielkości, a następnie wprowadzić uzyskane z pomiarów wyniki oraz odpowiadające im wartości niepewności standardowych lub niepewności stndardowych względnych oraz współczynników rozszerzenia (domyślna wartość 3). Obliczone zostaną granice przedziałów niepewności dla porównywanych wyników. Jeżeli przedziały te mają część wspólną, wówczas można uznać, że wyniki są zgodne w granicach niepewności. W przeciwnym przypadku przyjęte wartości niepewności nie wyjaśniają różnicy między wynikami.

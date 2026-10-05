@@ -1,0 +1,3 @@
+POMIAR BEZPOŚREDNI SEM ŹRÓDŁA
+
+Jeżeli rezystancja wewnętrzna Rw źródła jest różna od zera, wówczas dołączenie woltomierza o rezystancji wewnętrznej Rv do zacisków wyjściowych źródła spowoduje pojawienie się spadku napięcia na rezystancji wewnętrznej Rw, wywołanego przepływem prądu pobieranego ze źródła. Wskazanie woltomierza będzie więc mniejsze od wartości siły elektromotorycznej E. Wystąpi ujemny błąd systematyczny pomiaru (błąd metody), zależny od stosunku rezystancji Rv i Rw.

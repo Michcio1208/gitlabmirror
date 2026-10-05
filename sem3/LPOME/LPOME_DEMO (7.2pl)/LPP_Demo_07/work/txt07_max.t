@@ -1,0 +1,9 @@
+PRZETWORNIKI WARTOŚCI SZCZYTOWEJ
+
+Program demonstracyjny pozwala przeanalizować pracę dwóch przetworników wartości szczytowej: w układzie szeregowym i w układzie równoległym. W idealnym przypadku w obu tych przetwornikach kondensator zostaje naładowany do wartości szczytowej sygnału wejściowego z uwzględnieniem składowej stałej. W przetworniku  szeregowym napięcie na kondensatorze jest zarazem napięciem wyjściowym przetwornika. W przetworniku równoległym napięcie wyjściowe jest różnicą napięcia wejściowego i napięcia na kondensatorze, ma więc ten sam kształt, co napięcie wejściowe, a jego wartość średnia jest równa wartości szczytowej sygnału wejściowego z pominięciem składowej stałej.
+
+W rzeczywistych przetwornikach mamy do czynienia z nieidealną diodą, którą charakteryzuje tzw. napięcie progowe o wartości rzędu 0,3 - 0,7V. O taką wartość napięcie, do którego naładuje się kondensator, jest mniejsze od wartości szczytowej sygnału wejściowego.
+
+Wyjście przetworników jest zwykle obciążone jakąś rezystancją (może to być np. rezystancja woltomierza). W takim przypadku następuje rozładowywanie się kondensatora w czasie, kiedy dioda nie przewodzi, i jego ładowanie w czasie przewodzenia diody. Pojawiają się więc pulsacje napięcia na kondensatorze - tym większe, im mniejsza jest pojemność kondensatora oraz im dłuższy jest czas jego rozładowywania się, czyli im dłuższy jest okres sygnału (mniejsza częstotliwość).
+
+W prostych przetwornikach prąd ładowania kondensatora pobierany jest bezpośrednio ze źródła sygnału. Prąd ten powoduje spadek napięcia na rezystancji wewnętrznej źródła, przez co sygnał na wejściu przetwornika jest zniekształcony. Zjawisko to nie występuje w tzw. przetwornikach aktywnych, wyposażonych we wzmacniacz operacyjny o bardzo dużej rezystancji wejściowej.
