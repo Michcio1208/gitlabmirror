@@ -8,8 +8,11 @@ int main (void)
  a=9;
  b=7;
  c=a+b;
+ float d;
+ scanf("%f",&d);
  puts("Witamy na zajeciach PROS");
  printf("a=%d\nb=%d\na+b=%d\n",a,b,c);
+printf("d=%2.1f\n",d);
  return 0;
 }
 //////////////////////////////////////////////
