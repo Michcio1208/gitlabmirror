@@ -12,7 +12,10 @@ int main (void)
  scanf("%f",&d);
  puts("Witamy na zajeciach PROS");
  printf("a=%d\nb=%d\na+b=%d\n",a,b,c);
-printf("d=%2.1f\n",d);
+printf("d=%2.1e\n",d);
+printf("a=%+d\n",a);
+a= -a;
+printf("a=%+d\n",a);
  return 0;
 }
 //////////////////////////////////////////////
