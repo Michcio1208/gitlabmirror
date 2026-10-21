@@ -30,5 +30,67 @@ R5_zab=2*(1+0.01*(2*rand-1));
 Azab(3,7)=-R5_zab;
 x_zab=Azab\b;
 U3_zab=x_zab(3);
-U3_rel(k)=(U3_zab)
+U3_rel(k)=abs(U3_zab-U3)/abs(U3);
 end 
+u3_mean = mean(U3_rel)
+u3_max = max(U3_rel)
+
+%%
+n=6;
+for i=1:n 
+    for j=1:n
+        A3(i,j)=1/(i+j+6);
+    end 
+end
+
+b3=sum(A3,2);
+x3d=ones(n,1);
+x3=A3\b3;
+delta_x3=norm(x3-x3d)/norm(x3d)
+wskaz=cond(A3)
+%%
+for n=3:15
+    A3 = zeros(n);
+    for i=1:n 
+        for j=1:n
+        A3(i,j)=1/(i+j+6);
+        end 
+    end
+h=16*eye(n);
+A4=A3+h;
+b4=sum(A4,2);
+x4d=ones(n,1);
+x4=A4\b4;
+delta_x4(n)=norm(x4-x4d)/norm(x4d);
+wskaz4(n)=cond(A4);
+
+b3=sum(A3,2);
+x3d=ones(n,1);
+x3=A3\b3;
+delta_x3(n)=norm(x3-x3d)/norm(x3d);
+wskaz(n)=cond(A3);
+end
+figure
+semilogy(3:15,wskaz(3:15))
+hold on
+semilogy(3:15,delta_x3(3:15))
+semilogy(3:15,wskaz4(3:15))
+semilogy(3:15,delta_x4(3:15))
+legend('cond A3 ','delta x3', 'cond A4','delta x4')
+xlabel('n')
+ylabel('cond lub delta x')
+
+% macierz bez dodatku jest bardzo źle uwarunkowana nuemrycznie, przez to
+% cond A3 rośnie
+% wykładniczo i w pewnym
+% momencie wypłaszcza się
+% błąd wynosi 100% ,
+% natomiast gdy dodamy
+% 16 na diagonali
+% wtedy macierz
+% staje się silnie
+% diagonalnie
+% dominująca czyli
+% dobrze uwarunkowana
+% numerycznie dzięki czemu cond A4 ok. 1 więc obliczenia wykonywane z dokła
+% dnoiścią na poziomie około epsilon  masyznowego
