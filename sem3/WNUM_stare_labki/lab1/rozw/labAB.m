@@ -72,7 +72,6 @@ D=diag(diag(A));
 L=tril(A)-D;
 U=triu(A)-D;
 b=sum(A,2);
-
 omega_v=[1.1 1.2 1.3 1.5 1.8 1.9 2];
 for omega=omega_v
    
@@ -83,7 +82,7 @@ for omega=omega_v
     i=1;
     imax=100;
     x=x_old;
-    while(error>=1e-12 & i<imax) 
+    while(error(end)>=1e-12 & i<imax) 
         x_new=M*x_old+w;
         x=[x x_new];
         error(i)=norm(x_new-x_old);
@@ -93,8 +92,8 @@ for omega=omega_v
     x_new;
     semilogy(error)
     hold on;
-    xlabel("nr iteracj")
+    xlabel("nr iteracji")
     ylabel("error")
 
 end 
-legend('')
+legend('om1','om2','om3','om4','om5','om6','om7')
