@@ -40,5 +40,14 @@ int main(void) {
         fread(tabOdczyt, sizeof(tabOdczyt[0]), 4, fp);
         fclose(fp);
     }
-    return 0;
+    
+    printf("Odczytane dane: %d %f\n", x, y);
+    printf("Odczytany znak: %c\n", buf[0]);
+    printf("Odczytany łańcuch: %s\n", buf);
+    printf("Odczytana tablica binarna: ");
+    for (int i = 0; i < 4; i++) {
+        printf("%d ", tabOdczyt[i]);
+    }
+    printf("\n");  
+    return 0; 
 }
