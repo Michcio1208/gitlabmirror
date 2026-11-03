@@ -21,7 +21,10 @@ struct adress {
 };
 struct student {
     char name[20];
-    int age;
+    union {
+        int age;
+        float height;
+    };
     struct adress studentAdress; //struktura zagniezdzona
 }student1={"Jan", 20, {"Kwiatowa", "Warszawa", "00-000"}};
 int main() {
