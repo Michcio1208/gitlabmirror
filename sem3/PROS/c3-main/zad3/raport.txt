@@ -1,0 +1,4 @@
+1;Jan;meskie;3
+2;Anna;zenskie;4
+3;Ewa;zenskie;3
+4;Kuba;zenskie;4
