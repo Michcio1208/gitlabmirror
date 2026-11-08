@@ -6,10 +6,11 @@ double d;
 union {
 int i;
 double d;
-} someUnion={2};
+} someUnion={.d=2.14};
 int main(void)
 {
 printf("Struct size=%lu[B]\n",sizeof(someStruct));
 printf("Union size=%lu[B]\n",sizeof(someUnion));
+printf("Unia: i=%d, d=%lf\n",someUnion.i,someUnion.d);
 return 0;
 }
