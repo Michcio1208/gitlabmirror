@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="pl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elementy Fotoniczne (ELFO) – Kolokwium, Quizy i Kompendium Wiedzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        };
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Stylizacja dla kart 3D w trybie fiszek */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        /* Pasek przewijania */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- GÓRNY PASEK NAWIGACYJNY (STICKY) Z ZAWSZE WIDOCZNYM RESETEM -->
+    <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-lg no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <!-- Logo i tytuł -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
+                                ELFO • Kompendium &amp; Symulator Kolokwium
+                            </h1>
+                            <p class="text-xs text-slate-400">Politechnika Warszawska • IMiO • Elementy Fotoniczne</p>
+                        </div>
+                    </div>
+
+                    <!-- Licznik punktów na mobile -->
+                    <div class="flex lg:hidden items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700">
+                        <span class="text-xs text-slate-400">Wynik:</span>
+                        <span id="mobile-score-badge" class="text-sm font-bold text-indigo-400 font-mono">0 / 25</span>
+                    </div>
+                </div>
+
+                <!-- Panel szybkich akcji: Status, Tryb i ZAWSZE WIDOCZNE PRZYCISKI RESETU -->
+                <div id="quiz-controls-bar" class="flex flex-wrap items-center justify-between lg:justify-end gap-2 sm:gap-3">
+                    <!-- Licznik czasu -->
+                    <div class="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/80 text-xs sm:text-sm font-mono text-slate-300" title="Czas rozwiązywania bieżącego podejścia">
+                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span id="timer-display">00:00</span>
+                    </div>
+
+                    <!-- Licznik punktów (Desktop) -->
+                    <div class="hidden lg:flex items-center gap-2 bg-slate-800/80 px-3.5 py-1.5 rounded-xl border border-slate-700/80">
+                        <span class="text-xs text-slate-400">Wynik:</span>
+                        <span id="desktop-score-badge" class="text-sm font-bold text-emerald-400 font-mono">0 / 25 (0%)</span>
+                        <span class="text-slate-600">|</span>
+                        <span class="text-xs text-slate-400">Odp.:</span>
+                        <span id="desktop-answered-badge" class="text-sm font-semibold text-indigo-300 font-mono">0/25</span>
+                    </div>
+
+                    <!-- Przycisk Resetuj do 0 -->
+                    <button onclick="resetCurrentQuiz(false)" class="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-md shadow-rose-600/20 transition-all cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <span>Resetuj quiz i zacznij od 0</span>
+                    </button>
+
+                    <!-- Przycisk Resetuj i wymieszaj -->
+                    <button onclick="resetCurrentQuiz(true)" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-md shadow-indigo-600/20 transition-all cursor-pointer" title="Zeruje wynik i losuje nową kolejność pytań">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span>Resetuj i wymieszaj</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Główne Zakładki Nawigacyjne -->
+            <nav class="mt-3 pt-2 border-t border-slate-800/80 flex items-center gap-1.5 overflow-x-auto pb-1">
+                <button onclick="switchMainTab('quiz1')" id="tab-btn-quiz1" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-indigo-600 text-white shadow-sm">
+                    <span>📝 Quiz 1: Kolokwium z plików JPG (25 pytań)</span>
+                </button>
+                <button onclick="switchMainTab('quiz2')" id="tab-btn-quiz2" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-slate-800/70 text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <span>🎯 Quiz 2: Autorski Quiz Treningowy ELFO (25 nowych pytań)</span>
+                </button>
+                <button onclick="switchMainTab('flashcards')" id="tab-btn-flashcards" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-slate-800/70 text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <span>🗂️ Tryb fiszek / Szybka powtórka (50 pytań)</span>
+                </button>
+                <button onclick="switchMainTab('key')" id="tab-btn-key" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-slate-800/70 text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <span>🔍 Pełne Rozwiązanie JPG + Źródła</span>
+                </button>
+                <button onclick="switchMainTab('notes')" id="tab-btn-notes" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-slate-800/70 text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <span>📚 Kompletna Notatka do Kolokwium</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Pasek postępu aktywnego quizu -->
+        <div id="quiz-progress-container" class="w-full bg-slate-800 h-1.5 overflow-hidden">
+            <div id="quiz-progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 h-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+    </header>
+
+    <!-- POWIADOMIENIE TOAST (ZAMIAST ALERTÓW) -->
+    <div id="toast-notification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 bg-slate-800 border border-indigo-500/60 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <div>
+            <p id="toast-title" class="text-sm font-bold text-white">Zresetowano quiz!</p>
+            <p id="toast-desc" class="text-xs text-slate-300">Wynik wyzerowany – możesz zaczynać od początku.</p>
+        </div>
+    </div>
+
+    <!-- GŁÓWNA ZAWARTOŚĆ -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================================================================= -->
+        <!-- WIDOK QUIZU (OBSŁUGUJE ZARÓWNO QUIZ 1 JAK I QUIZ 2)               -->
+        <!-- ================================================================= -->
+        <section id="view-quiz" class="space-y-6">
+            <!-- Panel konfiguracji quizu i filtrów -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="quiz-badge-label" class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Zestaw 1 • Kolokwium (221201-A005)</span>
+                            <span id="quiz-shuffle-indicator" class="hidden px-2.5 py-0.5 text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full">Kolejność losowa</span>
+                        </div>
+                        <h2 id="quiz-main-title" class="text-xl sm:text-2xl font-extrabold text-white mt-1">
+                            Quiz 1: Kolokwium z plików JPG (25 pytań)
+                        </h2>
+                        <p id="quiz-main-subtitle" class="text-xs sm:text-sm text-slate-400 mt-1">
+                            Oryginalne pytania z arkusza kolokwialnego wraz z odtworzonymi wykresami, niezależną weryfikacją merytoryczną (z pominięciem odręcznych dopisków ze zdjęć) i dokładnym wskazaniem źródeł z plików PDF.
+                        </p>
+                    </div>
+
+                    <!-- Przełącznik trybu sprawdzania -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800 shrink-0">
+                        <span class="text-xs font-semibold text-slate-400 px-2">Tryb sprawdzania:</span>
+                        <div class="flex rounded-lg bg-slate-900 p-1 border border-slate-800">
+                            <button onclick="setCheckMode('instant')" id="mode-btn-instant" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all bg-indigo-600 text-white shadow cursor-pointer">
+                                ⚡ Od razu po kliknięciu
+                            </button>
+                            <button onclick="setCheckMode('exam')" id="mode-btn-exam" class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-white cursor-pointer">
+                                🎓 Na końcu (Symulacja Kolokwium)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pasek filtrów pytań oraz szybkiej nawigacji -->
+                <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-xs text-slate-400 mr-1">Filtruj pytania:</span>
+                        <button onclick="setQuestionFilter('all')" id="filter-btn-all" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-white border border-slate-600 cursor-pointer">
+                            Wszystkie (25)
+                        </button>
+                        <button onclick="setQuestionFilter('unanswered')" id="filter-btn-unanswered" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 cursor-pointer">
+                            Bez odpowiedzi
+                        </button>
+                        <button onclick="setQuestionFilter('wrong')" id="filter-btn-wrong" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-rose-400 hover:bg-rose-950/40 border border-slate-800 cursor-pointer">
+                            Błędne do powtórki
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="finish-exam-btn-top" onclick="finishExamNow()" class="hidden px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 transition-all cursor-pointer">
+                            ✅ Zakończ i sprawdź cały test
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Siatka szybkiej nawigacji po numerach 1-25 -->
+                <div id="question-nav-pills" class="mt-3 flex flex-wrap gap-1.5"></div>
+            </div>
+
+            <!-- Karta podsumowania wyniku -->
+            <div id="quiz-summary-card" class="hidden bg-gradient-to-br from-slate-900 via-indigo-950/60 to-slate-900 border-2 border-indigo-500/50 rounded-2xl p-6 shadow-2xl">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-5">
+                        <div id="summary-circle" class="w-24 h-24 rounded-2xl bg-slate-950 border-2 border-emerald-500 flex flex-col items-center justify-center shrink-0 shadow-inner">
+                            <span id="summary-percent" class="text-2xl font-extrabold text-emerald-400 font-mono">100%</span>
+                            <span id="summary-fraction" class="text-xs text-slate-400 font-mono mt-0.5">25 / 25 pkt</span>
+                        </div>
+                        <div>
+                            <span id="summary-grade-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                Wynik Kolokwium
+                            </span>
+                            <h3 id="summary-headline" class="text-2xl font-extrabold text-white mt-2">
+                                Świetna robota! Test rozwiązany.
+                            </h3>
+                            <p id="summary-details" class="text-sm text-slate-300 mt-1">
+                                Czas rozwiązywania: <span id="summary-time" class="font-mono font-semibold text-indigo-300">00:00</span> • Poprawne: <span id="summary-correct" class="text-emerald-400 font-bold">0</span> • Błędne: <span id="summary-wrong" class="text-rose-400 font-bold">0</span> • Pominięte: <span id="summary-skipped" class="text-amber-400 font-bold">0</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Przyciski akcji na ekranie podsumowania -->
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                        <button onclick="setQuestionFilter('wrong')" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-500/30 transition-all cursor-pointer">
+                            🔍 Pokaż tylko błędne odpowiedzi
+                        </button>
+                        <button onclick="resetCurrentQuiz(false)" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/25 transition-all flex items-center gap-2 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            <span>Resetuj quiz i zacznij od 0</span>
+                        </button>
+                        <button onclick="resetCurrentQuiz(true)" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2 cursor-pointer">
+                            <span>🎲 Resetuj i wymieszaj pytania</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista pytań quizu -->
+            <div id="questions-list-container" class="space-y-5"></div>
+
+            <!-- Dolny pasek z przyciskiem zakończenia / resetu -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-sm text-slate-400">
+                    Chcesz rozwiązać ten zestaw jeszcze raz od zera lub sprawdzić wynik końcowy?
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button id="finish-exam-btn-bottom" onclick="finishExamNow()" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 transition-all cursor-pointer">
+                        ✅ Sprawdź cały test i podsumuj wynik
+                    </button>
+                    <button onclick="resetCurrentQuiz(false)" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/20 transition-all cursor-pointer">
+                        🔄 Resetuj quiz i zacznij od 0
+                    </button>
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer">
+                        ⬆️ Na górę
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- WIDOK 3: TRYB FISZEK (WSZYSTKIE 50 PYTAŃ)                         -->
+        <!-- ================================================================= -->
+        <section id="view-flashcards" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full">Aktywna powtórka • 50 pytań</span>
+                        <h2 class="text-2xl font-extrabold text-white mt-1">Tryb Fiszek i Szybkiej Powtórki (50 pytań)</h2>
+                        <p class="text-sm text-slate-400 mt-1">Kliknij kartę (lub naciśnij Spację), aby ją obrócić i zobaczyć poprawną odpowiedź, wyjaśnienie oraz źródło z plików PDF.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="flashcard-deck-select" onchange="changeFlashcardDeck(this.value)" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2 font-semibold">
+                            <option value="all">Wszystkie pytania (50 fiszek)</option>
+                            <option value="quiz1">Tylko Quiz 1: Kolokwium JPG (25)</option>
+                            <option value="quiz2">Tylko Quiz 2: Autorski Trening (25)</option>
+                        </select>
+                        <button onclick="shuffleFlashcards()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-all cursor-pointer">
+                            🔀 Wymieszaj fiszki
+                        </button>
+                        <button onclick="resetFlashcards()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer">
+                            🔄 Od pierwszej (1)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Obszar fiszki 3D -->
+                <div class="mt-6 max-w-3xl mx-auto">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2 font-mono">
+                        <span id="fc-counter">Fiszka 1 z 50</span>
+                        <span id="fc-set-label" class="text-indigo-400 font-semibold">Zestaw 1 (JPG)</span>
+                    </div>
+
+                    <div onclick="flipFlashcard()" class="perspective-1000 cursor-pointer select-none">
+                        <div id="flashcard-inner" class="transform-style-3d relative w-full min-h-[420px] sm:min-h-[450px]">
+                            <!-- Przód fiszki (Pytanie + Opcje a,b,c,d) -->
+                            <div class="backface-hidden absolute inset-0 bg-gradient-to-br from-slate-800/90 via-slate-900 to-slate-950 border-2 border-slate-700 hover:border-indigo-500/60 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto">
+                                <div>
+                                    <div class="flex items-center justify-between gap-2 mb-4">
+                                        <span id="fc-front-badge" class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pytanie #1</span>
+                                        <span class="text-xs text-slate-400 flex items-center gap-1">
+                                            🔄 Kliknij, aby odwrócić
+                                        </span>
+                                    </div>
+                                    <h3 id="fc-front-question" class="text-base sm:text-lg font-bold text-white leading-relaxed"></h3>
+                                    <div id="fc-front-diagram" class="mt-3"></div>
+                                    <div id="fc-front-options" class="mt-4 space-y-2 text-xs sm:text-sm text-slate-300"></div>
+                                </div>
+                                <div class="pt-4 border-t border-slate-800/80 text-center text-xs text-indigo-400 font-semibold">
+                                    Kliknij w dowolnym miejscu karty, aby odsłonić poprawną odpowiedź i źródło ➔
+                                </div>
+                            </div>
+
+                            <!-- Tył fiszki (Odpowiedź + Wyjaśnienie + Źródło) -->
+                            <div class="backface-hidden rotate-y-180 absolute inset-0 bg-gradient-to-br from-indigo-950/90 via-slate-900 to-slate-950 border-2 border-emerald-500/60 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto">
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                            ✅ Poprawna odpowiedź
+                                        </span>
+                                        <span class="text-xs text-slate-400">Kliknij, aby wrócić do pytania</span>
+                                    </div>
+                                    <div id="fc-back-answer" class="p-3.5 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-200 font-bold text-sm sm:text-base"></div>
+                                    <div class="space-y-2">
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-300">Wyjaśnienie merytoryczne:</h4>
+                                        <p id="fc-back-explanation" class="text-xs sm:text-sm text-slate-200 leading-relaxed"></p>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-700">
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">📖 Źródło wiedzy:</h4>
+                                        <p id="fc-back-source" class="text-xs text-slate-300 font-mono"></p>
+                                    </div>
+                                </div>
+                                <div class="pt-3 border-t border-slate-800/80 text-center text-xs text-slate-400">
+                                    Użyj przycisków poniżej (lub strzałek ⬅️ ➡️ na klawiaturze), aby przejść dalej
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nawigacja fiszek -->
+                    <div class="mt-6 flex items-center justify-between gap-4">
+                        <button onclick="prevFlashcard()" class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <span>⬅️ Poprzednia</span>
+                        </button>
+                        <button onclick="flipFlashcard()" class="py-3 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all cursor-pointer">
+                            🔄 Odwróć kartę
+                        </button>
+                        <button onclick="nextFlashcard()" class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <span>Następna ➡️</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- WIDOK 4: PEŁNE ROZWIĄZANIE KOLOKWIUM JPG + KOREKTA DOPISKÓW       -->
+        <!-- ================================================================= -->
+        <section id="view-key" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+                    <div>
+                        <span class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">Weryfikacja Arkusza 221201-A005</span>
+                        <h2 class="text-2xl font-extrabold text-white mt-1">Rozwiązanie Testu z Plików JPG wraz ze Źródłami</h2>
+                        <p class="text-sm text-slate-400 mt-1">
+                            Poniżej znajduje się kompletne rozwiązanie wszystkich 25 pytań ze zdjęć <code class="text-indigo-300">IMG_7172.jpg</code> oraz <code class="text-indigo-300">IMG_7171.jpg</code> opracowane od podstaw na bazie załączonych materiałów PDF, całkowicie niezależnie od odręcznych liter dopisanych na arkuszu.
+                        </p>
+                    </div>
+                    <button onclick="window.print()" class="no-print shrink-0 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold border border-slate-700 flex items-center gap-2 cursor-pointer">
+                        🖨️ Drukuj / Zapisz jako PDF
+                    </button>
+                </div>
+
+                <!-- Ważny alert o błędach w odręcznych dopiskach na zdjęciach JPG -->
+                <div class="mt-5 p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs sm:text-sm space-y-2">
+                    <div class="font-bold text-amber-300 flex items-center gap-2 text-sm sm:text-base">
+                        <span>⚠️ Uwaga! Wykryto błędy oraz braki w odręcznych odpowiedziach dopisanych na zdjęciach JPG:</span>
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-slate-200">
+                        <li><strong>Pytanie 7:</strong> Na zdjęciu pod pytaniem dopisano czerwoną literę <strong>A</strong> (zderzenia niesprężyste), podczas gdy w kółko zakreślono <strong>b) termiczny ruch atomów</strong>. Poprawna odpowiedź to zdecydowanie <strong>b) termiczny ruch atomów</strong> (efekt Dopplera = poszerzenie niejednorodne), natomiast zderzenia niesprężyste dają poszerzenie <em>jednorodne</em> (ELFO3.pdf, str. 7).</li>
+                        <li><strong>Pytanie 12:</strong> Na zdjęciu dopisano literę <strong>D</strong> („pompowanych tylko i wyłącznie lampami błyskowymi”). Jest to <strong>błąd</strong>! Poprawna odpowiedź to <strong>b) laserów dielektrycznych domieszkowanych jonami ziem rzadkich</strong> (ELFO2.pdf, str. 12–13 jasno wskazuje, że Nd:YAG to kryształ dielektryczny domieszkowany lantanowcem Nd i bardzo często pompowany diodami laserowymi 808,6 nm).</li>
+                        <li><strong>Pytanie 13:</strong> Na zdjęciu dopisano literę <strong>C</strong> („kilkunastu-kilkudziesięciu watów”). Dla lasera krawędziowego <strong>z pojedynczym złączem (single emitter)</strong> maksymalna moc pracy ciągłej (CW) jest rzędu <strong>b) pojedynczych watów</strong> (np. 6–7,5 W na slajdzie 19 w ELFO_03_04_2026.pdf oraz rekord 8,21 W CW w ELFO_05.pdf, slajd 52). Moce kilkudziesięciu lub kilkuset watów uzyskuje się z wieloemiterowych linijek laserowych (laser bars).</li>
+                        <li><strong>Pytania 21, 23, 25:</strong> Na zdjęciu <code class="text-amber-300">IMG_7171.jpg</code> nie miały dopisanych żadnych liter – poniżej znajdują się ich pełne rozwiązania i wyliczenia (<strong>21: b</strong>, <strong>23: c</strong>, <strong>25: c</strong>).</li>
+                    </ul>
+                </div>
+
+                <!-- Pełna tabela / lista rozwiązań 1-25 -->
+                <div id="full-key-list" class="mt-6 space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- WIDOK 5: KOMPLETNA NOTATKA DO KOLOKWIUM ELFO                      -->
+        <!-- ================================================================= -->
+        <section id="view-notes" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+                    <div>
+                        <span class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Kompendium Egzaminacyjne ELFO</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Kompletna Notatka do Nauki do Kolokwium</h2>
+                        <p class="text-sm text-slate-400 mt-1">
+                            Syntetyczne opracowanie wszystkich załączonych materiałów: <strong>ELFO1</strong> (źródła niekoherentne, fotometria, kolorymetria), <strong>ELFO2</strong> (lasery półprzewodnikowe i Nd:YAG), <strong>ELFO3</strong> (podstawy fizyczne laserów, szerokość linii, koherencja, He-Ne), <strong>ELFO_03_04_2026</strong> (lasery DFB, DBR, VCSEL, układy WDM) oraz <strong>ELFO_05</strong> (lasery kaskadowe QCL i ICL, detekcja gazów w MIR) + wzory fotodetektorowe z kolokwium.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 no-print">
+                        <input type="text" id="notes-search-input" oninput="filterNotes(this.value)" placeholder="Szukaj w notatce (np. Wiena, QCL, DFB)..." class="bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-64">
+                        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer">
+                            🖨️ Drukuj notatkę
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Spis treści notatki (Szybkie skoki) -->
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 no-print">
+                    <a href="#note-sec-1" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-xs sm:text-sm font-semibold text-indigo-300 flex items-center gap-2 transition-all">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono">1</span>
+                        <span>Źródła niekoherentne, prawa CDC i fotometria (ELFO 1)</span>
+                    </a>
+                    <a href="#note-sec-2" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-xs sm:text-sm font-semibold text-indigo-300 flex items-center gap-2 transition-all">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono">2</span>
+                        <span>Fizyka laserów, rezonatory, poszerzenie linii i He-Ne (ELFO 2 &amp; 3)</span>
+                    </a>
+                    <a href="#note-sec-3" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-xs sm:text-sm font-semibold text-indigo-300 flex items-center gap-2 transition-all">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono">3</span>
+                        <span>Lasery ciała stałego i laser Nd:YAG + SHG (ELFO 2)</span>
+                    </a>
+                    <a href="#note-sec-4" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-xs sm:text-sm font-semibold text-indigo-300 flex items-center gap-2 transition-all">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono">4</span>
+                        <span>Lasery półprzewodnikowe: DH, QW, VCSEL, DFB, DBR (ELFO 2 &amp; Wykład)</span>
+                    </a>
+                    <a href="#note-sec-5" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-xs sm:text-sm font-semibold text-indigo-300 flex items-center gap-2 transition-all">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono">5</span>
+                        <span>Lasery kaskadowe QCL i ICL oraz spektroskopia MIR (ELFO 05)</span>
+                    </a>
+                    <a href="#note-sec-6" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-xs sm:text-sm font-semibold text-indigo-300 flex items-center gap-2 transition-all">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono">6</span>
+                        <span>Niezbędnik obliczeniowy: dBm, fotodiody PIN/APD, detektory</span>
+                    </a>
+                </div>
+
+                <!-- Treść notatki -->
+                <div id="notes-content-wrapper" class="mt-8 space-y-10 text-slate-200 leading-relaxed">
+
+                    <!-- ROZDZIAŁ 1 NOTATKI -->
+                    <article id="note-sec-1" class="note-section bg-slate-950/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                            <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-sm">Dział 1</span>
+                            <h3 class="text-xl font-extrabold text-white">Źródła światła niekoherentnego, prawa promieniowania, widzenie i fotometria (ELFO 1)</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">1.1. Ciało doskonale czarne (CDC) i prawa promieniowania</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Ciało doskonale czarne (CDC):</strong> całkowicie absorbuje każde padające promieniowanie niezależnie od długości fali $\lambda$ i temperatury $T$. Emituje promieniowanie o maksymalnym natężeniu w danej $T$, a widmo zależy wyłącznie od $T$. Model fizyczny: wnęka z małym otworem (ELFO1.pdf, str. 2).</li>
+                                    <li><strong>Prawo Plancka (1900 r.):</strong> określa emitancję widmową CDC przy założeniu emisji kwantami $h\nu$:
+                                        <div class="mt-1 p-2 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300">
+                                            $$M_{r\lambda}(T, \lambda) = \frac{c_1}{\lambda^5} \left[ \exp\left(\frac{c_2}{\lambda T}\right) - 1 \right]^{-1} \left[\frac{\text{W}}{\text{m}^3}\right]$$
+                                        </div>
+                                        gdzie $c_1 = 2\pi c^2 h = 3,7402 \cdot 10^{-16}\text{ W}\cdot\text{m}^2$, $c_2 = ch/k = 1,43848 \cdot 10^{-2}\text{ m}\cdot\text{K}$.
+                                    </li>
+                                    <li><strong>Prawo przesunięć Wiena:</strong> ze wzrostem temperatury $T$ maksimum promieniowania $\lambda_m$ przesuwa się ku <strong>krótszym długościom fal</strong> (ELFO1.pdf, str. 3):
+                                        <div class="mt-1 p-2 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300">
+                                            $$\lambda_m \cdot T = 2897\text{ [\mu m}\cdot\text{K]} \quad \Rightarrow \quad \lambda_m \approx \frac{3000}{T}$$
+                                        </div>
+                                        Dla $T = 290\text{ K}$ (pokojowa) $\lambda_m \approx 10\text{ }\mu\text{m}$ (podczerwień); dla $T = 2900\text{ K}$ $\lambda_m \approx 1\text{ }\mu\text{m}$.
+                                    </li>
+                                    <li><strong>Zasada Bohra dla promieniowania atomów:</strong> czas życia stanu wzbudzonego wynosi ok. $10^{-8}\text{ s}$; przejściu z $E_2$ do $E_1$ towarzyszy emisja kwantu $h\nu = E_2 - E_1$ (zgodnie z regułami wyboru, ELFO1.pdf, str. 3–4).</li>
+                                    <li><strong>Słońce jako źródło światła:</strong> widmo ciągłe zbliżone do CDC o temperaturze ok. <strong>5250 K</strong> (49% energii w zakresie widzialnym i bliskiej IR, 44% dla $\lambda > 800\text{ nm}$, 7% w bliskim UV $120\div 400\text{ nm}$, ELFO1.pdf, str. 4).</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">1.2. Mechanizmy wytwarzania światła i rodzaje źródeł</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Inkandescencja:</strong> temperaturowe wytwarzanie światła przez rozgrzanie ciała prądem elektrycznym (żarówki tradycyjne i halogenowe, ELFO1.pdf, str. 5).</li>
+                                    <li><strong>Luminescencja:</strong> „zimne świecenie” atomów/cząsteczek wzbudzonych czynnikiem innym niż wysoka temperatura (ELFO1.pdf, str. 5–6):
+                                        <ul class="list-disc list-inside ml-4 text-xs text-slate-400 space-y-1 mt-1">
+                                            <li><strong>Fotoluminescencja (fluorescencja):</strong> wzbudzenie luminoforu padającymi fotonami (np. UV w świetlówkach oraz konwersja niebieskiego światła w białych LED).</li>
+                                            <li><strong>Elektroluminescencja:</strong> emisja wskutek przepływu prądu / pola elektrycznego (diody LED, lampy wyładowcze).</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Żarówka tradycyjna:</strong> żarnik wolframowy ($T = 2100\div 2700\text{ K}$), bańka z gazem obojętnym (Ar, N₂, Kr, Xe) ograniczającym sublimację wolframu. Sprawność tylko $2\div 5\%$ (reszta to ciepło/IR), skuteczność ok. $14\text{ lm/W}$, trwałość $1000\text{ h}$, $\text{CRI} = 100$, $T_b = 2500\div 2700\text{ K}$ (ELFO1.pdf, str. 6–7, 20–21).</li>
+                                    <li><strong>Żarówka halogenowa:</strong> bańka ze szkła kwarcowego ($500\div 800^\circ\text{C}$), dodatek jodu lub bromu inicjuje <strong>cykl halogenowy</strong> (regeneracja żarnika – wolfram wraca na skrętkę). Pozwala to podnieść $T$ do ok. $3200\text{ K}$, skuteczność do $28\text{ lm/W}$ (w wersji <strong>IRC</strong> z powłoką odbijającą IR na żarnik o 30% wyższa), $\text{CRI} = 100$ (ELFO1.pdf, str. 7–8).</li>
+                                    <li><strong>Świetlówka (niskoprężna lampa rtęciowa):</strong> wyładowanie w parach Hg + Ar emituje promieniowanie UV (głównie linie rezonansowe <strong>185 nm i 254 nm</strong> – ok. 90% mocy). Luminofor na ściance konwertuje UV na światło widzialne. Widmo zawiera ostre piki Hg (405, 436, 546, 579 nm) na tle pasma luminoforu. Skuteczność do $105\text{ lm/W}$, trwałość $8000\div 20000\text{ h}$ (ELFO1.pdf, str. 8–10).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">1.3. Białe diody LED (3 metody wytwarzania bieli)</h4>
+                                <ol class="list-decimal list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>UV LED + 3 luminofory RGB:</strong> wycofana z uwagi na straty energii, brak regulacji barwy i wyciek szkodliwego UV (ELFO1.pdf, str. 11).</li>
+                                    <li><strong>Mieszanie 3 diod RGB:</strong> wysoka sprawność i sterowalność barwy, brak UV, ale trudna stabilizacja termiczna (szczególnie diody czerwonej).</li>
+                                    <li><strong>Metoda hybrydowa (najpopularniejsza!):</strong> <strong>niebieska dioda LED (ok. 450–470 nm) + żółty luminofor</strong>. Część światła niebieskiego przechodzi, a część pobudza luminofor emitujący szerokie pasmo zielono-żółto-czerwone ($500\div 700\text{ nm}$). Charakterystyka widmowa ma wyraźny <strong>wąski pik w błękicie (~450 nm) i szerokie wybrzuszenie wokół 550–600 nm</strong> (Rys. 3.11 w ELFO1.pdf, str. 12 – wykres z Pytania 14 na kolokwium!).</li>
+                                </ol>
+                                <p class="text-xs text-slate-400 mt-2">Parametry LED: trwałość do $100\,000\text{ h}$, skuteczność $\ge 100\text{ lm/W}$, czas włączania $100\text{ ns}$ / wyłączania $200\text{ ns}$ (ELFO1.pdf, str. 12).</p>
+                            </div>
+
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">1.4. Widzenie ludzkie, Fotometria, Kolorymetria i Monochromatory</h4>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                                    <li><strong>Fotoreceptory siatkówki (ELFO1.pdf, str. 14):</strong>
+                                        <strong>Czopki (7 mln, głównie w plamce żółtej):</strong> widzenie dzienne (fotopowe, $L > 3,5\div 10\text{ cd/m}^2$), barwne i ostre; 3 typy: niebieskie (4%, 420 nm), zielone (32%, 534 nm), czerwone (64%, 564 nm).
+                                        <strong>Pręciki (125 mln):</strong> widzenie nocne (skotopowe, $L < 0,035\text{ cd/m}^2$), bez rozróżniania barw. Przedział $0,035\div 3,5\text{ cd/m}^2$ to widzenie zmierzchowe (mezopowe).
+                                    </li>
+                                    <li><strong>Maksimum czułości widmowej oka:</strong> przypada na $\lambda = \mathbf{555\text{ nm}}$ ($540\text{ THz}$, barwa zielono-żółta), czemu odpowiada maksymalna skuteczność świetlna $683\text{ lm/W}$ (ELFO1.pdf, str. 15, 26).</li>
+                                    <li><strong>Wpływ biologiczny światła niebieskiego:</strong> hamuje wydzielanie <strong>melatoniny</strong> („hormonu snu” produkowanego w nocy przez szyszynkę) i stymuluje poranny <strong>kortyzol</strong> (ELFO1.pdf, str. 16).</li>
+                                    <li><strong>Wielkości fotometryczne (ELFO1.pdf, str. 17–18):</strong>
+                                        <span class="text-emerald-300 font-mono">Strumień świetlny $\Phi$ [lm]</span>;
+                                        <span class="text-emerald-300 font-mono">Natężenie oświetlenia $E = \Phi/S$ [lx = lm/m²]</span>;
+                                        <span class="text-emerald-300 font-mono">Światłość $I = \Phi/\Omega$ [cd = lm/sr]</span>;
+                                        <span class="text-emerald-300 font-mono">Luminancja $L = I/S_{\text{poz}}$ [cd/m²]</span>;
+                                        <span class="text-emerald-300 font-mono">Skuteczność świetlna $\eta = \Phi/P_{\text{el}}$ [lm/W]</span>.
+                                    </li>
+                                    <li><strong>Wskaźnik oddawania barw CRI ($R_a$):</strong> bezwymiarowy ($0\div 100$), wyznaczany z 8 (dla $R_a$) lub 14 (dla CRI) próbek Munsella ($R_{ij} = 100 - 4,6\Delta E_j$). Dla źródeł o $T_b < 5000\text{ K}$ wzorcem jest promiennik Plancka, a dla $T_b > 5000\text{ K}$ symulator światła dziennego (ELFO1.pdf, str. 21, 27–30).</li>
+                                    <li><strong>Dyspersja w pryzmacie vs siatce (ELFO1.pdf, str. 22–23):</strong> pryzmat silniej odchyla fale <strong>krótsze (fiolet)</strong> niż dłuższe (czerwień). Siatka dyfrakcyjna ma dyspersję $d\varphi/d\lambda = \frac{m}{d\cos\varphi}$ (gęstość rys: UV $1200\text{ rys/mm}$, VIS $600\text{ rys/mm}$, IR $1\div 300\text{ rys/mm}$).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ROZDZIAŁ 2 NOTATKI -->
+                    <article id="note-sec-2" class="note-section bg-slate-950/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                            <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-sm">Dział 2</span>
+                            <h3 class="text-xl font-extrabold text-white">Podstawy fizyczne laserów, warunki generacji, szerokość linii i laser He-Ne (ELFO 2 &amp; ELFO 3)</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">2.1. Zasada działania lasera i warunki generacji</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>LASER</strong> (<em>Light Amplification by Stimulated Emission of Radiation</em>) – pierwszy laser uruchomił <strong>T. Maiman w 1960 r.</strong> (laser rubinowy $\text{Cr}^{3+}:\text{Al}_2\text{O}_3$). Pierwszy laser gazowy He-Ne uruchomił <strong>Ali Javan w 1961 r.</strong> (ELFO3.pdf, str. 3, 15).</li>
+                                    <li><strong>Budowa ogólna:</strong> laser to optyczny generator samowzbudny składający się z dwóch niezbędnych elementów: <strong>ośrodka aktywnego (wzmacniającego)</strong> oraz <strong>rezonatora optycznego</strong> (dodatniej pętli sprzężenia zwrotnego, np. pary zwierciadeł Fabry-Perot: $R_1 \approx 100\%$, $R_2 < 100\%$, ELFO3.pdf, str. 3–4; ELFO2.pdf, str. 2).</li>
+                                    <li><strong>Trzy procesy Einsteina:</strong>
+                                        1) <em>Emisja spontaniczna</em> (samorzutny przeskok $E_g \to E_d$, fotony niespójne – szum startowy generatora);
+                                        2) <em>Absorpcja</em> (pochłonięcie fotonu $h\nu = E_g - E_d$, przeskok $E_d \to E_g$);
+                                        3) <em>Emisja wymuszona</em> (foton wymuszający wyzwala identyczny, bliźniaczy foton o tej samej energii, fazie, polaryzacji i kierunku propagacji, ELFO3.pdf, str. 4–5).
+                                    </li>
+                                    <li><strong>Warunek wystarczający wzmocnienia światła:</strong> wytworzenie w ośrodku <strong>inwersji obsadzeń</strong> ($N_g > N_d$), czyli odwrócenie równowagowego rozkładu Boltzmanna $\frac{N_g}{N_d} = \exp\left(-\frac{E_g - E_d}{kT}\right) < 1$ (ELFO3.pdf, str. 5).</li>
+                                    <li><strong>Dwa warunki generacji laserowej (drgań niegasnących, ELFO2.pdf, str. 3–4; ELFO3.pdf, str. 10–12):</strong>
+                                        <div class="mt-1 p-2.5 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300 space-y-1">
+                                            <div>$$1)\text{ Amplitudowy: } R_1 R_2 \exp[2(g_0 - \alpha_0)L_m] = 1 \implies g_{th} = \alpha_0 + \frac{1}{2L_m}\ln\left(\frac{1}{R_1 R_2}\right)$$</div>
+                                            <div>$$2)\text{ Fazowy: } L = m \cdot \frac{\lambda}{2n} \implies f_m = m \cdot \frac{c}{2Ln}, \quad \Delta\nu = \frac{c}{2Ln}$$</div>
+                                        </div>
+                                        Amplituda fali po pełnym obiegu rezonatora nie może zmaleć (wzmocnienie kompensuje straty), a jej faza musi pozostać bez zmian (wielokrotność połówek długości fali $\lambda/2$).
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">2.2. Poszerzenie linii widmowych i Droga Koherencji</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Poszerzenie jednorodne (funkcja Lorentza, ELFO3.pdf, str. 6–7):</strong> oddziałuje jednakowo na każdy atom:
+                                        <ul class="list-disc list-inside ml-4 text-xs text-slate-400 space-y-1 mt-1">
+                                            <li><strong>Naturalne:</strong> wynika ze skończonego czasu życia poziomów $\Delta\nu_N = \frac{1}{2\pi}\left(\frac{1}{t_g} + \frac{1}{t_d}\right)$ (dla He-Ne 632,8 nm: $\Delta\nu_N \approx 50\text{ MHz}$).</li>
+                                            <li><strong>Zderzeniowe (ciśnieniowe):</strong> zderzenia niesprężyste między atomami przerywają akt emisji, skracając ciąg falowy (rośnie wraz z ciśnieniem gazu).</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Poszerzenie niejednorodne (funkcja Gaussa, ELFO3.pdf, str. 7–8):</strong> wynika z <strong>termicznego ruchu atomów (efekt Dopplera)</strong>:
+                                        <div class="mt-1 p-2 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300">
+                                            $$\Delta\nu_D = \frac{2}{\lambda}\sqrt{\frac{2kT\ln 2}{M}} \quad (\text{dla He-Ne 632,8 nm: } \Delta\nu_D \approx 1500\text{ MHz} = 1,5\text{ GHz})$$
+                                        </div>
+                                        Szerokość dopplerowska rośnie ze wzrostem temperatury $T$ i maleje ze wzrostem masy atomowej $M$.
+                                    </li>
+                                    <li><strong>Czas i droga koherencji ($t_c, l_c$, ELFO3.pdf, str. 13):</strong> droga koherencji jest <strong>odwrotnie proporcjonalna do szerokości spektralnej $\Delta\nu$</strong>:
+                                        <div class="mt-1 p-2 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300">
+                                            $$t_c = \frac{1}{\Delta\nu}, \qquad l_c = c \cdot t_c = \frac{c}{\Delta\nu}$$
+                                        </div>
+                                        Porównanie (Tab. 5.1 z ELFO3.pdf): Nd:YAG (532 nm, $\Delta\nu \approx 250\text{ GHz} \Rightarrow l_c \approx 1,2\text{ mm}$); laser półprzewodnikowy (680 nm, $\Delta\nu \approx 130\text{ GHz} \Rightarrow l_c \approx 2,3\text{ mm}$); He-Ne wielomodowy ($\Delta\nu \approx 1,2\text{ GHz} \Rightarrow l_c \approx 25\text{ cm}$); <strong>He-Ne jednomodowy ($\Delta\nu \approx 5\text{ MHz} \Rightarrow l_c \approx 60\text{ m}$ – najdłuższa droga koherencji!)</strong>.
+                                    </li>
+                                    <li><strong>Budowa lasera He-Ne i mody $\text{TEM}_{mn}$ (ELFO3.pdf, str. 14–16):</strong> inwersja obsadzeń powstaje między poziomami <strong>atomów neonu (Ne)</strong>, a <strong>hel (He)</strong> wspomaga pompowanie przez zderzenia II rodzaju. Rurę zamykają <strong>okienka Brewstera</strong> ($\tan\alpha_B = n$), które eliminują straty odbiciowe dla polaryzacji liniowej w płaszczyźnie rysunku. Zimna katoda z $\text{Al}$ pokrytego $\text{Al}_2\text{O}_3$ chroni przed rozpylaniem katodowym. Średnica wiązki $\text{TEM}_{00}$ to okrąg, gdzie natężenie spada $e^2 \approx 7,4$ razy względem środka.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ROZDZIAŁ 3 NOTATKI -->
+                    <article id="note-sec-3" class="note-section bg-slate-950/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                            <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-sm">Dział 3</span>
+                            <h3 class="text-xl font-extrabold text-white">Lasery na ciele stałym i laser Nd:YAG (ELFO 2)</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">3.1. Matryce dielektryczne i jony domieszek</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Klasyfikacja (ELFO2.pdf, str. 12–13):</strong> lasery na ciele stałym wykorzystują <strong>ośrodki dielektryczne</strong> (kryształy lub szkła) domieszkowane (zwykle ok. 1%) jonami metali przejściowych ($\text{Cr, Ti, V}$) lub <strong>ziemi rzadkich / lantanowców ($\text{Nd, Er, Yb, Ce}$)</strong>. Lasery półprzewodnikowe stanowią odrębną grupę!</li>
+                                    <li><strong>Metale przejściowe vs Lantanowce:</strong>
+                                        <ul class="list-disc list-inside ml-4 text-xs text-slate-400 space-y-1 mt-1">
+                                            <li>W <em>metalach przejściowych</em> powłoka $d$ traci ekranowanie w krysztale i bierze udział w wiązaniach $\Rightarrow$ szerokie widma silnie zależne od matrycy.</li>
+                                            <li>W <em>lantanowcach (ziemiach rzadkich, np. $\text{Nd}^{3+}$)</em> niecałkowicie zapełniona powłoka <strong>$4f$ jest silnie ekranowana przez zewnętrzne elektrony $5s^2$ i $5p^6$</strong> $\Rightarrow$ słabo oddziałuje z siecią krystaliczną, a widma są wąskie jak dla jonów swobodnych.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">3.2. Właściwości lasera Nd:YAG i generacja II harmonicznej (SHG)</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Nd:YAG</strong> ($\text{Y}_{3-x}\text{Nd}_x\text{Al}_5\text{O}_{12}$ – granat itrowo-glinowy domieszkowany neodymem): współczynnik załamania $n = 1,8169$, czas życia fluorescencji $230\text{ }\mu\text{s}$ (ELFO2.pdf, str. 13–14).</li>
+                                    <li><strong>Układ 4-poziomowy:</strong> pompowanie optyczne (najsilniejsze pasmo absorpcji przypada na $\mathbf{808,6\text{ nm}}$ – idealne dla diody laserowej GaAs/AlGaAs – lub lampą błyskową). Przejście laserowe zachodzi ze stanu $^4\text{F}_{3/2} \to {^4\text{I}_{11/2}}$ z emisją fali podstawowej $\mathbf{\lambda = 1064\text{ nm}}$ (1064,14 nm).</li>
+                                    <li><strong>Dlaczego próg generacji jest niski?</strong> Ponieważ dolny poziom laserowy $^4\text{I}_{11/2}$ leży o $2111\text{ cm}^{-1}$ nad stanem podstawowym $^4\text{I}_{9/2}$, więc w temp. pokojowej jego obsadzenie termiczne z rozkładu Boltzmanna wynosi $\exp(-\Delta E/kT) \approx \exp(-10) \approx 0$ (jest praktycznie pusty, ELFO2.pdf, str. 15).</li>
+                                    <li><strong>Powielanie częstotliwości (SHG):</strong> umieszczenie wewnątrz rezonatora kryształu nieliniowego pozwala uzyskać drugą harmoniczną <strong>532 nm</strong> (zieloną), a także 355 nm (3. harm.) i 266 nm (4. harm.). Moc drugiej harmonicznej zależy kwadratowo od mocy fali podstawowej ($P_{532} \propto P_{1064}^2$, czyli nachylenie prostej na wykresie log-log wynosi 2 dla SHG oraz 1 dla 1064 nm, ELFO2.pdf, str. 15–16).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ROZDZIAŁ 4 NOTATKI -->
+                    <article id="note-sec-4" class="note-section bg-slate-950/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                            <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-sm">Dział 4</span>
+                            <h3 class="text-xl font-extrabold text-white">Lasery półprzewodnikowe: złącze p-n, heterostruktury, QW, VCSEL, DFB i DBR (ELFO 2 &amp; Wykład)</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">4.1. Fizyka złącza p-n, materiały i heterostruktury (DH, QW)</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Warunek budowy diody laserowej:</strong> złącze p-n wykonane z <strong>półprzewodników silnie domieszkowanych (zdegenerowanych) o PROSTEJ przerwie energetycznej</strong> (np. GaAs, InP, GaN, InGaAs, InGaAsP), spolaryzowane <strong>w kierunku przewodzenia</strong> ($eV_f \approx E_g$). Z półprzewodników ze <em>skośną przerwą</em> (Si, Ge, SiC) nie można wykonać klasycznego lasera złączowego, gdyż przejście wymaga udziału fononu (zderzenie 3-ciałowe elektron-foton-fonon, ELFO_03_04_2026.pdf, slajdy 4–5, 12). Wyjątkiem w Si są optycznie pompowane lasery ramanowskie (ELFO2.pdf, str. 5).</li>
+                                    <li><strong>Zależność długości fali od przerwy energetycznej (ELFO_03_04_2026.pdf, slajd 7):</strong>
+                                        <div class="mt-1 p-2 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300">
+                                            $$\lambda\,[\mu\text{m}] = \frac{hc}{E_g} \approx \frac{1,24}{E_g\,[\text{eV}]}$$
+                                        </div>
+                                        Przykłady z wykładu: <strong>GaN</strong> ($E_g = 3,4\text{ eV} \Rightarrow \lambda = 365\text{ nm}$), <strong>GaAs</strong> ($E_g = 1,42\text{ eV} \Rightarrow \lambda = 0,87\text{ }\mu\text{m}$), <strong>Si</strong> ($E_g = 1,12\text{ eV} \Rightarrow \lambda_c = 1,1\text{ }\mu\text{m}$), <strong>Ge</strong> ($E_g = 0,68\text{ eV} \Rightarrow \lambda_c = 1,8\text{ }\mu\text{m}$), <strong>InGaAsP/InP</strong> ($1330\text{ nm}$ i $1550\text{ nm}$ – telekomunikacja światłowodowa).</li>
+                                    <li><strong>Podwójna heterostruktura (DH, np. AlGaAs / GaAs / AlGaAs):</strong> cienka warstwa aktywna ($d \approx 0,1\text{ }\mu\text{m}$, np. GaAs o $E_g = 1,42\text{ eV}$) otoczona jest warstwami o <strong>większej przerwie zabronionej $E_g$</strong> (np. AlGaAs, $E_g \approx 1,8\div 2,0\text{ eV}$) i <strong>mniejszym o ok. 5% współczynniku załamania $n$</strong>. Daje to jednoczesne ograniczenie nośników ładunku w studni potencjału oraz ograniczenie pola optycznego (falowód, ELFO2.pdf, str. 7–8).</li>
+                                    <li><strong>Studnie kwantowe (QW – Quantum Well):</strong> grubość warstwy aktywnej $d < 20\text{ nm}$ (porównywalna z falą de Broglie’a) $\Rightarrow$ dyskretyzacja poziomów energetycznych, prąd progowy 10-krotnie niższy ($10\div 20\text{ mA}$), mniejsza wrażliwość na temperaturę, szybka modulacja bezpośrednia ($< 1\text{ ns}$, ELFO2.pdf, str. 8–9).</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">4.2. Porównanie: Laser Krawędziowy (EEL) vs VCSEL oraz DFB vs DBR</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Laser krawędziowy (EEL):</strong> długa wnęka ($L \approx 200\div 1270\text{ }\mu\text{m}$), zwierciadła tworzą przełamane krawędzie kryształu ($R \approx 32\%$). Wiązka wychodzi z wąskiej szczeliny ($1 \times 100\text{ }\mu\text{m}$), więc ma <strong>eliptyczny profil i dużą rozbieżność</strong>. Prąd progowy rzędu kilkudziesięciu mA, <strong>moc pojedynczego emitera CW sięga pojedynczych watów (ok. 1–8 W)</strong>, praca wielomodowa podłużnie dla prostego FP (ELFO2.pdf, str. 8–9; ELFO_03_04_2026.pdf, slajdy 14–19, 40).</li>
+                                    <li><strong>Laser VCSEL (Vertical-Cavity Surface-Emitting Laser):</strong> emisja prostopadła do powierzchni złącza, bardzo krótka wnęka pionowa ($L \approx 1\text{ }\mu\text{m}$) $\Rightarrow$ generuje <strong>pojedynczy mod podłużny</strong>. Zwierciadła to wielowarstwowe reflektory Bragga (DBR) o ogromnym współczynniku odbicia ($R > 99,9\%$). Zalety: <strong>bardzo niski prąd progowy ($< 0,5\div 2\text{ mA}$), kołowy profil wiązki, mała rozbieżność</strong>, łatwa integracja w matryce 2D. Wada pojedynczego VCSEL: <strong>niewielka moc wyjściowa (rzędu mW)</strong> oraz opór szeregowy stosów DBR. Najczęstsza długość fali: <strong>850 nm</strong> (ELFO2.pdf, str. 9; ELFO_03_04_2026.pdf, slajdy 33–35).</li>
+                                    <li><strong>Lasery jednomodowe SLM (DFB i DBR, ELFO_03_04_2026.pdf, slajdy 21–30):</strong> warunek Bragga dla siatki o okresie $\Lambda$: $\Lambda = n\frac{\lambda}{2}$.
+                                        <ul class="list-disc list-inside ml-4 text-xs text-slate-400 space-y-1 mt-1">
+                                            <li><strong>DBR (Distributed Bragg Reflector):</strong> pasywne siatki Bragga umieszczone <em>poza</em> obszarem aktywnym (umożliwia przestrajanie długości fali prądem sekcji DBR i fazy).</li>
+                                            <li><strong>DFB (Distributed Feedback):</strong> periodyczna siatka dyfrakcyjna biegnie <em>wzdłuż całego obszaru aktywnego</em>. Zastosowanie <strong>sekcji ćwierćfalowej ($\lambda/4$)</strong> usuwa degenerację dwóch modów braggowskich i wymusza stabilną pracę dokładnie na $\nu_{\text{Bragg}}$ przy wysokim SMSR ($> 35\div 50\text{ dB}$).</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ROZDZIAŁ 5 NOTATKI -->
+                    <article id="note-sec-5" class="note-section bg-slate-950/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                            <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-sm">Dział 5</span>
+                            <h3 class="text-xl font-extrabold text-white">Lasery kaskadowe QCL i ICL oraz spektroskopia w średniej podczerwieni MIR (ELFO 05)</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">5.1. Mechanika kwantowa studni i zasada kaskady (QCL)</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Energia w studni kwantowej (ELFO_05.pdf, slajd 11):</strong> $E_n = \frac{n^2 \pi^2 \hbar^2}{2 m^* L^2} \implies$ odstęp między podpasmami $\Delta E_{21} \propto \frac{1}{L^2}$. O długości fali w QCL decyduje <strong>grubość warstw (inżynieria funkcji falowych)</strong>, a nie szerokość przerwy zabronionej $E_g$ materiału!</li>
+                                    <li><strong>Sprzężone studnie kwantowe i supersieć (ELFO_05.pdf, slajdy 8–10):</strong> tunelowanie przez cienką barierę rozszczepia poziomy na stan <strong>symetryczny $\psi^+(z)$ (parzysty, niższa energia $E^+$)</strong> oraz <strong>antysymetryczny $\psi^-(z)$ (nieparzysty, z węzłem, wyższa energia $E^-$)</strong>. W wielu studniach (supersieci) tworzą się <em>minipasma</em>.</li>
+                                    <li><strong>QCL (Quantum Cascade Laser, 1994 – J. Faist, F. Capasso, slajdy 13–18):</strong> laser <strong>półprzewodnikowy UNIPOLARNY</strong> (transport wyłącznie elektronów), w którym zachodzą <strong>przejścia międzypodpasmowe (intersubband)</strong> wewnątrz pasma przewodnictwa ($h\nu = E_u - E_l$).</li>
+                                    <li><strong>Kaskadowość (slajdy 14–15, 20):</strong> pojedynczy stopień obejmuje <em>iniektor + obszar aktywny + obszar ekstrakcji</em>. Elektron po wyemitowaniu fotonu w jednym stopniu tuneluje rezonansowo do kolejnego stopnia – $N$ stopni pozwala jednemu elektronowi wyemitować $N$ fotonów ($eV \ge N \cdot h\nu$).</li>
+                                    <li><strong>Warunek inwersji obsadzeń w QCL (slajdy 17, 21):</strong> bardzo krótki czas życia na poziomie dolnym ($\tau_2 < \tau_3$, czasy rzędu pikosekund $\sim\text{ps}$), uzyskiwany dzięki <strong>szybkiemu rozpraszaniu na fononach optycznych LO</strong> i tunelowaniu do iniektora.</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">5.2. Porównanie QCL vs ICL, Polaryzacja TM/TE i zastosowania MIR</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs text-left border-collapse">
+                                        <thead>
+                                            <tr class="border-b border-slate-700 text-indigo-300">
+                                                <th class="py-1.5 pr-2">Parametr</th>
+                                                <th class="py-1.5 px-2">QCL (Kaskada kwantowa)</th>
+                                                <th class="py-1.5 pl-2">ICL (Międzypasmowy kaskadowy)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-800 text-slate-300">
+                                            <tr>
+                                                <td class="py-1.5 pr-2 font-semibold">Typ przejścia</td>
+                                                <td class="py-1.5 px-2">Międzypodpasmowe (Intersubband)</td>
+                                                <td class="py-1.5 pl-2">Międzypasmowe (Interband, typ II: InAs/GaInSb/AlSb)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-1.5 pr-2 font-semibold">Nośniki</td>
+                                                <td class="py-1.5 px-2">Unipolarny (tylko elektrony)</td>
+                                                <td class="py-1.5 pl-2">Bipolarny/hybrydowy (elektrony i dziury, złącze półmetaliczne)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-1.5 pr-2 font-semibold">Polaryzacja</td>
+                                                <td class="py-1.5 px-2 text-emerald-300 font-bold">TM ($E_z \ne 0$, prostopadle do warstw)</td>
+                                                <td class="py-1.5 pl-2 text-amber-300 font-bold">TE ($E \parallel$ warstw, $E_z = 0$)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-1.5 pr-2 font-semibold">Zakres $\lambda$</td>
+                                                <td class="py-1.5 px-2">$\sim 3,5\div 20\text{ }\mu\text{m}$ oraz pasmo THz ($30\div 300\text{ }\mu\text{m}$)</td>
+                                                <td class="py-1.5 pl-2">$\sim 3\div 6\text{ }\mu\text{m}$ (optymalnie $3\div 4,5\text{ }\mu\text{m}$)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-1.5 pr-2 font-semibold">Zasilanie i $P_{th}$</td>
+                                                <td class="py-1.5 px-2">Wyższe: $I_{th} = 0,5\div 2\text{ A}$, $U = 6\div 15\text{ V}$, duże moce ($>1\text{ W}$, rekord 8,21 W CW)</td>
+                                                <td class="py-1.5 pl-2">Bardzo niski pobór mocy: $I_{th} = 10\div 200\text{ mA}$, $U = 2\div 4\text{ V}$ (dłuższy czas życia $\sim\text{ns}$)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300 mt-2 text-xs">
+                                    <li><strong>Średnia podczerwień (MIR: $2,5\div 25\text{ }\mu\text{m}$, slajdy 39–43):</strong> pasmo daktyloskopowe („odcisk palca cząsteczek”), w którym leżą fundamentalne przejścia oscylacyjno-rotacyjne gazów ($\text{CO}_2, \text{CH}_4, \text{CO}, \text{NO}, \text{NH}_3, \text{H}_2\text{O}$). Spektroskopia TDLAS wykorzystuje prawo Lamberta-Beera: $T(\tilde{\nu}) = \frac{I(\tilde{\nu})}{I_0(\tilde{\nu})} = \exp[-\alpha(\tilde{\nu})\cdot L]$.</li>
+                                    <li><strong>Architektury falowodowe i montaż QCL (slajdy 48–49):</strong> <em>Ridge Waveguide (RWG)</em> – najprostsza technologia mesy; <em>Double-Trench (DT)</em> – dwa rowki; <em>Buried Heterostructure (BH)</em> – struktura zagrzebana zapewniająca najlepsze odprowadzanie ciepła i niskie straty w pracy CW. Montaż <strong>epi-down</strong> daje znacznie lepsze chłodzenie niż <strong>epi-up</strong>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ROZDZIAŁ 6 NOTATKI -->
+                    <article id="note-sec-6" class="note-section bg-slate-950/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                            <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-sm">Dział 6</span>
+                            <h3 class="text-xl font-extrabold text-white">Niezbędnik obliczeniowy do kolokwium: dBm, fotodiody PIN/APD, detektory termiczne i fotonowe</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">6.1. Przeliczanie mocy optycznej (dBm ⇄ mW) i Fotoprąd</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Skala dBm (odniesiona do $1\text{ mW}$):</strong>
+                                        <div class="mt-1 p-2 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300">
+                                            $$P_{[\text{dBm}]} = 10 \log_{10}\left(\frac{P_{[\text{mW}]}}{1\text{ mW}}\right) \quad \Longleftrightarrow \quad P_{[\text{mW}]} = 1\text{ mW} \cdot 10^{\frac{P_{[\text{dBm}]}}{10}}$$
+                                        </div>
+                                        Wartości kluczowe na kolokwium (bez kalkulatora):
+                                        <span class="font-mono text-xs text-indigo-300">$0\text{ dBm} = 1\text{ mW}$</span>,
+                                        <span class="font-mono text-xs text-indigo-300">$3\text{ dBm} \approx 2\text{ mW}$</span>,
+                                        <span class="font-mono text-xs text-indigo-300">$10\text{ dBm} = 10\text{ mW}$</span>,
+                                        <span class="font-mono text-xs text-indigo-300">$14\text{ dBm} = 20\text{ dBm} - 6\text{ dB} = \frac{100}{4} = 25\text{ mW}$</span>,
+                                        <span class="font-mono text-xs text-indigo-300">$20\text{ dBm} = 100\text{ mW}$</span>,
+                                        <span class="font-mono text-xs text-indigo-300">$30\text{ dBm} = 1000\text{ mW} = 1\text{ W}$</span>.
+                                    </li>
+                                    <li><strong>Natężenie fotoprądu i czułość widmowa fotodiody $R$:</strong>
+                                        <div class="mt-1 p-2 bg-slate-950 rounded-lg font-mono text-xs text-emerald-300">
+                                            $$I_{ph} = R \cdot P_{\text{opt}}, \qquad R = \eta \frac{e\lambda}{hc} \approx \eta \frac{\lambda\,[\mu\text{m}]}{1,24}\text{ [A/W]}$$
+                                        </div>
+                                        Przykład z Pytania 25: dla $P = 14\text{ dBm} = 25\text{ mW}$ oraz $R = 0,5\text{ A/W}$ fotoprąd wynosi $I_{ph} = 0,5 \cdot 25\text{ mA} = 12,5\text{ mA}$.
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-indigo-300">6.2. Detektory Fotonowe vs Termiczne oraz PIN vs APD</h4>
+                                <ul class="list-disc list-inside space-y-1.5 text-slate-300">
+                                    <li><strong>Długość fali odcięcia detektora fotonowego ($\lambda_c$):</strong> określona szerokością przerwy zabronionej $E_g$ półprzewodnika ($\lambda_c = \frac{1,24}{E_g\,[\text{eV}]}\text{ [\mu m]}$; dla $\text{Si}$: $\lambda_c \approx 1100\text{ nm}$, dla $\text{Ge}$: $\lambda_c \approx 1800\text{ nm}$, ELFO_03_04_2026.pdf, slajd 7). Fotodioda krzemowa detekuje fale <strong>krótsze niż 1100 nm</strong> ($\lambda \le 1100\text{ nm}$, np. 650 nm)!</li>
+                                    <li><strong>Charakterystyki widmowe detektorów (Pytanie 20):</strong>
+                                        <ul class="list-disc list-inside ml-4 text-xs text-slate-400 space-y-1 mt-1">
+                                            <li><strong>Detektor termiczny:</strong> przy <em>stałej mocy</em> odpowiedź jest płaska ($\text{const}$); przy <em>stałej liczbie fotonów</em> odpowiedź maleje hiperbolicznie jak $1/\lambda$ (bo energia 1 fotonu to $hc/\lambda$).</li>
+                                            <li><strong>Detektor fotonowy:</strong> przy <em>stałej liczbie fotonów</em> odpowiedź jest płaska do $\lambda_c$; przy <em>stałej mocy</em> odpowiedź rośnie liniowo z $\lambda$ aż do gwałtownego spadku przy $\lambda_c$.</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Fotodioda PIN vs Fotodioda lawinowa (APD, Pytania 18 i 23):</strong>
+                                        Dioda <strong>PIN</strong> nie ma wzmocnienia wewnętrznego ($M=1$), ma typową czułość <strong>$0,5\div 1\text{ A/W}$</strong>, niskie napięcie polaryzacji zaporowej i niskie szumy.
+                                        Fotodioda <strong>lawinowa (APD)</strong> wykorzystuje jonizację zderzeniową – ma <strong>większe wzmocnienie ($M=10\div 100$), większy poziom szumów (szum nadmiarowy powielania) oraz większe napięcie polaryzacji ($50\div 400\text{ V}$)</strong>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- STOPKA -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-5 px-4 text-center text-xs text-slate-500 no-print">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span>ELFO • Elementy Fotoniczne – Symulator Kolokwium Wielokrotnego Użytku i Kompendium</span>
+            <span>Politechnika Warszawska • Wydział Elektroniki i Technik Informacyjnych (IMiO)</span>
+        </div>
+    </footer>
+
+   <!-- ================================================================= -->
+    <!-- SKRYPT JAVASCRIPT: BAZA 50 PYTAŃ, DIAGRAMY SVG I LOGIKA QUIZÓW    -->
+    <!-- (Zastąp tym blokiem urwany znacznik <script> na końcu pliku HTML) -->
+    <!-- ================================================================= -->
+    <script>
+        // Pomocnicze diagramy SVG odtwarzające rysunki z arkusza JPG (Pytania 8, 14, 20)
+        const DIAGRAM_Q8 = `
+        <div class="my-3 p-4 rounded-xl bg-slate-950 border border-slate-800 overflow-x-auto">
+            <p class="text-xs text-slate-400 mb-2 font-mono">Odtworzenie schematów procesów a), b), c), d) z arkusza IMG_7172.jpg (Pytanie 8):</p>
+            <svg viewBox="0 0 680 140" class="w-full max-w-2xl mx-auto h-auto text-slate-200">
+                <!-- a) Absorpcja -->
+                <g transform="translate(10, 10)">
+                    <text x="65" y="12" fill="#94a3b8" font-size="12" font-weight="bold" text-anchor="middle">a)</text>
+                    <line x1="25" y1="30" x2="115" y2="30" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="34" fill="#cbd5e1" font-size="11">Eg</text>
+                    <line x1="25" y1="105" x2="115" y2="105" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="109" fill="#cbd5e1" font-size="11">Ed</text>
+                    <circle cx="70" cy="105" r="4" fill="#38bdf8"/>
+                    <line x1="70" y1="101" x2="70" y2="36" stroke="#38bdf8" stroke-width="2"/>
+                    <polygon points="70,31 66,40 74,40" fill="#38bdf8"/>
+                    <path d="M 15 68 Q 22 60 29 68 T 43 68" fill="none" stroke="#fbbf24" stroke-width="2"/>
+                    <polygon points="48,68 41,64 41,72" fill="#fbbf24"/>
+                    <text x="28" y="58" fill="#fbbf24" font-size="11">hν</text>
+                </g>
+                <!-- b) Emisja spontaniczna -->
+                <g transform="translate(175, 10)">
+                    <text x="65" y="12" fill="#94a3b8" font-size="12" font-weight="bold" text-anchor="middle">b)</text>
+                    <line x1="25" y1="30" x2="115" y2="30" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="34" fill="#cbd5e1" font-size="11">Eg</text>
+                    <line x1="25" y1="105" x2="115" y2="105" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="109" fill="#cbd5e1" font-size="11">Ed</text>
+                    <circle cx="65" cy="30" r="4" fill="#f472b6"/>
+                    <line x1="65" y1="34" x2="65" y2="99" stroke="#f472b6" stroke-width="2"/>
+                    <polygon points="65,104 61,95 69,95" fill="#f472b6"/>
+                    <path d="M 75 68 Q 82 60 89 68 T 103 68" fill="none" stroke="#fbbf24" stroke-width="2"/>
+                    <polygon points="108,68 101,64 101,72" fill="#fbbf24"/>
+                    <text x="90" y="58" fill="#fbbf24" font-size="11">hν</text>
+                </g>
+                <!-- c) Emisja wymuszona -->
+                <g transform="translate(340, 10)">
+                    <text x="70" y="12" fill="#34d399" font-size="12" font-weight="bold" text-anchor="middle">c)</text>
+                    <line x1="30" y1="30" x2="115" y2="30" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="34" fill="#cbd5e1" font-size="11">Eg</text>
+                    <line x1="30" y1="105" x2="115" y2="105" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="109" fill="#cbd5e1" font-size="11">Ed</text>
+                    <circle cx="65" cy="30" r="4" fill="#34d399"/>
+                    <line x1="65" y1="34" x2="65" y2="99" stroke="#34d399" stroke-width="2"/>
+                    <polygon points="65,104 61,95 69,95" fill="#34d399"/>
+                    <path d="M 10 68 Q 17 60 24 68 T 38 68" fill="none" stroke="#fbbf24" stroke-width="2"/>
+                    <polygon points="43,68 36,64 36,72" fill="#fbbf24"/>
+                    <text x="22" y="58" fill="#fbbf24" font-size="11">hν</text>
+                    <path d="M 75 60 Q 82 52 89 60 T 103 60" fill="none" stroke="#34d399" stroke-width="2"/>
+                    <polygon points="108,60 101,56 101,64" fill="#34d399"/>
+                    <path d="M 75 78 Q 82 70 89 78 T 103 78" fill="none" stroke="#34d399" stroke-width="2"/>
+                    <polygon points="108,78 101,74 101,82" fill="#34d399"/>
+                    <text x="90" y="50" fill="#34d399" font-size="10">2×hν</text>
+                </g>
+                <!-- d) Niefizyczny -->
+                <g transform="translate(510, 10)">
+                    <text x="70" y="12" fill="#94a3b8" font-size="12" font-weight="bold" text-anchor="middle">d)</text>
+                    <line x1="30" y1="30" x2="115" y2="30" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="34" fill="#cbd5e1" font-size="11">Eg</text>
+                    <line x1="30" y1="105" x2="115" y2="105" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="122" y="109" fill="#cbd5e1" font-size="11">Ed</text>
+                    <circle cx="65" cy="105" r="4" fill="#f87171"/>
+                    <line x1="65" y1="101" x2="65" y2="36" stroke="#f87171" stroke-width="2"/>
+                    <polygon points="65,31 61,40 69,40" fill="#f87171"/>
+                    <path d="M 10 68 Q 17 60 24 68 T 38 68" fill="none" stroke="#fbbf24" stroke-width="2"/>
+                    <polygon points="43,68 36,64 36,72" fill="#fbbf24"/>
+                    <path d="M 75 60 Q 82 52 89 60 T 103 60" fill="none" stroke="#f87171" stroke-width="2"/>
+                    <polygon points="108,60 101,56 101,64" fill="#f87171"/>
+                    <path d="M 75 78 Q 82 70 89 78 T 103 78" fill="none" stroke="#f87171" stroke-width="2"/>
+                    <polygon points="108,78 101,74 101,82" fill="#f87171"/>
+                </g>
+            </svg>
+        </div>`;
+
+        const DIAGRAM_Q14 = `
+        <div class="my-3 p-4 rounded-xl bg-slate-950 border border-slate-800">
+            <p class="text-xs text-slate-400 mb-2 font-mono">Odtworzenie charakterystyki spektralnej z arkusza IMG_7171.jpg (Pytanie 14):</p>
+            <svg viewBox="0 0 420 175" class="w-full max-w-md mx-auto h-auto">
+                <line x1="45" y1="145" x2="395" y2="145" stroke="#94a3b8" stroke-width="1.5"/>
+                <line x1="45" y1="145" x2="45" y2="15" stroke="#94a3b8" stroke-width="1.5"/>
+                <text x="20" y="25" fill="#94a3b8" font-size="10">1.0</text>
+                <text x="20" y="65" fill="#94a3b8" font-size="10">0.6</text>
+                <text x="20" y="105" fill="#94a3b8" font-size="10">0.3</text>
+                <text x="20" y="145" fill="#94a3b8" font-size="10">0.0</text>
+                <text x="55" y="160" fill="#94a3b8" font-size="10" text-anchor="middle">350</text>
+                <!-- MIEJSCE URWANIA KODU W TWOIM WKLEJONYM FRAGMENCIE -->
+                <text x="115" y="160" fill="#94a3b8" font-size="10" text-anchor="middle">450</text>
+                <text x="185" y="160" fill="#94a3b8" font-size="10" text-anchor="middle">550</text>
+                <text x="255" y="160" fill="#94a3b8" font-size="10" text-anchor="middle">650</text>
+                <text x="325" y="160" fill="#94a3b8" font-size="10" text-anchor="middle">750</text>
+                <text x="375" y="160" fill="#cbd5e1" font-size="10" font-weight="bold">λ [nm]</text>
+                <!-- Siatka pomocnicza -->
+                <line x1="45" y1="25" x2="385" y2="25" stroke="#334155" stroke-dasharray="3,3"/>
+                <line x1="45" y1="65" x2="385" y2="65" stroke="#334155" stroke-dasharray="3,3"/>
+                <line x1="45" y1="105" x2="385" y2="105" stroke="#334155" stroke-dasharray="3,3"/>
+                <!-- Krzywa widmowa białej diody LED (pik niebieski ~450 nm + szerokie pasmo luminoforu ~560-580 nm) -->
+                <path d="M 55 145 L 85 144 C 95 140, 105 22, 115 22 C 125 22, 132 122, 142 120 C 158 115, 175 55, 200 55 C 235 55, 275 135, 335 144 L 370 145" fill="rgba(99, 102, 241, 0.18)" stroke="#38bdf8" stroke-width="2.5"/>
+                <circle cx="115" cy="22" r="3.5" fill="#60a5fa"/>
+                <text x="115" y="14" fill="#60a5fa" font-size="9" text-anchor="middle">~455 nm (LED)</text>
+                <circle cx="200" cy="55" r="3.5" fill="#fbbf24"/>
+                <text x="215" y="46" fill="#fbbf24" font-size="9" text-anchor="middle">~565 nm (Luminofor)</text>
+            </svg>
+        </div>`;
+
+        const DIAGRAM_Q20 = `
+        <div class="my-3 p-4 rounded-xl bg-slate-950 border border-slate-800">
+            <p class="text-xs text-slate-400 mb-2 font-mono">Odtworzenie charakterystyk czułości R(λ) przy P = const z arkusza IMG_7171.jpg (Pytanie 20):</p>
+            <svg viewBox="0 0 420 165" class="w-full max-w-md mx-auto h-auto">
+                <line x1="45" y1="135" x2="385" y2="135" stroke="#94a3b8" stroke-width="1.5"/>
+                <line x1="45" y1="135" x2="45" y2="15" stroke="#94a3b8" stroke-width="1.5"/>
+                <text x="18" y="30" fill="#cbd5e1" font-size="11" font-weight="bold">R(λ)</text>
+                <text x="365" y="152" fill="#cbd5e1" font-size="11" font-weight="bold">λ</text>
+                <!-- Krzywa 1: Detektor fotonowy (rośnie liniowo do λc, potem spada) -->
+                <path d="M 45 135 L 250 30 L 258 135" fill="none" stroke="#34d399" stroke-width="2.5"/>
+                <line x1="250" y1="30" x2="250" y2="135" stroke="#34d399" stroke-dasharray="3,3"/>
+                <text x="250" y="150" fill="#34d399" font-size="10" text-anchor="middle">λc</text>
+                <text x="175" y="52" fill="#34d399" font-size="11" font-weight="bold">1 (Fotonowy)</text>
+                <!-- Krzywa 2: Detektor termiczny (stała czułość od λ przy P=const) -->
+                <line x1="45" y1="85" x2="355" y2="85" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="6,3"/>
+                <text x="315" y="76" fill="#fbbf24" font-size="11" font-weight="bold">2 (Termiczny)</text>
+            </svg>
+        </div>`;
+
+        // =========================================================================
+        // ZESTAW 1: 25 PYTAŃ Z KOLOKWIUM Z PLIKÓW JPG (ARKUSZ 221201-A005)
+        // =========================================================================
+        const QUIZ_1_QUESTIONS = [
+            {
+                id: 1,
+                question: "Zgodnie z prawem przesunięć Wiena dla ciała doskonale czarnego (CDC), wraz ze wzrostem temperatury bezwzględnej T tego ciała, maksimum jego emisji widmowej przesuwa się:",
+                options: {
+                    a: "w stronę większych długości fal (wprost proporcjonalnie do T)",
+                    b: "w stronę krótszych długości fal (odwrotnie proporcjonalnie do T)",
+                    c: "nie zmienia swojego położenia na osi długości fali, rośnie jedynie amplituda",
+                    d: "w stronę mniejszych częstotliwości zgodnie z zależnością λm · T² = const"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "Prawo przesunięć Wiena ma postać $\\lambda_m \\cdot T = 2897\\text{ [}\\mu\\text{m}\\cdot\\text{K]}$, skąd $\\lambda_m \\approx \\frac{3000}{T}$. Oznacza to, że ze wzrostem temperatury $T$ maksimum emisji przesuwa się ku krótszym długościom fal.",
+                source: "ELFO1.pdf, str. 3 (Rozdz. 1.2: Prawa promieniowania CDC, Rys. 1.2)"
+            },
+            {
+                id: 2,
+                question: "W jakim zakresie widmowym przypada maksimum promieniowania termicznego ciała doskonale czarnego (CDC) znajdującego się w temperaturze pokojowej (ok. 290 K)?",
+                options: {
+                    a: "W zakresie światła widzialnego (ok. 555 nm)",
+                    b: "W zakresie bliskiego ultrafioletu (ok. 254 nm)",
+                    c: "W zakresie podczerwieni (ok. 10 μm)",
+                    d: "W zakresie mikrofalowym (ok. 1 cm)"
+                },
+                correct: "c",
+                handwritten: "c (poprawnie)",
+                explanation: "Z prawa przesunięć Wiena dla $T = 290\\text{ K}$ otrzymujemy $\\lambda_m = \\frac{2897\\text{ }\\mu\\text{m}\\cdot\\text{K}}{290\\text{ K}} \\approx 10\\text{ }\\mu\\text{m}$, co leży w paśmie średniej/dalekiej podczerwieni.",
+                source: "ELFO1.pdf, str. 3 (Rozdz. 1.2: Prawo przesunięć Wiena)"
+            },
+            {
+                id: 3,
+                question: "Zastosowanie cyklu halogenowego (dodatek jodu lub bromu oraz bańka ze szkła kwarcowego) w żarówkach halogenowych umożliwia:",
+                options: {
+                    a: "całkowite wyeliminowanie emisji promieniowania podczerwonego (sprawność > 80%)",
+                    b: "regenerację żarnika wolframowego, podniesienie jego temperatury pracy (do ok. 3200 K) i wzrost skuteczności świetlnej",
+                    c: "zamianę mechanizmu świecenia z inkandescencji na elektroluminescencję złączową",
+                    d: "obniżenie wskaźnika oddawania barw CRI poniżej 50 przy zachowaniu zimnej bańki"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "W cyklu halogenowym odparowany wolfram łączy się z halogenem przy ściance bańki i w pobliżu gorącego żarnika ulega dysocjacji, osadzając się z powrotem na skrętce. Pozwala to podnieść temperaturę żarnika do ok. 3200 K i zwiększyć skuteczność świetlną do 28 lm/W przy CRI = 100.",
+                source: "ELFO1.pdf, str. 7–8 (Rozdz. 3.2: Żarówki halogenowe)"
+            },
+            {
+                id: 4,
+                question: "W klasycznej świetlówce (niskoprężnej lampie rtęciowej) wyładowanie elektryczne w parach rtęci wytwarza bezpośrednio przede wszystkim promieniowanie:",
+                options: {
+                    a: "podczerwone, które rozgrzewa wolframową katodę do świecenia",
+                    b: "ultrafioletowe (linie 185 nm i 254 nm), które pobudza luminofor do emisji światła widzialnego",
+                    c: "monochromatyczne światło żółte o długości fali 589 nm bez udziału luminoforu",
+                    d: "spójne promieniowanie laserowe w wyniku inwersji obsadzeń poziomów argonu"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "Około 90% energii wyładowania w parach rtęci pod niskim ciśnieniem przypada na linie rezonansowe UV 185 nm i 254 nm. Dopiero warstwa luminoforu na wewnętrznej ściance rury konwertuje to promieniowanie UV (na drodze fluorescencji) na światło widzialne.",
+                source: "ELFO1.pdf, str. 8–10 (Rozdz. 3.3: Świetlówki)"
+            },
+            {
+                id: 5,
+                question: "Maksimum czułości widmowej oka ludzkiego przystosowanego do widzenia dziennego (fotopowego) przypada dla długości fali równej około:",
+                options: {
+                    a: "450 nm (barwa niebieska)",
+                    b: "507 nm (barwa niebiesko-zielona)",
+                    c: "555 nm (barwa zielono-żółta)",
+                    d: "632,8 nm (barwa czerwona)"
+                },
+                correct: "c",
+                handwritten: "c (poprawnie)",
+                explanation: "Dla widzenia dziennego (fotopowego, realizowanego przez czopki) maksimum czułości oka przypada na $\\lambda = 555\\text{ nm}$ ($f = 540\\text{ THz}$), czemu odpowiada maksymalna skuteczność świetlna $683\\text{ lm/W}$. Wartość 507 nm dotyczy widzenia nocnego (skotopowego).",
+                source: "ELFO1.pdf, str. 15 oraz str. 26 (Rozdz. 4.2 i 6.1)"
+            },
+            {
+                id: 6,
+                question: "Warunkiem wystarczającym do uzyskania wzmocnienia promieniowania optycznego w ośrodku aktywnym lasera (przewagi emisji wymuszonej nad absorpcją) jest:",
+                options: {
+                    a: "utrzymanie ośrodka w stanie równowagi termodynamicznej opisywanej rozkładem Boltzmanna",
+                    b: "wytworzenie stanu inwersji obsadzeń, czyli większej koncentracji atomów w stanie górnym niż dolnym (Ng > Nd)",
+                    c: "zastosowanie zwierciadeł o współczynniku odbicia R = 0%",
+                    d: "schłodzenie każdego ośrodka aktywnego do temperatury ciekłego helu (4,2 K)"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "W równowadze termodynamicznej zawsze $N_g < N_d$, przez co dominuje absorpcja. Aby emisja wymuszona przeważyła nad absorpcją i nastąpiło wzmocnienie fali świetlnej, konieczne jest odwrócenie obsadzeń poziomów: $N_g > N_d$ (inwersja obsadzeń).",
+                source: "ELFO3.pdf, str. 5 (Rozdz. 2: Warunek wzmocnienia promieniowania)"
+            },
+            {
+                id: 7,
+                question: "Poszerzenie niejednorodne linii widmowej w ośrodku aktywnym lasera (opisywane funkcją Gaussa) jest powodowane głównie przez:",
+                options: {
+                    a: "zderzenia niesprężyste pomiędzy atomami gazu",
+                    b: "termiczny ruch atomów (zjawisko Dopplera)",
+                    c: "skończony czas życia poziomów energetycznych wynikający z zasady nieoznaczoności Heisenberga",
+                    d: "emisję spontaniczną zachodzącą w rezonatorze Fabry-Perot"
+                },
+                correct: "b",
+                handwritten: "⚠️ Błąd w czerwonym dopisku 'A' na JPG (zakreślone w kółko b jest poprawne!)",
+                explanation: "Poszerzenie niejednorodne (opisywane krzywą Gaussa) wynika z termicznego ruchu atomów i związanego z nim efektu Dopplera ($\\Delta\\nu_D$). Zderzenia niesprężyste (opcja a) oraz skończony czas życia (opcja c) dają poszerzenie JEDNORODNE (krzywa Lorentza).",
+                source: "ELFO3.pdf, str. 6–8 (Rozdz. 3.1 i 3.2: Poszerzenie jednorodne i niejednorodne)"
+            },
+            {
+                id: 8,
+                question: "Który z przedstawionych poniżej schematów przejść energetycznych między poziomami Ed i Eg ilustruje proces emisji wymuszonej?",
+                diagram: DIAGRAM_Q8,
+                options: {
+                    a: "Schemat a)",
+                    b: "Schemat b)",
+                    c: "Schemat c)",
+                    d: "Schemat d)"
+                },
+                correct: "c",
+                handwritten: "c (poprawnie)",
+                explanation: "Schemat a) przedstawia absorpcję, b) emisję spontaniczną, natomiast c) emisję wymuszoną: padający foton $h\\nu$ wyzwala przejście elektronu z poziomu $E_g$ na $E_d$, w wyniku czego układ opuszczają dwa identyczne, spójne fotony $h\\nu$. Schemat d) jest niefizyczny (narusza zasadę zachowania energii).",
+                source: "ELFO3.pdf, str. 4–5 (Rys. 5.2: Trzy procesy Einsteina)"
+            },
+            {
+                id: 9,
+                question: "Odległość częstotliwościowa Δν pomiędzy sąsiednimi modami podłużnymi rezonatora optycznego Fabry-Perot o długości L, wypełnionego ośrodkiem o współczynniku załamania n, wyraża się wzorem:",
+                options: {
+                    a: "Δν = c / (2 · L · n)",
+                    b: "Δν = 2 · L · n / c",
+                    c: "Δν = c · n / L",
+                    d: "Δν = λ / (2 · L)"
+                },
+                correct: "a",
+                handwritten: "a (poprawnie)",
+                explanation: "Z warunku fazowego $L = m \\cdot \\frac{\\lambda}{2n}$ częstotliwości kolejnych modów podłużnych wynoszą $f_m = m \\cdot \\frac{c}{2Ln}$. Różnica częstotliwości sąsiednich modów ($m+1$ oraz $m$) to $\\Delta\\nu = \\frac{c}{2Ln}$.",
+                source: "ELFO2.pdf, str. 3–4 oraz ELFO3.pdf, str. 11–12 (Warunek fazowy generacji)"
+            },
+            {
+                id: 10,
+                question: "Który z wymienionych laserów charakteryzuje się największą długością drogi koherencji (lc = c / Δν)?",
+                options: {
+                    a: "Laser półprzewodnikowy wielomodowy (λ = 680 nm)",
+                    b: "Laser neodymowy Nd:YAG z generacją drugiej harmonicznej (λ = 532 nm)",
+                    c: "Laser gazowy He-Ne pracujący w reżimie jednomodowym (λ = 632,8 nm)",
+                    d: "Wszystkie wymienione lasery mają identyczną drogę koherencji równą 1 m"
+                },
+                correct: "c",
+                handwritten: "c (poprawnie)",
+                explanation: "Droga koherencji $l_c = c/\\Delta\\nu$ jest odwrotnie proporcjonalna do szerokości linii widmowej $\\Delta\\nu$. Według Tabeli 5.1 w ELFO3.pdf: Nd:YAG ma $l_c \\approx 1,2\\text{ mm}$, laser półprzewodnikowy $l_c \\approx 2,3\\text{ mm}$, He-Ne wielomodowy $l_c \\approx 25\\text{ cm}$, a He-Ne jednomodowy ($\\Delta\\nu \\approx 5\\text{ MHz}$) osiąga aż $l_c \\approx 60\\text{ m}$.",
+                source: "ELFO3.pdf, str. 13 (Tabela 5.1: Czas i droga koherencji wybranych laserów)"
+            },
+            {
+                id: 11,
+                question: "W laserze gazowym He-Ne inwersja obsadzeń oraz przejścia optyczne odpowiedzialne za akcję laserową (np. dla linii 632,8 nm) zachodzą pomiędzy poziomami energetycznymi:",
+                options: {
+                    a: "atomów helu (He), podczas gdy neon służy wyłącznie do chłodzenia rury wyładowczej",
+                    b: "atomów neonu (Ne), natomiast atomy helu wspomagają ich wzbudzanie poprzez zderzenia II rodzaju",
+                    c: "cząsteczek zjonizowanego azotu domieszkującego mieszaninę He-Ne",
+                    d: "pasma przewodnictwa i pasma walencyjnego okienek Brewstera"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "W laserze He-Ne ośrodkiem właściwym, w którym zachodzi inwersja obsadzeń i emisja wymuszona (632,8 nm, 1152 nm, 3391 nm), są atomy neonu (Ne). Atomy helu (He) są wzbudzane elektronami do stanów metastabilnych i przekazują energię atomom neonu w zderzeniach II rodzaju.",
+                source: "ELFO3.pdf, str. 14–16 (Rozdz. 5: Budowa i zasada działania lasera He-Ne)"
+            },
+            {
+                id: 12,
+                question: "Laser neodymowy Nd:YAG należy do grupy:",
+                options: {
+                    a: "laserów półprzewodnikowych o złączu p-n ze studnią kwantową",
+                    b: "laserów dielektrycznych (na ciele stałym) domieszkowanych jonami ziem rzadkich (lantanowców)",
+                    c: "laserów gazowych pracujących wyłącznie w dalekiej podczerwieni",
+                    d: "laserów pompowanych tylko i wyłącznie lampami błyskowymi"
+                },
+                correct: "b",
+                handwritten: "⚠️ Błąd na JPG! Dopisano 'D', poprawna odpowiedź to b",
+                explanation: "Nd:YAG to kryształ dielektryczny (granat itrowo-glinowy $\\text{Y}_3\\text{Al}_5\\text{O}_{12}$) domieszkowany jonami neodymu $\\text{Nd}^{3+}$, który należy do grupy ziem rzadkich (lantanowców). Odpowiedź d) jest fałszywa, ponieważ lasery Nd:YAG są bardzo często pompowane diodami laserowymi ($\\lambda = 808,6\\text{ nm}$).",
+                source: "ELFO2.pdf, str. 12–15 (Rozdz. 2: Lasery na ciele stałym i laser Nd:YAG)"
+            },
+            {
+                id: 13,
+                question: "Maksymalna moc wyjściowa pracy ciągłej (CW) współczesnego półprzewodnikowego lasera krawędziowego z pojedynczym złączem (pojedynczego emitera) jest rzędu:",
+                options: {
+                    a: "pojedynczych mikrowatów (μW)",
+                    b: "pojedynczych watów (W)",
+                    c: "kilkunastu – kilkudziesięciu watów",
+                    d: "kilkuset watów do kilku kilowatów"
+                },
+                correct: "b",
+                handwritten: "⚠️ Błąd na JPG! Dopisano 'C', poprawna odpowiedź dla pojedynczego emitera to b",
+                explanation: "Pojedynczy emiter (single-junction edge-emitting laser) osiąga w pracy ciągłej (CW) moce rzędu pojedynczych watów (typowo 1–7,5 W dla diod szerokopaskowych, rekord dla QCL CW to 8,21 W). Moce kilkudziesięciu lub kilkuset watów uzyskuje się dopiero z wieloemiterowych linijek (laser bars) i stosów (stacks).",
+                source: "ELFO_03_04_2026.pdf, slajd 19 oraz ELFO_05.pdf, slajd 52"
+            },
+            {
+                id: 14,
+                question: "Przedstawiona na poniższym rysunku charakterystyka spektralna promieniowania jest typowa dla:",
+                diagram: DIAGRAM_Q14,
+                options: {
+                    a: "tradycyjnej żarówki wolframowej o temperaturze żarnika 2700 K",
+                    b: "białej diody elektroluminescencyjnej (LED) z niebieskim chipem półprzewodnikowym i żółtym luminoforem",
+                    c: "niskoprężnej lampy rtęciowej (świetlówki) z widmem liniowym par rtęci",
+                    d: "jednomodowego lasera He-Ne generującego linię 632,8 nm"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "Wykres przedstawia charakterystyczny wąski pik w obszarze światła niebieskiego (~450–460 nm pochodzący z chipu InGaN) oraz szerokie pasmo fluorescencji żółtego luminoforu (500–700 nm). Złożenie tych dwóch składowych daje światło białe w hybrydowej diodzie LED.",
+                source: "ELFO1.pdf, str. 12 (Rys. 3.11: Widmo białej diody LED)"
+            },
+            {
+                id: 15,
+                question: "Z którego z wymienionych materiałów półprzewodnikowych NIE wykonuje się klasycznych złączowych diod laserowych ze względu na skośną przerwę energetyczną?",
+                options: {
+                    a: "Arsenku galu (GaAs)",
+                    b: "Fosforku indu (InP)",
+                    c: "Krzemu (Si)",
+                    d: "Azotku galu (GaN)"
+                },
+                correct: "c",
+                handwritten: "c (poprawnie)",
+                explanation: "Krzem (Si) oraz german (Ge) posiadają skośną przerwę energetyczną – minimum pasma przewodnictwa i maksimum pasma walencyjnego leżą przy różnych wektorach falowych $\\vec{k}$. Rekombinacja promienista wymaga udziału fononu, co ma bardzo niskie prawdopodobieństwo. GaAs, InP i GaN mają prostą przerwę energetyczną.",
+                source: "ELFO_03_04_2026.pdf, slajdy 4–5 i 12 oraz ELFO2.pdf, str. 5"
+            },
+            {
+                id: 16,
+                question: "W laserze półprzewodnikowym z podwójną heterostrukturą (DH, np. AlGaAs / GaAs / AlGaAs) warstwa aktywna (GaAs) w stosunku do otaczających ją warstw ograniczających (AlGaAs) posiada:",
+                options: {
+                    a: "mniejszą szerokość przerwy energetycznej Eg oraz większy współczynnik załamania światła n",
+                    b: "większą szerokość przerwy energetycznej Eg oraz mniejszy współczynnik załamania światła n",
+                    c: "większą szerokość przerwy energetycznej Eg oraz większy współczynnik załamania światła n",
+                    d: "identyczną szerokość przerwy energetycznej Eg, ale ujemny współczynnik załamania"
+                },
+                correct: "a",
+                handwritten: "a (poprawnie)",
+                explanation: "W podwójnej heterostrukturze warstwa aktywna (np. GaAs, $E_g = 1,42\\text{ eV}$) ma mniejszą przerwę zabronioną niż okładziny AlGaAs ($E_g \\approx 1,8\\div 2,0\\text{ eV}$), co tworzy studnię potencjału dla elektronów i dziur. Jednocześnie większy o ok. 5% współczynnik załamania $n$ warstwy aktywnej tworzy falowód optyczny.",
+                source: "ELFO2.pdf, str. 7–8 (Rozdz. 1.3: Heterozłącza w laserach półprzewodnikowych)"
+            },
+            {
+                id: 17,
+                question: "Laser półprzewodnikowy o emisji powierzchniowej z pionowym rezonatorem (VCSEL) w porównaniu do klasycznego lasera krawędziowego charakteryzuje się:",
+                options: {
+                    a: "znacznie wyższym prądem progowym (rzędu kilku amperów) oraz silnie eliptyczną wiązką",
+                    b: "kołowym przekrojem wiązki o małej rozbieżności, niskim prądem progowym oraz pracą w jednym modzie podłużnym",
+                    c: "długim rezonatorem (ok. 1 mm) i brakiem konieczności stosowania zwierciadeł Bragga (DBR)",
+                    d: "brakiem możliwości integracji w dwuwymiarowe matryce (2D arrays) na płytce krzemowej"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "Laser VCSEL posiada bardzo krótki rezonator pionowy ($L \\approx 1\\text{ }\\mu\\text{m}$) zamknięty wielowarstwowymi zwierciadłami DBR ($R > 99,9\\%$). Dzięki temu generuje pojedynczy mod podłużny, ma kołowy profil wiązki o małej rozbieżności i bardzo niski prąd progowy ($\\sim 1\\text{ mA}$).",
+                source: "ELFO2.pdf, str. 9 oraz ELFO_03_04_2026.pdf, slajdy 33–35"
+            },
+            {
+                id: 18,
+                question: "Typowa wartość czułości widmowej (responsitivity R) półprzewodnikowej fotodiody PIN w pobliżu maksimum jej charakterystyki widmowej wynosi około:",
+                options: {
+                    a: "0,5 – 1 A/W",
+                    b: "100 – 500 A/W",
+                    c: "10⁻⁶ A/W",
+                    d: "50 – 100 mA/mW"
+                },
+                correct: "a",
+                handwritten: "a (poprawnie)",
+                explanation: "Fotodioda PIN nie posiada wzmocnienia wewnętrznego ($M = 1$). Ze wzoru $R = \\eta \\frac{e\\lambda}{hc} \\approx \\eta \\frac{\\lambda\\,[\\mu\\text{m}]}{1,24}\\text{ [A/W]}$ przy sprawności kwantowej $\\eta \\approx 0,7\\div 0,9$ czułość widmowa w zakresie VIS/NIR wynosi typowo $0,5\\div 1\\text{ A/W}$.",
+                source: "Materiały wykładowe ELFO – Parametry fotodiod PIN (Dział 6 notatki)"
+            },
+            {
+                id: 19,
+                question: "Kwantowy laser kaskadowy (QCL – Quantum Cascade Laser) jest przyrządem:",
+                options: {
+                    a: "bipolarnym, w którym emisja zachodzi dzięki rekombinacji elektron-dziura przez przerwę zabronioną Eg",
+                    b: "unipolarnym, w którym emisja fotonów wynika z przejść międzypodpasmowych elektronów w paśmie przewodnictwa",
+                    c: "gazowym, wykorzystującym kaskadowe zderzenia atomów helu i neonu",
+                    d: "emitującym wyłącznie promieniowanie ultrafioletowe poniżej 300 nm"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "Laser QCL jest przyrządem unipolarnym (w transporcie biorą udział tylko elektrony). Przejścia optyczne są międzypodpasmowe (intersubband) wewnątrz pasma przewodnictwa wielokrotnych studni kwantowych, a pojedynczy elektron pokonujący $N$ stopni kaskady może wyemitować $N$ fotonów.",
+                source: "ELFO_05.pdf, slajdy 13–18 (Kwantowe lasery kaskadowe QCL)"
+            },
+            {
+                id: 20,
+                question: "Na rysunku przedstawiono teoretyczne zależności czułości widmowej R(λ) przy stałej mocy promieniowania padającego dla dwóch typów detektorów (krzywe 1 i 2). Które przyporządkowanie jest poprawne?",
+                diagram: DIAGRAM_Q20,
+                options: {
+                    a: "1 – detektor termiczny, 2 – detektor fotonowy",
+                    b: "1 – detektor fotonowy, 2 – detektor termiczny",
+                    c: "Obie krzywe dotyczą detektorów termicznych w różnych temperaturach",
+                    d: "1 – fotorezystor kadmowy, 2 – fotodioda lawinowa APD"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "Przy stałej mocy optycznej $P = \\text{const}$ liczba fotonów padających w jednostce czasu rośnie z długością fali ($N_{ph} = \\frac{P\\lambda}{hc}$), dlatego czułość idealnego detektora fotonowego (krzywa 1) rośnie liniowo z $\\lambda$ aż do długości fali odcięcia $\\lambda_c = hc/E_g$. Detektor termiczny (krzywa 2) reaguje na moc cieplną niezależnie od długości fali ($R = \\text{const}$).",
+                source: "Materiały wykładowe ELFO – Detektory fotonowe i termiczne (Dział 6.2 notatki)"
+            },
+            {
+                id: 21,
+                question: "Fotodioda krzemowa (Si) może zostać skutecznie zastosowana do detekcji promieniowania optycznego o długości fali:",
+                options: {
+                    a: "1550 nm",
+                    b: "650 nm",
+                    c: "3,39 μm",
+                    d: "10,6 μm"
+                },
+                correct: "b",
+                handwritten: "Brak dopisku na JPG – wyznaczona poprawna odpowiedź: b",
+                explanation: "Krzem posiada przerwę energetyczną $E_g = 1,12\\text{ eV}$, co wyznacza długość fali odcięcia $\\lambda_c = \\frac{1,24}{1,12} \\approx 1,1\\text{ }\\mu\\text{m} = 1100\\text{ nm}$. Fotodioda krzemowa wykrywa wyłącznie fale krótsze niż $1100\\text{ nm}$, a więc spośród podanych tylko $\\lambda = 650\\text{ nm}$.",
+                source: "ELFO_03_04_2026.pdf, slajd 7 (Tabela przerw energetycznych i długości fali odcięcia)"
+            },
+            {
+                id: 22,
+                question: "W półprzewodnikowym laserze DFB (Distributed Feedback) selekcję pojedynczego modu podłużnego uzyskuje się poprzez:",
+                options: {
+                    a: "zastosowanie zewnętrznego pryzmatu szklanego ustawionego pod kątem Brewstera",
+                    b: "wytworzenie periodycznej siatki dyfrakcyjnej (Bragga) wzdłuż całego obszaru aktywnego",
+                    c: "umieszczenie pasywnych zwierciadeł Bragga wyłącznie poza obszarem aktywnym (jak w DBR)",
+                    d: "zwiększenie długości rezonatora Fabry-Perot powyżej 10 cm"
+                },
+                correct: "b",
+                handwritten: "b (poprawnie)",
+                explanation: "W laserze DFB (z rozłożonym sprzężeniem zwrotnym) periodyczna struktura (siatka dyfrakcyjna o okresie $\\Lambda = n\\lambda/2$, często z przesunięciem fazowym $\\lambda/4$) rozciąga się wzdłuż całego obszaru aktywnego, wymuszając generację jednomodową (SLM).",
+                source: "ELFO_03_04_2026.pdf, slajdy 24–29 (Lasery DFB vs DBR)"
+            },
+            {
+                id: 23,
+                question: "Fotodioda lawinowa (APD) w porównaniu do klasycznej fotodiody PIN charakteryzuje się:",
+                options: {
+                    a: "mniejszym wzmocnieniem, mniejszym poziomem szumów i niższym napięciem polaryzacji",
+                    b: "brakiem konieczności polaryzacji zaporowej oraz zerowym prądem ciemnym",
+                    c: "większym wzmocnieniem wewnętrznym, większym poziomem szumów oraz wyższym napięciem polaryzacji",
+                    d: "większym wzmocnieniem przy całkowicie bezszumowym procesie powielania i napięciu pracy < 1 V"
+                },
+                correct: "c",
+                handwritten: "Brak dopisku na JPG – wyznaczona poprawna odpowiedź: c",
+                explanation: "Fotodioda lawinowa (APD) wykorzystuje zjawisko jonizacji zderzeniowej (powielania lawinowego nośników) w silnym polu elektrycznym. Daje to duże wzmocnienie wewnętrzne ($M = 10\\div 100$), ale wymaga wysokiego napięcia polaryzacji zaporowej ($50\\div 400\\text{ V}$) i wprowadza dodatkowy szum nadmiarowy powielania.",
+                source: "Materiały wykładowe ELFO – Porównanie fotodiod PIN oraz APD (Dział 6.2 notatki)"
+            },
+            {
+                id: 24,
+                question: "Ze względu na reguły wyboru dla przejść międzypodpasmowych w studniach kwantowych, promieniowanie generowane przez kwantowy laser kaskadowy (QCL) posiada polaryzację:",
+                options: {
+                    a: "TM (wektor pola elektrycznego E prostopadły do płaszczyzny warstw heterostruktury)",
+                    b: "TE (wektor pola elektrycznego E równoległy do płaszczyzny warstw heterostruktury)",
+                    c: "zawsze kołową prawoskrętną",
+                    d: "całkowicie niespolaryzowaną, identyczną jak w żarówce halogenowej"
+                },
+                correct: "a",
+                handwritten: "a (poprawnie)",
+                explanation: "W laserach QCL ruch elektronów jest skwantowany w kierunku wzrostu warstw (oś $z$). Przejście międzypodpasmowe sprzęga się wyłącznie ze składową pola elektrycznego $E_z \\neq 0$ prostopadłą do płaszczyzny studni kwantowych, co oznacza polaryzację TM (dlatego QCL nie może emitować powierzchniowo jak klasyczny VCSEL bez siatek sprzęgających).",
+                source: "ELFO_05.pdf, slajd 22 (Polaryzacja promieniowania w QCL: TM vs TE)"
+            },
+            {
+                id: 25,
+                question: "Na fotodiodę o czułości widmowej R = 0,5 A/W pada wiązka promieniowania optycznego o mocy P = 14 dBm. Natężenie generowanego fotoprądu Iph wynosi około:",
+                options: {
+                    a: "7 mA",
+                    b: "10 mA",
+                    c: "12,5 mA",
+                    d: "25 mA"
+                },
+                correct: "c",
+                handwritten: "Brak dopisku na JPG – wyznaczona poprawna odpowiedź: c",
+                explanation: "Przeliczamy moc z dBm na mW bez kalkulatora: $14\\text{ dBm} = 20\\text{ dBm} - 6\\text{ dB} = 100\\text{ mW} / 4 = 25\\text{ mW}$ (dokładnie $10^{1,4} \\approx 25,12\\text{ mW}$). Następnie obliczamy fotoprąd: $I_{ph} = R \\cdot P = 0,5\\text{ A/W} \\cdot 25\\text{ mW} = 12,5\\text{ mA}$.",
+                source: "Obliczenia fotodetektorowe z arkusza IMG_7171.jpg (Dział 6.1 notatki)"
+            }
+        ];
+
+        // =========================================================================
+        // ZESTAW 2: 25 AUTORSKICH PYTAŃ TRENINGOWYCH ELFO (NOWE PYTANIA Z PDF-ÓW)
+        // =========================================================================
+        const QUIZ_2_QUESTIONS = [
+            {
+                id: 1,
+                question: "Jakiej temperaturze ciała doskonale czarnego (CDC) odpowiada w przybliżeniu ciągłe widmo promieniowania Słońca?",
+                options: {
+                    a: "ok. 2700 K",
+                    b: "ok. 5250 K",
+                    c: "ok. 10 000 K",
+                    d: "ok. 1500 K"
+                },
+                correct: "b",
+                explanation: "Widmo promieniowania słonecznego (poza liniami absorpcyjnymi Fraunhofera) jest zbliżone do widma ciała doskonale czarnego o temperaturze ok. 5250 K (49% energii w VIS i bliskiej IR, 44% dla λ > 800 nm, 7% w UV).",
+                source: "ELFO1.pdf, str. 4 (Rozdz. 2: Słońce jako źródło światła)"
+            },
+            {
+                id: 2,
+                question: "Zgodnie z zasadą Bohra dla promieniowania atomów, jaki jest typowy średni czas życia atomu w stanie wzbudzonym (dla dozwolonych przejść dipolowych)?",
+                options: {
+                    a: "ok. 10⁻⁸ s (10 ns)",
+                    b: "ok. 10 s",
+                    c: "ok. 10⁻¹⁵ s (1 fs)",
+                    d: "ok. 1 godzina"
+                },
+                correct: "a",
+                explanation: "Według pierwszej zasady Bohra opisanej w materiałach, średni czas życia atomu w stanie wzbudzonym wynosi około $10^{-8}\\text{ s}$, po czym następuje samorzutny przeskok do stanu niższego z emisją kwantu $h\\nu = E_2 - E_1$.",
+                source: "ELFO1.pdf, str. 3–4 (Rozdz. 1.3: Zasada Bohra)"
+            },
+            {
+                id: 3,
+                question: "Co oznacza skrót IRC w nowoczesnych żarówkach halogenowych o podwyższonej sprawności?",
+                options: {
+                    a: "Zastosowanie powłoki na bańce, która przepuszcza światło widzialne, a odbija promieniowanie podczerwone (IR) z powrotem na żarnik",
+                    b: "Całkowite zastąpienie żarnika wolframowego diodą podczerwoną GaAs",
+                    c: "Wypełnienie bańki ciekłym azotem w celu chłodzenia trzonka",
+                    d: "Wbudowany elektroniczny układ ściemniania sterowany pilotem na podczerwień"
+                },
+                correct: "a",
+                explanation: "W żarówkach halogenowych IRC (InfraRed Coating) specjalna wielowarstwowa powłoka interferencyjna na kwarcowej bańce odbija ciepło (promieniowanie IR) z powrotem na skrętkę wolframową. Zmniejsza to zapotrzebowanie na moc elektryczną i podnosi skuteczność świetlną o ok. 30%.",
+                source: "ELFO1.pdf, str. 8 (Rozdz. 3.2: Żarówki halogenowe IRC)"
+            },
+            {
+                id: 4,
+                question: "W jaki sposób ekspozycja człowieka na światło niebieskie (ok. 460–480 nm) w godzinach wieczornych wpływa na układ hormonalny?",
+                options: {
+                    a: "Gwałtownie pobudza szyszynkę do wydzielania melatoniny i wywołuje natychmiastową senność",
+                    b: "Hamuje wydzielanie melatoniny („hormonu snu”) i podnosi poziom kortyzolu, utrudniając zasypianie",
+                    c: "Nie ma żadnego wpływu biologicznego, ponieważ pręciki i czopki nie reagują na światło niebieskie",
+                    d: "Powoduje trwałą zamianę widzenia fotopowego na skotopowe"
+                },
+                correct: "b",
+                explanation: "Światło niebieskie aktywuje receptory pozawzrokowe w siatkówce, co hamuje nocne wydzielanie melatoniny przez szyszynkę i stymuluje wydzielanie kortyzolu (hormonu czuwania/stresu).",
+                source: "ELFO1.pdf, str. 16 (Rozdz. 4.3: Biologiczny wpływ światła)"
+            },
+            {
+                id: 5,
+                question: "Stosunek strumienia świetlnego dΦ wysyłanego przez źródło punktowe w określonym kierunku do wartości kąta bryłowego dΩ (I = dΦ/dΩ), wyrażany w kandelach [cd = lm/sr], to definicja:",
+                options: {
+                    a: "Natężenia oświetlenia (E)",
+                    b: "Światłości (I)",
+                    c: "Luminancji (L)",
+                    d: "Skuteczności świetlnej (η)"
+                },
+                correct: "b",
+                explanation: "Światłość $I = d\\Phi / d\\Omega$ wyraża gęstość kątową strumienia świetlnego i jej jednostką w układzie SI jest kandela ($1\\text{ cd} = 1\\text{ lm/sr}$). Natężenie oświetlenia to $E = d\\Phi/dS\\text{ [lx]}$, a luminancja to $L = dI/dS_{\\text{poz}}\\text{ [cd/m}^2\\text{]}$.",
+                source: "ELFO1.pdf, str. 17–18 (Rozdz. 5: Wielkości i jednostki fotometryczne)"
+            },
+            {
+                id: 6,
+                question: "Ile standardowych próbek barwnych Munsella wykorzystuje się przy wyznaczaniu ogólnego wskaźnika oddawania barw Ra (oraz rozszerzonego CRI)?",
+                options: {
+                    a: "8 próbek dla Ra (oraz 14 próbek dla rozszerzonego CRI)",
+                    b: "Tylko 3 próbki odpowiadające barwom podstawowym R, G, B",
+                    c: "Dokładnie 100 próbek dla każdego źródła światła",
+                    d: "1 próbkę wzorcową o barwie idealnie czarnej"
+                },
+                correct: "a",
+                explanation: "Ogólny wskaźnik oddawania barw $R_a$ oblicza się jako średnią arytmetyczną ze wskaźników dla 8 podstawowych, nienasyconych próbek Munsella (TCS01–TCS08), natomiast pełny zestaw obejmuje 14 próbek ($R_{ij} = 100 - 4,6\\Delta E_j$).",
+                source: "ELFO1.pdf, str. 21 oraz str. 27–30 (Rozdz. 6.2: Wskaźnik oddawania barw CRI)"
+            },
+            {
+                id: 7,
+                question: "W monochromatorze pryzmatycznym wiązka światła białego ulega rozszczepieniu (dyspersji). Które fale ulegają najsilniejszemu odchyleniu po przejściu przez pryzmat?",
+                options: {
+                    a: "Fale najdłuższe (światło czerwone i podczerwone)",
+                    b: "Fale najkrótsze (światło fioletowe i ultrafioletowe)",
+                    c: "Wszystkie długości fal odchylają się pod tym samym kątem",
+                    d: "Wyłącznie fala o długości 555 nm"
+                },
+                correct: "b",
+                explanation: "W obszarze dyspersji normalnej współczynnik załamania szkła $n(\\lambda)$ maleje ze wzrostem długości fali ($dn/d\\lambda < 0$). Dlatego fale najkrótsze (fiolet/UV) mają największy współczynnik załamania i są najsilniej odchylane przez pryzmat.",
+                source: "ELFO1.pdf, str. 22–23 (Rozdz. 5.3: Monochromatory pryzmatyczne i siatkowe)"
+            },
+            {
+                id: 8,
+                question: "Kto i w którym roku uruchomił pierwszy w historii działający laser (oraz jaki był jego ośrodek aktywny)?",
+                options: {
+                    a: "Theodore Maiman w 1960 r. – laser rubinowy (Cr³⁺:Al₂O₃)",
+                    b: "Albert Einstein w 1917 r. – laser półprzewodnikowy GaAs",
+                    c: "Ali Javan w 1945 r. – laser kaskadowy QCL",
+                    d: "Max Planck w 1900 r. – laser neodymowy Nd:YAG"
+                },
+                correct: "a",
+                explanation: "Pierwszy laser uruchomił Theodore Maiman w 1960 roku, wykorzystując kryształ rubinu ($\\text{Al}_2\\text{O}_3$ domieszkowany jonami chromu $\\text{Cr}^{3+}$, $\\lambda = 694,3\\text{ nm}$) pompowany spiralną lampą błyskową. W 1961 r. Ali Javan uruchomił pierwszy laser gazowy He-Ne.",
+                source: "ELFO3.pdf, str. 3 oraz str. 15"
+            },
+            {
+                id: 9,
+                question: "Jak zmienia się dopplerowska szerokość linii widmowej ΔνD w laserze gazowym w funkcji temperatury gazu T oraz masy atomowej M?",
+                options: {
+                    a: "Rośnie z pierwiastkiem z temperatury (√T) i maleje z pierwiastkiem z masy atomu (1/√M)",
+                    b: "Maleje ze wzrostem temperatury T i rośnie liniowo z masą atomu M",
+                    c: "Zależy wyłącznie od współczynnika odbicia zwierciadeł R1 i R2",
+                    d: "Jest odwrotnie proporcjonalna do ciśnienia gazu"
+                },
+                correct: "a",
+                explanation: "Wzór na szerokość dopplerowską ma postać $\\Delta\\nu_D = \\frac{2}{\\lambda}\\sqrt{\\frac{2kT\\ln 2}{M}}$. Wyższa temperatura oznacza większe prędkości termiczne atomów (szersza linia), a cięższe atomy poruszają się wolniej (węższa linia).",
+                source: "ELFO3.pdf, str. 7–8 (Wzór 5.10: Poszerzenie dopplerowskie)"
+            },
+            {
+                id: 10,
+                question: "Ile wynosi progowy współczynnik wzmocnienia gth w laserze o długości ośrodka aktywnego Lm = 10 cm, współczynniku strat wewnętrznych α0 = 0,02 cm⁻¹ oraz zwierciadłach o iloczynie R1·R2 = exp(-0,4)?",
+                options: {
+                    a: "0,04 cm⁻¹",
+                    b: "0,20 cm⁻¹",
+                    c: "0,02 cm⁻¹",
+                    d: "0,42 cm⁻¹"
+                },
+                correct: "a",
+                explanation: "Z amplitudowego warunku generacji: $g_{th} = \\alpha_0 + \\frac{1}{2L_m}\\ln\\left(\\frac{1}{R_1 R_2}\\right) = 0,02 + \\frac{1}{2 \\cdot 10} \\cdot 0,4 = 0,02 + 0,02 = 0,04\\text{ cm}^{-1}$.",
+                source: "ELFO2.pdf, str. 3–4 oraz ELFO3.pdf, str. 10–11 (Warunek amplitudowy generacji)"
+            },
+            {
+                id: 11,
+                question: "W jakim celu rurę wyładowczą lasera He-Ne zamyka się płasko-równoległymi płytkami kwarcowymi ustawionymi pod kątem Brewstera (tan αB = n)?",
+                options: {
+                    a: "Aby wyeliminować straty odbiciowe dla fali spolaryzowanej liniowo w płaszczyźnie padania i wymusić polaryzację liniową wiązki laserowej",
+                    b: "Aby zamienić czerwoną linię 632,8 nm na jej drugą harmoniczną 316,4 nm",
+                    c: "Aby całkowicie zablokować emisję wymuszoną i przepuszczać tylko emisję spontaniczną",
+                    d: "Aby zwiększyć ciśnienie mieszaniny He-Ne do 100 atmosfer"
+                },
+                correct: "a",
+                explanation: "Dla promienia padającego pod kątem Brewstera ($\\tan\\alpha_B = n$) składowa spolaryzowana równolegle do płaszczyzny padania (polaryzacja p) przechodzi przez okienko bez strat odbiciowych ($R_p = 0$), podczas gdy składowa prostopadła doznaje strat. Dzięki temu laser generuje wiązkę spolaryzowaną liniowo.",
+                source: "ELFO3.pdf, str. 14–15 (Rys. 5.12 i opis okienek Brewstera w laserze He-Ne)"
+            },
+            {
+                id: 12,
+                question: "Jak definiuje się umowną średnicę podstawowego modu poprzecznego TEM00 (wiązki gaussowskiej) na przekroju poprzecznym wiązki laserowej?",
+                options: {
+                    a: "Jako średnicę okręgu, na którym natężenie promieniowania spada e² ≈ 7,4 razy względem wartości maksymalnej w osi wiązki",
+                    b: "Jako odległość między punktami, gdzie natężenie spada o 1% względem środka",
+                    c: "Jako zewnętrzną średnicę obudowy zasilacza lasera",
+                    d: "Jako iloczyn długości fali λ i czasu koherencji tc"
+                },
+                correct: "a",
+                explanation: "Rozkład natężenia w modzie podstawowym $\\text{TEM}_{00}$ jest funkcją Gaussa. Średnicę wiązki (2w) określa się w miejscach, gdzie natężenie $I(r)$ maleje $e^2 \\approx 7,39$ razy (czyli do ok. 13,5%) w stosunku do maksimum w środku plamki ($r=0$).",
+                source: "ELFO3.pdf, str. 16 (Rozdz. 5.1: Mody poprzeczne TEMmn)"
+            },
+            {
+                id: 13,
+                question: "Dlaczego linie widmowe jonów ziem rzadkich (lantanowców, np. Nd³⁺ w krysztale YAG) są bardzo wąskie i słabo zależą od matrycy krystalicznej w porównaniu do jonów metali przejściowych (np. Cr³⁺, Ti³⁺)?",
+                options: {
+                    a: "Ponieważ przejścia optyczne zachodzą w wewnętrznej, niecałkowicie zapełnionej powłoce 4f, która jest silnie ekranowana przez zewnętrzne elektrony 5s² i 5p⁶",
+                    b: "Ponieważ jony neodymu nie posiadają żadnych elektronów walencyjnych ani jądra atomowego",
+                    c: "Ponieważ kryształ YAG jest przewodnikiem metalicznym o zerowej przerwie energetycznej",
+                    d: "Ponieważ w lantanowcach nie występuje emisja spontaniczna"
+                },
+                correct: "a",
+                explanation: "W lantanowcach powłoka $4f$ leży głębiej i jest ekranowana przed polem krystalicznym matrycy przez zewnętrzne, całkowicie zapełnione podpowłoki $5s^2$ oraz $5p^6$. W metalach przejściowych powłoka $3d$ jest zewnętrzna i silnie oddziałuje z siecią, dając szerokie pasma.",
+                source: "ELFO2.pdf, str. 12–13 (Rozdz. 2.1: Jony domieszek w laserach na ciele stałym)"
+            },
+            {
+                id: 14,
+                question: "Jaka jest podstawowa długość fali generacji lasera Nd:YAG, jaka długość fali odpowiada jego drugiej harmonicznej (SHG) oraz jaką diodą laserową najczęściej się go pompuje?",
+                options: {
+                    a: "Podstawowa: 1064 nm, II harmoniczna: 532 nm (zielona), pompowanie diodą: ok. 808,6 nm",
+                    b: "Podstawowa: 632,8 nm, II harmoniczna: 1265,6 nm, pompowanie diodą: 1550 nm",
+                    c: "Podstawowa: 532 nm, II harmoniczna: 1064 nm, pompowanie diodą: 405 nm",
+                    d: "Podstawowa: 10,6 μm, II harmoniczna: 5,3 μm, pompowanie: wyładowaniem w CO₂"
+                },
+                correct: "a",
+                explanation: "Najsilniejsze przejście laserowe w $\\text{Nd}^{3+}:\\text{YAG}$ ($^4\\text{F}_{3/2} \\to {^4\\text{I}_{11/2}}$) daje falę podczerwoną $\\lambda = 1064\\text{ nm}$. Po podwojeniu częstotliwości (SHG) w krysztale nieliniowym otrzymujemy $\\lambda/2 = 532\\text{ nm}$ (światło zielone). Główne pasmo absorpcji pompy leży przy $808,6\\text{ nm}$.",
+                source: "ELFO2.pdf, str. 14–16 (Rozdz. 2.2 i 2.3: Laser Nd:YAG i generacja harmonicznych)"
+            },
+            {
+                id: 15,
+                question: "Dlaczego czteropoziomowy laser Nd:YAG charakteryzuje się znacznie niższym progiem pompowania niż trójpoziomowy laser rubinowy?",
+                options: {
+                    a: "Ponieważ dolny poziom laserowy (⁴I₁₁/₂) leży wysoko (ok. 2111 cm⁻¹) nad stanem podstawowym i w temperaturze pokojowej jest praktycznie pusty",
+                    b: "Ponieważ w układzie czteropoziomowym nie jest potrzebna inwersja obsadzeń",
+                    c: "Ponieważ kryształ YAG ma współczynnik załamania równy 1,00",
+                    d: "Ponieważ czas życia górnego poziomu laserowego w Nd:YAG wynosi 10⁻¹⁵ s"
+                },
+                correct: "a",
+                explanation: "W układzie 4-poziomowym dolny poziom przejścia laserowego ($^4\\text{I}_{11/2}$) leży o $\\Delta E \\approx 2111\\text{ cm}^{-1} \\approx 10\\,kT$ powyżej stanu podstawowego $^4\\text{I}_{9/2}$. Z rozkładu Boltzmanna jego obsadzenie termiczne w $300\\text{ K}$ wynosi $\\exp(-10) \\approx 4,5\\cdot 10^{-5} \\approx 0$, więc każde wzbudzenie na poziom górny od razu daje inwersję obsadzeń.",
+                source: "ELFO2.pdf, str. 15 (Rys. 2.3 i analiza obsadzenia poziomów Nd:YAG)"
+            },
+            {
+                id: 16,
+                question: "Na wykresie w skali podwójnie logarytmicznej (log P_wy w funkcji log P_pompy) dla lasera Nd:YAG z wewnątrzrezonatorową generacją drugiej harmonicznej, stosunek nachylenia prostej dla fali 532 nm do nachylenia dla fali podstawowej 1064 nm wynosi:",
+                options: {
+                    a: "2 : 1 (moc drugiej harmonicznej 532 nm rośnie z kwadratem mocy fali podstawowej 1064 nm)",
+                    b: "1 : 1 (obie moce rosną liniowo)",
+                    c: "1 : 2 (moc drugiej harmonicznej rośnie z pierwiastkiem mocy podstawowej)",
+                    d: "4 : 1"
+                },
+                correct: "a",
+                explanation: "Generacja drugiej harmonicznej (SHG) jest procesem nieliniowym drugiego rzędu, w którym dwa fotony $\\omega$ łączą się w jeden foton $2\\omega$, zatem $P_{2\\omega} \\propto P_{\\omega}^2$. W skali log-log wykładnik potęgi przechodzi w współczynnik kierunkowy prostej (nachylenie 2 dla 532 nm wobec nachylenia 1 dla 1064 nm).",
+                source: "ELFO2.pdf, str. 15–16 (Rys. 2.4: Charakterystyka mocy 1064 nm i 532 nm)"
+            },
+            {
+                id: 17,
+                question: "Jaką długość fali promieniowania emituje dioda laserowa wykonana z azotku galu (GaN), którego szerokość przerwy energetycznej w temperaturze pokojowej wynosi Eg = 3,4 eV?",
+                options: {
+                    a: "ok. 365 nm (bliski ultrafiolet)",
+                    b: "ok. 870 nm (bliska podczerwień)",
+                    c: "ok. 1550 nm (trzecie okno telekomunikacyjne)",
+                    d: "ok. 10,6 μm (średnia podczerwień)"
+                },
+                correct: "a",
+                explanation: "Korzystamy ze wzoru $\\lambda\\,[\\mu\\text{m}] \\approx \\frac{1,24}{E_g\\,[\\text{eV}]} = \\frac{1,24}{3,4} \\approx 0,365\\text{ }\\mu\\text{m} = 365\\text{ nm}$. Wartość ta jest wprost podana w tabeli materiałów na slajdzie 7 wykładu.",
+                source: "ELFO_03_04_2026.pdf, slajd 7 (Tabela półprzewodników i długości fal)"
+            },
+            {
+                id: 18,
+                question: "Zastosowanie aktywnej warstwy w postaci studni kwantowej (QW – Quantum Well o grubości d < 20 nm) w laserze półprzewodnikowym pozwala na:",
+                options: {
+                    a: "około 10-krotne obniżenie prądu progowego (do 10–20 mA), zmniejszenie wrażliwości termicznej oraz uzyskanie dyskretnych poziomów energetycznych",
+                    b: "całkowitą rezygnację ze złącza p-n i polaryzacji zewnętrznym napięciem",
+                    c: "zwiększenie grubości obszaru aktywnego do kilku milimetrów",
+                    d: "zamianę półprzewodnika ze skośną przerwą na izolator dielektryczny"
+                },
+                correct: "a",
+                explanation: "Gdy grubość warstwy aktywnej spadnie poniżej ok. 20 nm (staje się porównywalna z długością fali de Broglie'a elektronu), następuje kwantyzacja ruchu nośników i skokowa zmiana gęstości stanów. Obniża to prąd progowy do 10–20 mA i poprawia stabilność temperaturową oraz szybkość modulacji.",
+                source: "ELFO2.pdf, str. 8–9 (Rozdz. 1.4: Lasery ze studnią kwantową QW)"
+            },
+            {
+                id: 19,
+                question: "Czym konstrukcyjnie różni się laser DBR (Distributed Bragg Reflector) od lasera DFB (Distributed Feedback)?",
+                options: {
+                    a: "W laserze DBR pasywne siatki Bragga umieszczone są poza obszarem aktywnym (jako selektywne zwierciadła), natomiast w DFB siatka biegnie wzdłuż całego obszaru aktywnego",
+                    b: "Laser DBR nie posiada w ogóle siatki dyfrakcyjnej, a jedynie przełamane krawędzie kryształu",
+                    c: "Laser DFB jest laserem gazowym, a DBR laserem na ciele stałym",
+                    d: "W laserze DBR emisja wychodzi zawsze prostopadle do powierzchni jak w VCSEL"
+                },
+                correct: "a",
+                explanation: "W laserze DBR okresowa struktura Bragga znajduje się w pasywnych sekcjach falowodowych na końcach wnęki (poza sekcją wzmocnienia), co pozwala niezależnie przestrajać długość fali prądem sekcji DBR. W laserze DFB siatka dyfrakcyjna jest zintegrowana bezpośrednio z obszarem aktywnym.",
+                source: "ELFO_03_04_2026.pdf, slajdy 22–30 (Porównanie struktur DBR i DFB)"
+            },
+            {
+                id: 20,
+                question: "W jakim celu w strukturze siatki dyfrakcyjnej lasera DFB wprowadza się w środku rezonatora przesunięcie fazowe o ćwierć długości fali (sekcję λ/4)?",
+                options: {
+                    a: "Aby znieść degenerację dwóch symetrycznych modów braggowskich i wymusić stabilną generację pojedynczego modu dokładnie na częstotliwości Bragga",
+                    b: "Aby przekształcić laser jednomodowy w szerokopasmową diodę superluminescencyjną",
+                    c: "Aby zmniejszyć współczynnik tłumienia modów bocznych SMSR do 0 dB",
+                    d: "Aby umożliwić pracę lasera bez przepływu prądu elektrycznego"
+                },
+                correct: "a",
+                explanation: "Jednorodna siatka DFB posiada przerwę wzbronioną (stopband) wokół częstotliwości Bragga i dwa symetryczne mody o jednakowym progu na jej krawędziach. Wprowadzenie defektu fazowego $\\lambda/4$ pojawia pojedynczy mod dokładnie w środku pasma zabronionego ($\\nu_B$) o wysokim współczynniku SMSR ($>35\\div 50\\text{ dB}$).",
+                source: "ELFO_03_04_2026.pdf, slajdy 27–29 (Laser DFB z przesunięciem fazowym λ/4)"
+            },
+            {
+                id: 21,
+                question: "W nieskończenie głębokiej studni kwantowej o szerokości L energie dozwolonych poziomów wyrażają się wzorem En = (n²·π²·ℏ²)/(2·m*·L²). Jak zmieni się odstęp energetyczny ΔE₂₁ = E₂ - E₁, jeśli szerokość studni L zmniejszymy dwukrotnie?",
+                options: {
+                    a: "Wzrośnie 4-krotnie (ponieważ ΔE ∝ 1/L²)",
+                    b: "Zmniejszy się 2-krotnie",
+                    c: "Zmniejszy się 4-krotnie",
+                    d: "Nie ulegnie zmianie, bo zależy tylko od przerwy zabronionej Eg"
+                },
+                correct: "a",
+                explanation: "Energie poziomów w studni kwantowej są odwrotnie proporcjonalne do kwadratu szerokości studni ($E_n \\propto 1/L^2$). Dwukrotne zwężenie studni ($L' = L/2$) powoduje czterokrotny wzrost energii każdego poziomu oraz czterokrotny wzrost różnicy $\\Delta E_{21}$.",
+                source: "ELFO_05.pdf, slajd 11 (Kwantyzacja energii w studni kwantowej)"
+            },
+            {
+                id: 22,
+                question: "Dzięki jakiemu zjawisku fizycznemu w kwantowym laserze kaskadowym (QCL) uzyskuje się bardzo krótki czas życia elektronów na dolnym poziomie laserowym (τ₂ < τ₃, rzędu pojedynczych pikosekund), co gwarantuje inwersję obsadzeń?",
+                options: {
+                    a: "Dzięki szybkiemu rezonansowemu rozpraszaniu elektronów na podłużnych fononach optycznych (LO) oraz tunelowaniu do kolejnego iniektora",
+                    b: "Dzięki rekombinacji promienistej z dziurami w paśmie walencyjnym trwającej milisekundy",
+                    c: "Dzięki zderzeniom z atomami helu w stanie metastabilnym",
+                    d: "Dzięki zjawisku powielania lawinowego w złączu spolaryzowanym zaporowo"
+                },
+                correct: "a",
+                explanation: "W laserach QCL czasy życia w podpasmach są niezwykle krótkie ($\\sim\\text{ps}$), gdyż dominuje bezpromieniste rozpraszanie na fononach optycznych LO. Projektując odstęp między poziomem 2 i 1 równy energii fononu LO ($E_{21} \\approx \\hbar\\omega_{LO} \\approx 34\\div 36\\text{ meV}$), opróżniamy dolny poziom laserowy w ułamku pikosekundy ($\\tau_2 \\ll \\tau_3$).",
+                source: "ELFO_05.pdf, slajdy 17 oraz 21 (Inwersja obsadzeń i inżynieria czasów życia w QCL)"
+            },
+            {
+                id: 23,
+                question: "Czym różni się międzypasmowy laser kaskadowy (ICL – Interband Cascade Laser) od kwantowego lasera kaskadowego (QCL)?",
+                options: {
+                    a: "W ICL przejście optyczne jest międzypasmowe (elektron-dziura w heterostrukturze typu II: InAs/GaInSb), co daje polaryzację TE, dłuższy czas życia (~ns) i znacznie niższy pobór mocy na progu",
+                    b: "ICL pracuje wyłącznie w zakresie fal rentgenowskich, a QCL w zakresie fal radiowych",
+                    c: "ICL wymaga prądu progowego powyżej 50 A oraz napięcia 230 V",
+                    d: "W ICL nie występuje kaskadowe łączenie stopni aktywnych"
+                },
+                correct: "a",
+                explanation: "Laser ICL łączy zalety kaskadowego recyklingu elektronów z przejściem międzypasmowym (pomiędzy pasmem przewodnictwa InAs a walencyjnym GaInSb w układzie typu II „broken-gap”). Dzięki czasom życia rzędu nanosekund ma bardzo niski prąd progowy ($10\\div 200\\text{ mA}$), niskie napięcie ($2\\div 4\\text{ V}$), emituje polaryzację TE i jest idealny dla zakresu $3\\div 6\\text{ }\\mu\\text{m}$.",
+                source: "ELFO_05.pdf, slajdy 26–38 (Międzypasmowe lasery kaskadowe ICL vs QCL)"
+            },
+            {
+                id: 24,
+                question: "Dlaczego zakres średniej podczerwieni (MIR: 2,5 – 25 μm), w którym pracują lasery QCL i ICL, jest nazywany w spektroskopii gazów „zakresem daktyloskopowym” (molecular fingerprint region)?",
+                options: {
+                    a: "Ponieważ leżą w nim fundamentalne pasma absorpcji oscylacyjno-rotacyjnej większości cząsteczek gazów (np. CO₂, CH₄, CO, NO, NH₃), o przekrojach czynnych wielokrotnie większych niż dla overtonów w NIR",
+                    b: "Ponieważ promieniowanie z tego zakresu służy do skanowania linii papilarnych palców na lotniskach",
+                    c: "Ponieważ atmosfera ziemska w całym zakresie 2,5–25 μm całkowicie pochłania promieniowanie bez żadnych okien transmisyjnych",
+                    d: "Ponieważ tylko w tym zakresie działają fotodiody krzemowe Si"
+                },
+                correct: "a",
+                explanation: "W średniej podczerwieni (MIR) znajdują się podstawowe (fundamentalne) przejścia oscylacyjno-rotacyjne molekuł chemicznych. Ich intensywność absorpcji (opisywana prawem Lamberta-Beera $I = I_0 \\exp(-\\alpha L)$) jest o 2–4 rzędy wielkości silniejsza niż pasm harmonicznych (overtonów) w bliskiej podczerwieni NIR, co umożliwia detekcję stężeń na poziomie ppb/ppt.",
+                source: "ELFO_05.pdf, slajdy 39–45 (Spektroskopia TDLAS w zakresie MIR)"
+            },
+            {
+                id: 25,
+                question: "Która technologia wytwarzania falowodu i montażu chipu lasera kaskadowego QCL zapewnia najlepsze odprowadzanie ciepła i najwyższe moce w pracy ciągłej (CW) w temperaturze pokojowej?",
+                options: {
+                    a: "Struktura zagrzebana BH (Buried Heterostructure z zarastaniem InP:Fe) zmontowana warstwą epitaksjalną w dół (epi-down) na podłożu diamentowym/AlN",
+                    b: "Prosta szeroka mesa RWG zmontowana warstwą epitaksjalną do góry (epi-up) na podkładce z tworzywa sztucznego",
+                    c: "Brak ograniczenia bocznego fali i chłodzenie wyłącznie swobodną konwekcją powietrza",
+                    d: "Zatopienie nieobrobionego kryształu w żywicy epoksydowej jak w standardowej diodzie LED 5 mm"
+                },
+                correct: "a",
+                explanation: "W strukturze zagrzebanej BH (Buried Heterostructure) wąski obszar aktywny jest otoczony z boków półizolującym fosforkiem indu (InP:Fe) o wysokiej przewodności cieplnej, a montaż epi-down zbliża gorące złącze na odległość kilku mikrometrów od radiatora, co jest kluczowe dla pracy CW wysokich mocy.",
+                source: "ELFO_05.pdf, slajdy 48–52 (Architektury falowodowe RWG, DT, BH oraz montaż epi-up/epi-down)"
+            }
+        ];
+
+        // =========================================================================
+        // STAN APLIKACJI I ZMIENNE GLOBALNE
+        // =========================================================================
+        let activeTab = 'quiz1';           // 'quiz1' | 'quiz2' | 'flashcards' | 'key' | 'notes'
+        let checkMode = 'instant';         // 'instant' | 'exam'
+        let questionFilter = 'all';        // 'all' | 'unanswered' | 'wrong'
+
+        // Niezależny stan dla obu quizów (umożliwiający wielokrotny reset do 0)
+        const quizState = {
+            quiz1: {
+                questions: [...QUIZ_1_QUESTIONS],
+                answers: {},               // { [id]: 'a' | 'b' | 'c' | 'd' }
+                shuffled: false,
+                examFinished: false,
+                secondsElapsed: 0
+            },
+            quiz2: {
+                questions: [...QUIZ_2_QUESTIONS],
+                answers: {},
+                shuffled: false,
+                examFinished: false,
+                secondsElapsed: 0
+            }
+        };
+
+        let timerInterval = null;
+        let toastTimeout = null;
+
+        // Stan dla trybu fiszek (50 pytań)
+        let flashcardDeckMode = 'all';     // 'all' | 'quiz1' | 'quiz2'
+        let flashcardList = [];
+        let flashcardIndex = 0;
+        let isFlashcardFlipped = false;
+
+        // =========================================================================
+        // FUNKCJE POMOCNICZE (MATHJAX, TOAST, TIMER, SHUFFLE)
+        // =========================================================================
+        function typesetMath() {
+            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                window.MathJax.typesetPromise().catch(() => {});
+            }
+        }
+
+        function showToast(title, desc) {
+            const toast = document.getElementById('toast-notification');
+            const titleEl = document.getElementById('toast-title');
+            const descEl = document.getElementById('toast-desc');
+            if (!toast) return;
+
+            titleEl.textContent = title;
+            descEl.textContent = desc;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2800);
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (activeTab !== 'quiz1' && activeTab !== 'quiz2') return;
+                const state = quizState[activeTab];
+                const total = state.questions.length;
+                const answeredCount = Object.keys(state.answers).length;
+                const isDone = (checkMode === 'exam' && state.examFinished) || (checkMode === 'instant' && answeredCount === total);
+                if (!isDone) {
+                    state.secondsElapsed++;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const currentKey = (activeTab === 'quiz2') ? 'quiz2' : 'quiz1';
+            const el = document.getElementById('timer-display');
+            if (el) el.textContent = formatTime(quizState[currentKey].secondsElapsed);
+        }
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        // =========================================================================
+        // NAWIGACJA MIĘDZY ZAKŁADKAMI GŁÓWNYMI
+        // =========================================================================
+        function switchMainTab(tab) {
+            activeTab = tab;
+
+            const tabs = ['quiz1', 'quiz2', 'flashcards', 'key', 'notes'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (!btn) return;
+                if (t === tab) {
+                    btn.className = "tab-btn whitespace-nowrap px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-indigo-600 text-white shadow-sm cursor-pointer";
+                } else {
+                    btn.className = "tab-btn whitespace-nowrap px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-slate-800/70 text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer";
+                }
+            });
+
+            const viewQuiz = document.getElementById('view-quiz');
+            const viewFlashcards = document.getElementById('view-flashcards');
+            const viewKey = document.getElementById('view-key');
+            const viewNotes = document.getElementById('view-notes');
+
+            viewQuiz.classList.add('hidden');
+            viewFlashcards.classList.add('hidden');
+            viewKey.classList.add('hidden');
+            viewNotes.classList.add('hidden');
+
+            if (tab === 'quiz1' || tab === 'quiz2') {
+                viewQuiz.classList.remove('hidden');
+                renderActiveQuiz();
+            } else if (tab === 'flashcards') {
+                viewFlashcards.classList.remove('hidden');
+                renderFlashcard();
+            } else if (tab === 'key') {
+                viewKey.classList.remove('hidden');
+                renderFullKey();
+            } else if (tab === 'notes') {
+                viewNotes.classList.remove('hidden');
+                typesetMath();
+            }
+
+            updateTimerDisplay();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // =========================================================================
+        // OBSŁUGA QUIZÓW 1 I 2 (RENDEROWANIE, ODPOWIEDZI, FILTRY, RESET DO 0)
+        // =========================================================================
+        function getActiveQuizKey() {
+            return (activeTab === 'quiz2') ? 'quiz2' : 'quiz1';
+        }
+
+        function setCheckMode(mode) {
+            checkMode = mode;
+            const btnInstant = document.getElementById('mode-btn-instant');
+            const btnExam = document.getElementById('mode-btn-exam');
+            const finishTop = document.getElementById('finish-exam-btn-top');
+
+            if (mode === 'instant') {
+                btnInstant.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition-all bg-indigo-600 text-white shadow cursor-pointer";
+                btnExam.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-white cursor-pointer";
+                finishTop.classList.add('hidden');
+            } else {
+                btnExam.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition-all bg-indigo-600 text-white shadow cursor-pointer";
+                btnInstant.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-white cursor-pointer";
+                finishTop.classList.remove('hidden');
+            }
+            renderActiveQuiz();
+        }
+
+        function setQuestionFilter(filter) {
+            questionFilter = filter;
+            const filters = ['all', 'unanswered', 'wrong'];
+            filters.forEach(f => {
+                const btn = document.getElementById(`filter-btn-${f}`);
+                if (!btn) return;
+                if (f === filter) {
+                    btn.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white border border-indigo-500 cursor-pointer";
+                } else if (f === 'wrong') {
+                    btn.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-rose-400 hover:bg-rose-950/40 border border-slate-800 cursor-pointer";
+                } else {
+                    btn.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 cursor-pointer";
+                }
+            });
+            renderActiveQuiz();
+        }
+
+        function selectQuizAnswer(qId, optKey) {
+            const key = getActiveQuizKey();
+            const state = quizState[key];
+
+            // W trybie instant nie pozwalamy zmienić raz klikniętej odpowiedzi (chyba że zresetuje się quiz),
+            // natomiast w trybie exam można zmieniać odpowiedź aż do kliknięcia "Zakończ i sprawdź cały test".
+            if (checkMode === 'instant' && state.answers[qId]) return;
+            if (checkMode === 'exam' && state.examFinished) return;
+
+            state.answers[qId] = optKey;
+
+            // Jeżeli w trybie instant odpowiedziano na wszystkie pytania, pokaż podsumowanie
+            if (checkMode === 'instant' && Object.keys(state.answers).length === state.questions.length) {
+                state.examFinished = true;
+            }
+
+            renderActiveQuiz();
+        }
+
+        function resetSingleQuestion(qId) {
+            const key = getActiveQuizKey();
+            const state = quizState[key];
+            delete state.answers[qId];
+            state.examFinished = false;
+            renderActiveQuiz();
+            showToast("Wyczyszczono pytanie #" + qId, "Możesz ponownie zaznaczyć odpowiedź dla tego pytania.");
+        }
+
+        function finishExamNow() {
+            const key = getActiveQuizKey();
+            const state = quizState[key];
+            state.examFinished = true;
+            renderActiveQuiz();
+            const summaryCard = document.getElementById('quiz-summary-card');
+            if (summaryCard) {
+                summaryCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            showToast("Test sprawdzony!", "Sprawdź swój wynik i szczegółowe wyjaśnienia poniżej.");
+        }
+
+        function resetCurrentQuiz(shouldShuffle = false) {
+            // Jeśli użytkownik kliknie Reset będąc w zakładce Fiszek/Klucza/Notatki, przełącz na Quiz 1 lub zresetuj aktywny
+            if (activeTab === 'flashcards') {
+                if (shouldShuffle) shuffleFlashcards();
+                else resetFlashcards();
+                return;
+            }
+            if (activeTab !== 'quiz1' && activeTab !== 'quiz2') {
+                activeTab = 'quiz1';
+                switchMainTab('quiz1');
+            }
+
+            const key = getActiveQuizKey();
+            const baseQuestions = (key === 'quiz1') ? QUIZ_1_QUESTIONS : QUIZ_2_QUESTIONS;
+
+            quizState[key] = {
+                questions: shouldShuffle ? shuffleArray(baseQuestions) : [...baseQuestions],
+                answers: {},
+                shuffled: shouldShuffle,
+                examFinished: false,
+                secondsElapsed: 0
+            };
+
+            questionFilter = 'all';
+            setQuestionFilter('all');
+            updateTimerDisplay();
+            renderActiveQuiz();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast(
+                shouldShuffle ? "Zresetowano i wymieszano pytania!" : "Zresetowano quiz do 0!",
+                "Wszystkie odpowiedzi i licznik zostały wyzerowane – możesz rozwiązywać od nowa."
+            );
+        }
+
+        function renderActiveQuiz() {
+            const key = getActiveQuizKey();
+            const state = quizState[key];
+            const total = state.questions.length;
+
+            // Aktualizacja nagłówków opisu quizu
+            const badgeLabel = document.getElementById('quiz-badge-label');
+            const shuffleInd = document.getElementById('quiz-shuffle-indicator');
+            const mainTitle = document.getElementById('quiz-main-title');
+            const mainSub = document.getElementById('quiz-main-subtitle');
+
+            if (key === 'quiz1') {
+                badgeLabel.textContent = "Zestaw 1 • Kolokwium (221201-A005)";
+                mainTitle.textContent = "Quiz 1: Kolokwium z plików JPG (25 pytań)";
+                mainSub.textContent = "Oryginalne pytania z arkusza kolokwialnego wraz z odtworzonymi wykresami, niezależną weryfikacją merytoryczną (z korektą błędnych dopisków ze zdjęć) i dokładnym wskazaniem źródeł z plików PDF.";
+            } else {
+                badgeLabel.textContent = "Zestaw 2 • Autorski Trening ELFO";
+                mainTitle.textContent = "Quiz 2: Autorski Quiz Treningowy ELFO (25 nowych pytań)";
+                mainSub.textContent = "25 dodatkowych pytań przekrojowych z wykładów i materiałów PDF (CDC, fotometria, He-Ne, Nd:YAG, SHG, DFB/DBR, VCSEL, QCL/ICL, spektroskopia MIR), które dopełniają przygotowanie do kolokwium.";
+            }
+
+            if (state.shuffled) {
+                shuffleInd.classList.remove('hidden');
+            } else {
+                shuffleInd.classList.add('hidden');
+            }
+
+            // Obliczanie statystyk
+            let answeredCount = 0;
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            state.questions.forEach(q => {
+                const userAns = state.answers[q.id];
+                if (userAns) {
+                    answeredCount++;
+                    if (userAns === q.correct) correctCount++;
+                    else wrongCount++;
+                }
+            });
+
+            const showResultsNow = (checkMode === 'instant') || state.examFinished;
+            const percent = Math.round((correctCount / total) * 100);
+
+            // Liczniki w pasku górnym
+            const mobileBadge = document.getElementById('mobile-score-badge');
+            const desktopBadge = document.getElementById('desktop-score-badge');
+            const desktopAns = document.getElementById('desktop-answered-badge');
+            const progressBar = document.getElementById('quiz-progress-bar');
+
+            if (checkMode === 'exam' && !state.examFinished) {
+                mobileBadge.textContent = `${answeredCount} / ${total}`;
+                desktopBadge.textContent = `Trwa kolokwium`;
+                desktopAns.textContent = `${answeredCount}/${total}`;
+            } else {
+                mobileBadge.textContent = `${correctCount} / ${total}`;
+                desktopBadge.textContent = `${correctCount} / ${total} (${percent}%)`;
+                desktopAns.textContent = `${answeredCount}/${total}`;
+            }
+
+            progressBar.style.width = `${Math.round((answeredCount / total) * 100)}%`;
+
+            // Aktualizacja liczników na przyciskach filtrów
+            document.getElementById('filter-btn-all').textContent = `Wszystkie (${total})`;
+            document.getElementById('filter-btn-unanswered').textContent = `Bez odpowiedzi (${total - answeredCount})`;
+            document.getElementById('filter-btn-wrong').textContent = showResultsNow ? `Błędne do powtórki (${wrongCount})` : `Błędne do powtórki`;
+
+            // Siatka pigułek nawigacyjnych 1..25
+            const pillsContainer = document.getElementById('question-nav-pills');
+            pillsContainer.innerHTML = state.questions.map((q, idx) => {
+                const userAns = state.answers[q.id];
+                let pillClass = "bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-600";
+                if (userAns) {
+                    if (!showResultsNow) {
+                        pillClass = "bg-indigo-600/30 text-indigo-200 border-indigo-500/60";
+                    } else if (userAns === q.correct) {
+                        pillClass = "bg-emerald-600/30 text-emerald-300 border-emerald-500/60";
+                    } else {
+                        pillClass = "bg-rose-600/30 text-rose-300 border-rose-500/60";
+                    }
+                }
+                return `<button onclick="document.getElementById('q-card-${q.id}')?.scrollIntoView({behavior:'smooth', block:'center'})" class="w-8 h-8 rounded-lg text-xs font-mono font-bold border transition-all cursor-pointer ${pillClass}" title="Skocz do pytania #${q.id}">${idx + 1}</button>`;
+            }).join('');
+
+            // Karta podsumowania wyniku
+            const summaryCard = document.getElementById('quiz-summary-card');
+            if (state.examFinished || (checkMode === 'instant' && answeredCount === total)) {
+                summaryCard.classList.remove('hidden');
+                document.getElementById('summary-percent').textContent = `${percent}%`;
+                document.getElementById('summary-fraction').textContent = `${correctCount} / ${total} pkt`;
+                document.getElementById('summary-time').textContent = formatTime(state.secondsElapsed);
+                document.getElementById('summary-correct').textContent = correctCount;
+                document.getElementById('summary-wrong').textContent = wrongCount;
+                document.getElementById('summary-skipped').textContent = total - answeredCount;
+
+                const headline = document.getElementById('summary-headline');
+                const gradeBadge = document.getElementById('summary-grade-badge');
+                if (percent >= 90) {
+                    headline.textContent = "Celująco! Materiał ELFO opanowany perfekcyjnie (5.0)";
+                    gradeBadge.textContent = "Ocena: 5.0 (Bardzo dobry)";
+                } else if (percent >= 75) {
+                    headline.textContent = "Bardzo dobry wynik! Solidne przygotowanie (4.0 – 4.5)";
+                    gradeBadge.textContent = "Ocena: 4.0 / 4.5";
+                } else if (percent >= 52) {
+                    headline.textContent = "Kolokwium zaliczone! Warto powtórzyć błędne pytania (3.0 – 3.5)";
+                    gradeBadge.textContent = "Zaliczone (≥ 50%)";
+                } else {
+                    headline.textContent = "Wymagana powtórka – przejrzyj wyjaśnienia i zresetuj quiz!";
+                    gradeBadge.textContent = "Poniżej progu 50%";
+                }
+            } else {
+                summaryCard.classList.add('hidden');
+            }
+
+            // Filtrowanie listy pytań
+            const filteredQuestions = state.questions.filter(q => {
+                const userAns = state.answers[q.id];
+                if (questionFilter === 'unanswered') return !userAns;
+                if (questionFilter === 'wrong') return showResultsNow && userAns && userAns !== q.correct;
+                return true;
+            });
+
+            const listContainer = document.getElementById('questions-list-container');
+            if (filteredQuestions.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-3">
+                        <p class="text-base font-bold text-white">Brak pytań spełniających wybrany filtr.</p>
+                        <button onclick="setQuestionFilter('all')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">
+                            Pokaż wszystkie pytania (25)
+                        </button>
+                    </div>`;
+                return;
+            }
+
+            listContainer.innerHTML = filteredQuestions.map((q) => {
+                const userAns = state.answers[q.id];
+                const isAnswered = Boolean(userAns);
+                const shouldReveal = (checkMode === 'instant' && isAnswered) || state.examFinished;
+                const isCorrect = userAns === q.correct;
+
+                let cardBorder = "border-slate-800";
+                if (shouldReveal && isAnswered) {
+                    cardBorder = isCorrect ? "border-emerald-500/60" : "border-rose-500/60";
+                } else if (isAnswered) {
+                    cardBorder = "border-indigo-500/60";
+                }
+
+                const optionsHtml = Object.entries(q.options).map(([optKey, optText]) => {
+                    let btnStyle = "bg-slate-950/90 hover:bg-slate-800/90 border-slate-800 text-slate-200";
+                    let badgeStyle = "bg-slate-800 text-slate-300 border-slate-700";
+                    let statusTag = "";
+
+                    if (shouldReveal) {
+                        if (optKey === q.correct) {
+                            btnStyle = "bg-emerald-950/50 border-emerald-500 text-emerald-100 font-semibold";
+                            badgeStyle = "bg-emerald-500 text-slate-950 font-bold border-emerald-400";
+                            statusTag = `<span class="ml-auto text-xs font-bold text-emerald-400 shrink-0">✓ Poprawna</span>`;
+                        } else if (userAns === optKey && optKey !== q.correct) {
+                            btnStyle = "bg-rose-950/50 border-rose-500 text-rose-200";
+                            badgeStyle = "bg-rose-500 text-white font-bold border-rose-400";
+                            statusTag = `<span class="ml-auto text-xs font-bold text-rose-400 shrink-0">✗ Twoja odpowiedź</span>`;
+                        } else {
+                            btnStyle = "bg-slate-950/40 border-slate-800/60 text-slate-500";
+                        }
+                    } else if (userAns === optKey) {
+                        btnStyle = "bg-indigo-950/60 border-indigo-500 text-indigo-100 font-semibold";
+                        badgeStyle = "bg-indigo-500 text-white font-bold border-indigo-400";
+                        statusTag = `<span class="ml-auto text-xs font-semibold text-indigo-300 shrink-0">Wybrano</span>`;
+                    }
+
+                    return `
+                        <button onclick="selectQuizAnswer(${q.id}, '${optKey}')" class="w-full text-left p-3.5 rounded-xl border transition-all flex items-start gap-3 cursor-pointer ${btnStyle}">
+                            <span class="w-7 h-7 rounded-lg border flex items-center justify-center text-xs font-mono uppercase shrink-0 mt-0.5 ${badgeStyle}">${optKey}</span>
+                            <span class="text-xs sm:text-sm leading-relaxed">${optText}</span>
+                            ${statusTag}
+                        </button>`;
+                }).join('');
+
+                const explanationHtml = shouldReveal ? `
+                    <div class="mt-4 pt-4 border-t border-slate-800/90 space-y-2.5 text-xs sm:text-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="font-bold ${isAnswered ? (isCorrect ? 'text-emerald-400' : 'text-rose-400') : 'text-amber-400'}">
+                                ${isAnswered ? (isCorrect ? '✅ Odpowiedź poprawna!' : `❌ Błędna odpowiedź (wybrano: ${userAns.toUpperCase()}, poprawna: ${q.correct.toUpperCase()})`) : `⚠️ Brak zaznaczonej odpowiedzi – poprawna to: ${q.correct.toUpperCase()}`}
+                            </span>
+                            <button onclick="resetSingleQuestion(${q.id})" class="text-xs text-slate-400 hover:text-white underline cursor-pointer">
+                                Wyczyść to pytanie
+                            </button>
+                        </div>
+                        <p class="text-slate-300 leading-relaxed"><strong class="text-indigo-300">Wyjaśnienie:</strong> ${q.explanation}</p>
+                        <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-amber-300">
+                            📖 Źródło: ${q.source}
+                        </div>
+                    </div>` : '';
+
+                return `
+                    <article id="q-card-${q.id}" class="bg-slate-900/95 border-2 ${cardBorder} rounded-2xl p-5 sm:p-6 shadow-lg transition-all">
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                Pytanie #${q.id}
+                            </span>
+                            ${q.handwritten ? `<span class="text-xs font-mono text-slate-400">${q.handwritten}</span>` : ''}
+                        </div>
+                        <h3 class="text-sm sm:text-base font-bold text-white leading-relaxed mb-3">${q.question}</h3>
+                        ${q.diagram ? q.diagram : ''}
+                        <div class="space-y-2.5 mt-3">${optionsHtml}</div>
+                        ${explanationHtml}
+                    </article>`;
+            }).join('');
+
+            typesetMath();
+        }
+
+        // =========================================================================
+        // OBSŁUGA TRYBU FISZEK (50 PYTAŃ)
+        // =========================================================================
+        function buildFlashcardDeck() {
+            const q1 = QUIZ_1_QUESTIONS.map(q => ({ ...q, deckLabel: "Zestaw 1: Kolokwium JPG" }));
+            const q2 = QUIZ_2_QUESTIONS.map(q => ({ ...q, deckLabel: "Zestaw 2: Autorski Trening ELFO" }));
+
+            if (flashcardDeckMode === 'quiz1') flashcardList = [...q1];
+            else if (flashcardDeckMode === 'quiz2') flashcardList = [...q2];
+            else flashcardList = [...q1, ...q2];
+
+            flashcardIndex = 0;
+            isFlashcardFlipped = false;
+        }
+
+        function changeFlashcardDeck(val) {
+            flashcardDeckMode = val;
+            buildFlashcardDeck();
+            renderFlashcard();
+        }
+
+        function shuffleFlashcards() {
+            flashcardList = shuffleArray(flashcardList);
+            flashcardIndex = 0;
+            isFlashcardFlipped = false;
+            renderFlashcard();
+            showToast("Wymieszano fiszki!", "Kolejność kart została wylosowana na nowo.");
+        }
+
+        function resetFlashcards() {
+            buildFlashcardDeck();
+            renderFlashcard();
+            showToast("Zresetowano fiszki!", "Wrócono do pierwszej fiszki w zestawie.");
+        }
+
+        function flipFlashcard() {
+            isFlashcardFlipped = !isFlashcardFlipped;
+            const inner = document.getElementById('flashcard-inner');
+            if (inner) {
+                inner.classList.toggle('rotate-y-180', isFlashcardFlipped);
+            }
+        }
+
+        function nextFlashcard() {
+            if (flashcardList.length === 0) return;
+            isFlashcardFlipped = false;
+            flashcardIndex = (flashcardIndex + 1) % flashcardList.length;
+            renderFlashcard();
+        }
+
+        function prevFlashcard() {
+            if (flashcardList.length === 0) return;
+            isFlashcardFlipped = false;
+            flashcardIndex = (flashcardIndex - 1 + flashcardList.length) % flashcardList.length;
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            if (flashcardList.length === 0) buildFlashcardDeck();
+            const card = flashcardList[flashcardIndex];
+            const inner = document.getElementById('flashcard-inner');
+            if (inner) inner.classList.remove('rotate-y-180');
+
+            document.getElementById('fc-counter').textContent = `Fiszka ${flashcardIndex + 1} z ${flashcardList.length}`;
+            document.getElementById('fc-set-label').textContent = card.deckLabel;
+            document.getElementById('fc-front-badge').textContent = `Pytanie #${card.id}`;
+            document.getElementById('fc-front-question').textContent = card.question;
+            document.getElementById('fc-front-diagram').innerHTML = card.diagram || '';
+
+            document.getElementById('fc-front-options').innerHTML = Object.entries(card.options).map(([k, v]) => `
+                <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800 flex items-start gap-2">
+                    <span class="font-mono font-bold uppercase text-indigo-400">${k})</span>
+                    <span>${v}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('fc-back-answer').textContent = `${card.correct.toUpperCase()}) ${card.options[card.correct]}`;
+            document.getElementById('fc-back-explanation').innerHTML = card.explanation;
+            document.getElementById('fc-back-source').textContent = card.source;
+
+            typesetMath();
+        }
+
+        // =========================================================================
+        // WIDOK 4: PEŁNY KLUCZ ODPOWIEDZI KOLOKWIUM JPG (1–25)
+        // =========================================================================
+        function renderFullKey() {
+            const container = document.getElementById('full-key-list');
+            if (!container) return;
+
+            container.innerHTML = QUIZ_1_QUESTIONS.map(q => `
+                <div class="p-5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="px-3 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            Pytanie ${q.id}
+                        </span>
+                        <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+                            Na zdjęciu JPG: ${q.handwritten}
+                        </span>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-bold text-white">${q.question}</h3>
+                    ${q.diagram ? q.diagram : ''}
+                    <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm font-bold">
+                        ✅ Poprawna odpowiedź: ${q.correct.toUpperCase()}) ${q.options[q.correct]}
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        <strong class="text-indigo-300">Uzasadnienie:</strong> ${q.explanation}
+                    </p>
+                    <div class="text-xs font-mono text-amber-300">
+                        📖 Źródło w plikach: ${q.source}
+                    </div>
+                </div>
+            `).join('');
+
+            typesetMath();
+        }
+
+        // =========================================================================
+        // WIDOK 5: WYSZUKIWARKA W NOTATCE
+        // =========================================================================
+        function filterNotes(query) {
+            const normalized = query.trim().toLowerCase();
+            const sections = document.querySelectorAll('.note-section');
+            sections.forEach(sec => {
+                if (!normalized || sec.textContent.toLowerCase().includes(normalized)) {
+                    sec.classList.remove('hidden');
+                } else {
+                    sec.classList.add('hidden');
+                }
+            });
+        }
+
+        // Obsługa klawiatury w trybie fiszek (Spacja = obrót, Strzałki = nawigacja)
+        document.addEventListener('keydown', (e) => {
+            if (activeTab !== 'flashcards') return;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                flipFlashcard();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                nextFlashcard();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                prevFlashcard();
+            }
+        });
+
+        // Inicjalizacja po załadowaniu DOM
+        window.addEventListener('DOMContentLoaded', () => {
+            buildFlashcardDeck();
+            renderActiveQuiz();
+            renderFullKey();
+            startTimer();
+        });
+    </script>
+</body>
+</html>
