@@ -104,3 +104,36 @@ end
 xs=x;
 nr_i=i;
 end
+%% Zad3 
+points={2 , 0.5};
+fx=@(x) x^3-3*x+1;
+fpx=@(x) 3*x^2-3;
+dok=1e-14;
+options = optimset("TolX",0);
+x_d(1)=fzero(fx,2,options);
+x_d(2)=fzero(fx,0.5,options);
+
+for h=1:length(points)
+x0=points{h};
+[xs,err]=newton3(fx,fpx,x0,100,x_d(h));
+fprintf("rozw= %d dla x0= %d \n",xs,x0)
+err_plot=err;
+err_plot(err_plot == 0) = 1e-17;
+
+idx = find(err(1:end-1) > 1e-12 & err(2:end) > 1e-12); % znajduje indeksy i, dla których jednocześnie Delta_i > 1e-12 oraz Delta_{i+1} > 1e-12 (automatycznie odrzuca też nieużyte zera z prealokacji wektora err)
+p = polyfit(log(err(idx)), log(err(idx+1)),1); % dopasowuje prostą metodą najmniejszych kwadratów (wielomian 1. stopnia) do punktów (ln(Delta_i), ln(Delta_{i+1})); p(1) to jej współczynnik kierunkowy, czyli rząd zbieżności rho
+C = err(idx(end)+1) / err(idx(end))^2; % oblicza współczynnik C = Delta_{i+1} / Delta_i^2 dla ostatniej iteracji spełniającej warunek > 1e-12, przyjmując rho = 2
+fprintf("| rho = %.6f, C = %.6f\n", p(1), C); % wypisuje wyznaczone rho i C dla danego pierwiastka i przechodzi do nowej linii
+end
+
+function [xs, err] = newton3(f, fp, x0, n, x_dok)
+err=zeros(n,1);
+x = x0;
+i=0;
+while abs(x-x_dok)>=1e-14 && i<n
+    x = x - f(x) / fp(x);
+    i=i+1;
+err(i) = abs(x - x_dok);
+end
+xs=x;
+end
