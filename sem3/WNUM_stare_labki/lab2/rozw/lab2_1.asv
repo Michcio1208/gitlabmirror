@@ -1,0 +1,96 @@
+% Dane z zadania 1:
+f     = @(x) x.^12 - 1;
+fp    = @(x) 12 * x.^11;
+x_dok = 1;
+
+% a) Wywołanie obu metod
+[xs_rf, err_rf] = regula_falsi(f, 0, 2, 200000, x_dok);
+[xs_n,  err_n]  = newton(f, fp, 2, 1000, x_dok);
+
+% b) Wypisanie minimalnego błędu i pierwszych iteracji poniżej progów
+wypisz_wyniki('Regula falsi', err_rf);
+wypisz_wyniki('Newton',       err_n);
+
+% c) Wspólny wykres w skali log-log (zera zastąpione przez 1e-17)
+err_rf_plot = err_rf;
+err_rf_plot(err_rf_plot == 0) = 1e-17;
+
+err_n_plot = err_n;
+err_n_plot(err_n_plot == 0) = 1e-17;
+
+figure;
+loglog(1:length(err_rf), err_rf_plot, 'LineWidth', 1.5);
+hold on;
+loglog(1:length(err_n),  err_n_plot,  'LineWidth', 1.5);
+grid on;
+xlabel('Numer iteracji i');
+ylabel('Błąd rzeczywisty |x_i - x^*|');
+title('Błąd rzeczywisty w funkcji numeru iteracji (regula falsi vs Newton)');
+legend('Regula falsi', 'Metoda Newtona', 'Location', 'southwest');
+
+% --- Definicje funkcji ---
+
+function [xs, err] = regula_falsi(f, a, b, n, x_dok)
+xs = zeros(n, 1);
+fa = f(a);
+fb = f(b);
+
+for i = 1:n
+    x_new = (a * fb - b * fa) / (fb - fa);
+    xs(i) = x_new;
+    fx = f(x_new);
+
+    if fa * fx < 0
+        b = x_new;
+        fb = fx;
+    else
+        a = x_new;
+        fa = fx;
+    end
+end
+err = abs(xs - x_dok);
+end
+
+function [xs, err] = newton(f, fp, x0, n, x_dok)
+xs = zeros(n, 1);
+x = x0;
+
+for i = 1:n
+    x = x - f(x) / fp(x);
+    xs(i) = x;
+end
+err = abs(xs - x_dok);
+end
+
+function wypisz_wyniki(nazwa, err)
+fprintf('=== %s ===\n', nazwa);
+fprintf('Najmniejszy błąd: %.3e\n', min(err));
+for prog = [1e-6, 1e-9, 1e-12]
+    it = find(err < prog, 1);
+    if isempty(it)
+        fprintf('Błąd < %.0e: nie nastąpiło\n', prog);
+    else
+        fprintf('Błąd < %.0e: iteracja %d\n', prog, it);
+    end
+end
+fprintf('\n');
+end
+%% ZAD.2
+fv=@()[x^3-3*x*y^2-1;3*x^2*y-y^3];
+J=@(x,y)[3*x^2-3*y^2,(-6)*x*y;6*x*y,3*x^2-3*y^2];
+
+function [xs,nr_i,spelnione]=newton2(fv,J,x0,n,dokl)
+xs=zeros(n,1);
+x=x0;
+i=1;
+while i<n && err(i)>dokl
+x=x-J(x)\fv(x);
+xs(i)=x_n;
+i=i+1;
+if(xs(i)<10e-10)
+spelnione="spelnione";
+end
+end
+nr_i=i;
+
+end
