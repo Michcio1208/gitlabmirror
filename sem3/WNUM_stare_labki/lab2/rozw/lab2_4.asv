@@ -1,0 +1,81 @@
+% Zad1 
+clear all
+f=@(x) sin(x-(pi/4));
+fp=@(x) cos(x-(pi/4));
+x0=(pi/4)*1.05;
+xd=(pi/4);
+x1=xd*1.1;
+
+[x_n,err_n]=newton(f,fp,x0,xd);
+[x_b,err_b]=bisekcja(0,1,f,x0,xd);
+[x_s,err_s]=sieczne(f,x0,x1,xd);
+
+semilogy(err_n)
+hold on;
+semilogy(err_b)
+semilogy(err_s)
+legend('newton','bisekcja','sieczne')
+
+
+%funkcje 
+function [x,err]=newton(f,fp,x0,xd)
+x=x0;
+i=0;
+while abs(x-xd)>=1e-14 
+x=x-f(x)/fp(x);
+i=i+1;
+err(i)=abs(x-xd);
+end
+end
+
+function [x,err]=bisekcja(a,b,f,x0,xd)
+i=0;
+x=x0;
+while abs(x-xd)>=1e-14 
+    x=(a+b)/2;
+    if f(a)*f(x)<0
+        b=x;
+    else
+        a=x;
+    end
+    i=i+1;
+    err(i)=abs(x-xd);
+end
+end
+
+function [x,err]=sieczne(f,x0,x1,xd)
+x_older=x0;
+x_old=x1;
+x=x0;
+i=0;
+while abs(x-xd)>1e-14 
+    x_new=x_old-f(x_old)*(x_old-x_older)/(f(x_old)-f(x_older));
+    i=i+1;
+    x_older=x_old;
+    x_old=x_new;
+x=x_new;
+err(i)=abs(x-xd);
+end
+end
+
+%% Zad2 
+options=optimoptions('fsolve','FunctionTolerance',1e-12);
+
+
+
+
+
+%funkcje
+
+function F=obwod(z)
+J=1;
+r1=8.5;
+k=1;
+
+F=[
+J-i
+
+];
+
+
+end

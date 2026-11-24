@@ -44,6 +44,7 @@ idx=find(err(1:end-1)>=1e-12 & err(2:end)>=1e-12);
 px=polyfit(log(err(idx)),log(err(idx+1)),1);
 p=px(1);
 end
+
 function[x,err]=newton(f,fp,x0,xd)
 x=x0;
 i=0;
@@ -111,10 +112,37 @@ end
 iter=i;
 end
 %% Zad3
-z0=[];%
+z0=[4,3.5,3,2,2,2,1];% v1 v2 v3 ir1 id1 ir2 ir4
+options=optimoptions('fsolve','StepTolerance',1e-12,'FunctionTolerance',1e-12);
+
+fsolve(@obwod,z0,options)
 
 % funkcje
 
 function F=obwod(z)
+J=3;
+r1=0.5;
+r2=1.5;
+r4=4;
+ut=0.026;
+Is=1e-9;
 
+v1=z(1);
+v2=z(2);
+v3=z(3);
+ir1=z(4);
+id1=z(5);
+ir2=z(6);
+ir4=z(7);
+
+F=[
+    v1-v2-r1*ir1;
+    v3-ir2*r2;
+    v1-r4*ir4;
+    id1-Is*exp(((v2-v3)/ut)-1);
+
+    ir1-id1;
+    id1-ir2;
+    J-ir1-ir4;
+    ];
 end

@@ -1,0 +1,58 @@
+% Zad1
+clear all
+p=[1,-4,2,4,-3];
+r=roots(p);
+w=@(x) x^4-4*x^3+2*x^2+4*x-3;
+wp=@(x) 4*x^3-12*x^2+4*x+4;
+x=linspace(-2,5,1200);
+y=polyval(p,x);
+r_in_range=r(r>=-2 & r<=5);
+figure(1)
+plot(x,y)
+hold on;
+plot(r_in_range,zeros(length(r_in_range)),'ro')
+grid on;
+
+[x1,err1,iter1]=newton1(w,wp,0.8);
+[x2,err2,iter2]=newton1(w,wp,4.2);
+
+figure(2)
+semilogy(e)
+hold on;
+semilogy(err2)
+legend('dla 0.8','dla 4.2')
+
+function [x,err,iter]=newton1(f,fp,x0)
+x_l=x0;
+for i=1:100
+    x_n=x_l-f(x_l)/fp(x_l);
+    err(i)=abs(x_n-x_l);
+     x(i)=x_n;
+    if err(i)<1e-8
+        break
+    end
+    x_l=x_n;
+   
+end
+iter=i;
+end
+%% Zad2
+clear all
+f=@(v)[sin(v(1))+v(2)^2-5;2*v(1)*v(2)-4*atan(v(2))];
+J=@(v)[cos(v(1)),2*v(2);2*v(2),2*v(1)-4*(1/1+v(2)^2)];
+
+x1=[1;2];
+[x,err]=newton2(f,J,x1);
+semilogy(err)
+grid on;
+
+function [x,err]=newton2(f,J,x0)
+i=0;
+x=x0;
+while norm(f(x))>1e-10 && i<80
+x=x-J(x)\f(x);
+i=i+1;
+err(i)=norm(f(x));
+end
+
+end
