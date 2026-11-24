@@ -89,4 +89,139 @@ end
 x=x_new;
 end
 %% Zad2
+clear all
+x0=0;
+f=@(x) x^3-2*x+2;
+fp=@(x) 3*x^2 -2;
 
+[x8,it]=newton2(f,fp,x0,7);
+x8;
+
+x_axis=linspace(-3,3,1201);
+iters = zeros(size(x_axis));
+for k = 1:length(x_axis)
+    [~, iters(k)] = newton2(f, fp, x_axis(k),100);
+end
+
+plot(x_axis, iters)
+xlabel('x_0')
+ylabel('Liczba iteracji')
+title('Liczba iteracji metody Newtona w funkcji punktu startowego x_0')
+
+%funkcje
+function [x,iter]=newton2(f,fp,x0,n)
+x(1)=x0;
+for i=1:n 
+    x(i+1)=x(i)-f(x(i))/fp(x(i));
+    if abs(x(i+1)-x(i))<=1e-10
+        break   
+    end
+    i=i+1;
+    
+end
+iter=i;
+end 
+
+%% Zad3
+clear all
+z0 = [4; 3; 2.5; 1; 1; 1; 1]; % [V1; V2; V3; iR1; iD1; iR2; iR4]
+
+opcje = optimoptions('fsolve', 'StepTolerance', 1e-12, 'FunctionTolerance', 1e-12);
+z = fsolve(@f_obwod, z0, opcje);
+
+fprintf('V1  = %.6f V\n',  z(1));
+fprintf('V2  = %.6f V\n',  z(2));
+fprintf('V3  = %.6f V\n',  z(3));
+fprintf('iR1 = %.6f mA\n', z(4));
+fprintf('iD1 = %.6f mA\n', z(5));
+fprintf('iR2 = %.6f mA\n', z(6));
+fprintf('iR4 = %.6f mA\n', z(7));
+
+suma_w2 = z(4) - z(5);
+fprintf('Suma prądów w węźle 2: %.3e mA\n', suma_w2);
+fprintf('Błąd poniżej 1e-10 mA: %d\n', abs(suma_w2) < 1e-10);
+
+%funkcje
+function F = f_obwod(z)
+J  = 2;     % mA
+R1 = 1;     % kOhm
+R2 = 2;     % kOhm
+R4 = 5;     % kOhm
+Is = 1e-9;  % mA
+UT = 0.026; % V
+
+V1  = z(1);
+V2  = z(2);
+V3  = z(3);
+iR1 = z(4);
+iD1 = z(5);
+iR2 = z(6);
+iR4 = z(7);
+
+F = [
+    % 4 równania gałęziowe
+    V1 - V2 - iR1*R1;
+    iD1 - Is*(exp((V2 - V3)/UT) - 1);
+    V3 - iR2*R2;
+    V1 - iR4*R4;
+    % 3 prawa prądowe Kirchhoffa (węzły 1, 2, 3)
+    J - iR4 - iR1;
+    iR1 - iD1;
+    iD1 - iR2
+    ];
+end
+%% Zad 3 samemu
+
+z0=[4,3,2.5,1,1,1,1]; % v1,v2,v3,ir1,id1,ir2,ir4
+
+options=optimoptions('fsolve','StepTolerance',1e-12,'FunctionTolerance',1e-12);
+
+fsolve(@obwod,z0,options);
+
+fprintf("V1 to %.2f\n",z(1))
+fprintf("V2 to %.2f\n",z(2))
+fprintf("V3 to %.2f\n",z(3))
+fprintf("ir1 to %.2f\n",z(4))
+fprintf("id1 to %.2f\n",z(5))
+fprintf("ir2 to %.2f\n",z(6))
+fprintf("ir4 to %.2f\n",z(7))
+
+if z(4)-z(5)<1e-10
+fprintf("jest zero\n")
+else
+    fprintf("nie zero\n")
+end
+
+%funckje
+function F=obwod(z)
+
+J=2;
+r1=1;
+r2=2;
+r4=5;
+ut=0.026;
+Is=1e-9;
+
+
+V1=z(1);
+V2=z(2);
+V3=z(3);
+ir1=z(4);
+id1=z(5);
+ir2=z(6);
+ir4=z(7);
+
+
+F=[
+V1-ir1*r1-V2;
+id1-Is*exp(((V2-V3)/ut)-1);
+V3-r2*ir2;
+V1-r4*ir4;
+
+J-ir1-ir4;
+ir1-id1;
+id1-ir2;
+];
+
+
+end

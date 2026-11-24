@@ -1,0 +1,109 @@
+%Zad1
+clear all
+f=@(x) x^3-4*x+1;
+fp=@(x) 3*x^2 -4;
+x0=2.5;
+x1=2.3;
+options=optimset("TolX",0);
+xd=fzero(f,[1,2.5],options);
+
+[x_n,err_n]=newton(f,fp,x0,xd);
+[x_b,err_b]=bisekcja(1,2.5,f,xd);
+[x_s,err_s]=sieczne(x0,x1,f,xd);
+
+figure(1)
+semilogy(err_n)
+hold on;
+semilogy(err_b)
+semilogy(err_s)
+legend('newton','bisekcja','sieczne')
+
+[idx_n,p_n]=indexer(err_n);
+[idx_b,p_b]=indexer(err_b);
+[idx_s,p_s]=indexer(err_s);
+ 
+fprintf("p dla siecznych %.6f\n",p_s)
+fprintf("p dla newtona %.6f\n",p_n)
+fprintf("p dla biseckji %.6f\n",p_b)
+
+C_s=err_s(idx_s(end))/ (err_s(idx_s(end-1)))^((1+sqrt(5))/2);
+C_n=err_n(idx_n(end))/ (err_n(idx_n(end-1)))^2;
+fprintf("C dla siecznych %.6f\n",C_s)
+fprintf("C dla newtona %.6f\n",C_n)
+
+figure(2)
+loglog(err_n(idx_n(1:end-1)),err_n(idx_n(2:end)),'o')
+hold on;
+loglog(err_b(idx_b(1:end-1)),err_b(idx_b(2:end)),'o')
+loglog(err_s(idx_s(1:end-1)),err_s(idx_s(2:end)),'o')
+legend('newton','bisekcja','sieczne')
+%funkcje 
+
+function [idx,p]=indexer(err)
+idx=find(err(1:end-1)>=1e-12 & err(2:end)>=1e-12);
+px=polyfit(log(err(idx)),log(err(idx+1)),1);
+p=px(1);
+end
+function[x,err]=newton(f,fp,x0,xd)
+x=x0;
+i=0;
+while abs(x-xd)>=1e-14 && i<100
+x=x-f(x)/fp(x);
+i=i+1;
+err(i)=abs(x-xd);
+end
+end
+
+function[x,err]=bisekcja(a,b,f,xd)
+i=0;
+while abs(a-b)>=1e-14 && i<100
+x=(a+b)/2;
+if f(a)*f(x)<0
+b=x;
+else
+a=x;
+end
+i=i+1;
+err(i)=abs(x-xd);
+end
+end
+
+function[x,err]=sieczne(x0,x1,f,xd)
+i=0;
+x_old=x1;
+x_older=x0;
+while abs(x_old-x_older)>=1e-14 && i<100
+   x_new=x_old-f(x_old)*((x_old-x_older)/(f(x_old)-f(x_older)));
+   i=i+1;
+   err(i)=abs(x_new-xd);
+   x_older=x_old;
+   x_old=x_new;
+end
+x=x_new;
+end
+
+%% Zad2
+clear all
+f=@(x) x^3-2*x-2;
+fp=@(x) 3*x^2-2;
+[x,err,i]=newton2(f,fp,0,7);
+x
+
+x_axis=linspace(-3,3,1201);
+for k=1:length(x_axis)
+[x_p(k),err,(k),i_p(k)]=newto
+end
+
+%funkcje
+function[x,err,iter]=newton2(f,fp,x0,n)
+x(1)=x0;
+for i=1:n
+    x(i+1)=x(i)-f(x(i))/fp(x(i));
+    err(i)=abs(x(i+1)-x(i));
+    if err(i)<=1e-10
+    break;
+    end
+    i=i+1;
+end
+iter=i;
+end
