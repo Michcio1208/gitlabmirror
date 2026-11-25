@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="pl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ELFO2 – Quiz laboratoryjny: Lasery półprzewodnikowe i Nd:YAG</title>
+
+  <!-- Font Inter dla wysokiej czytelności -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN z konfiguracją trybu ciemnego (class) i czcionki Inter -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          colors: {
+            laser: {
+              532: '#10b981',
+              glow: '#34d399',
+              ir: '#f43f5e',
+              uv: '#8b5cf6',
+            },
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-200 transition-colors duration-200">
+  <!-- Dekoracyjna optoelektroniczna poświata w tle -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
+    <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[38rem] h-[18rem] rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-[26rem] h-[20rem] rounded-full bg-violet-500/10 dark:bg-violet-500/10 blur-3xl"></div>
+    <div class="absolute top-1/2 -left-24 w-[20rem] h-[20rem] rounded-full bg-rose-500/5 dark:bg-rose-500/10 blur-3xl"></div>
+  </div>
+
+  <!-- Główny pasek nawigacji -->
+  <header class="sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/85 dark:bg-slate-950/85 backdrop-blur-md">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <!-- Logo i tytuł aplikacji -->
+      <button id="btn-header-home" type="button" class="flex items-center gap-3 text-left group focus:outline-none rounded-xl p-1 -ml-1">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-500 dark:to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0 group-hover:scale-105 transition-transform">
+          <!-- Ikona wiązki laserowej w rezonatorze -->
+          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 5v14" />
+            <path d="M18 5v14" stroke-dasharray="2.5 2.5" />
+            <path d="M4 12h17" />
+            <path d="M18 9l3 3-3 3" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold tracking-tight text-sm sm:text-base text-slate-900 dark:text-white truncate">ELFO2 • Quiz</span>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+              532 / 1064 nm
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 truncate">Lasery półprzewodnikowe i Nd:YAG</p>
+        </div>
+      </button>
+
+      <!-- Przyciski akcji w nagłówku -->
+      <div class="flex items-center gap-2">
+        <button id="btn-nav-menu" type="button" class="hidden items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+          </svg>
+          <span>Menu</span>
+        </button>
+
+        <button id="btn-theme-toggle" type="button" title="Przełącz motyw jasny / ciemny" aria-label="Przełącz motyw jasny lub ciemny" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/90 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors">
+          <!-- Ikona słońca (widoczna w ciemnym motywie) -->
+          <svg id="icon-sun" class="w-5 h-5 hidden dark:block text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" /><path d="M12 20v2" />
+            <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
+            <path d="M2 12h2" /><path d="M20 12h2" />
+            <path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" />
+          </svg>
+          <!-- Ikona księżyca (widoczna w jasnym motywie) -->
+          <svg id="icon-moon" class="w-5 h-5 block dark:hidden text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Główny kontener widoków -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+
+    <!-- ==================== WIDOK 1: PANEL STARTOWY ==================== -->
+    <section id="view-start" class="space-y-6">
+      <!-- Karta tytułowa -->
+      <div class="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/30">
+        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-violet-500"></div>
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Elementy Fotoniczne • Przygotowanie do wejściówki
+          </span>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+            20 pytań ABCD • 100% na bazie instrukcji
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+          Badanie podstawowych właściwości laserów półprzewodnikowych i ciała stałego (Nd:YAG)
+        </h1>
+        <p class="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+          Sprawdź swoją wiedzę przed laboratorium. Każda odpowiedź zawiera wyjaśnienie oparte wyłącznie na instrukcji
+          <span class="font-medium text-slate-800 dark:text-slate-200">ELFO2</span> wraz z dokładnym numerem strony, rozdziału i rysunku.
+        </p>
+
+        <!-- Ustawienia losowania -->
+        <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+          <label class="inline-flex items-center gap-3 cursor-pointer select-none">
+            <span class="relative inline-flex items-center">
+              <input id="toggle-shuffle-questions" type="checkbox" class="sr-only peer" />
+              <span class="w-11 h-6 rounded-full bg-slate-300 dark:bg-slate-700 peer-checked:bg-emerald-500 transition-colors"></span>
+              <span class="absolute left-0.5 top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></span>
+            </span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Losowa kolejność pytań</span>
+          </label>
+
+          <label class="inline-flex items-center gap-3 cursor-pointer select-none">
+            <span class="relative inline-flex items-center">
+              <input id="toggle-shuffle-options" type="checkbox" class="sr-only peer" checked />
+              <span class="w-11 h-6 rounded-full bg-slate-300 dark:bg-slate-700 peer-checked:bg-emerald-500 transition-colors"></span>
+              <span class="absolute left-0.5 top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></span>
+            </span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Losowa kolejność odpowiedzi A/B/C/D</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Wybór trybu quizu -->
+      <div>
+        <div class="flex items-center justify-between mb-3 px-1">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Wybierz tryb quizu</h2>
+          <span class="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">Obsługa klawiatury: A–D / 1–4 oraz Enter</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Tryb 1: Wszystkie pytania -->
+          <button type="button" data-mode="all" class="mode-card group text-left rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 hover:border-emerald-500/60 dark:hover:border-emerald-500/60 p-5 shadow-md hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-200 flex flex-col justify-between gap-4">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-sm border border-emerald-500/20">
+                  20
+                </span>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  Pełny zestaw
+                </span>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                Wszystkie pytania (20)
+              </h3>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                Kompletny przegląd zagadnień: 7 pewniaków ze zdjęć oraz 13 dodatkowych pytań z całej instrukcji.
+              </p>
+            </div>
+            <div class="flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              <span>Rozpocznij quiz</span>
+              <svg class="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+          </button>
+
+          <!-- Tryb 2: Tylko pytania ze zdjęć -->
+          <button type="button" data-mode="photos" class="mode-card group text-left rounded-2xl border border-amber-400/50 dark:border-amber-500/40 bg-gradient-to-br from-white to-amber-50/50 dark:from-slate-900/95 dark:to-amber-950/20 hover:border-amber-500 p-5 shadow-md hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-200 flex flex-col justify-between gap-4">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold text-sm border border-amber-500/30">
+                  7
+                </span>
+                <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/></svg>
+                  Ze zdjęć (pewniak)
+                </span>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                Tylko pytania ze zdjęć (7)
+              </h3>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                Kluczowe pytania ze zrzutów: długości fal Nd:YAG, pompowanie, krawędziowy vs VCSEL, homostruktura i przerwa E<sub>G</sub>.
+              </p>
+            </div>
+            <div class="flex items-center text-sm font-semibold text-amber-600 dark:text-amber-400">
+              <span>Ćwicz pewniaki</span>
+              <svg class="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+          </button>
+
+          <!-- Tryb 3: Dodatkowe z instrukcji -->
+          <button type="button" data-mode="extra" class="mode-card group text-left rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 hover:border-violet-500/60 dark:hover:border-violet-500/60 p-5 shadow-md hover:shadow-lg hover:shadow-violet-500/10 transition-all duration-200 flex flex-col justify-between gap-4">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-violet-500/15 text-violet-600 dark:text-violet-400 font-bold text-sm border border-violet-500/20">
+                  13
+                </span>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/20">
+                  Teoria i praktyka
+                </span>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                Dodatkowe z instrukcji (13)
+              </h3>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                Warunki generacji, Fabry-Perot, studnie kwantowe, widmo modowe, ekranowanie 4f, poziomy Nd:YAG i zakres ćwiczenia.
+              </p>
+            </div>
+            <div class="flex items-center text-sm font-semibold text-violet-600 dark:text-violet-400">
+              <span>Rozpocznij quiz</span>
+              <svg class="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+          </button>
+
+          <!-- Tryb 4: Powtórka błędnych -->
+          <div class="relative flex flex-col">
+            <button id="btn-mode-wrong" type="button" data-mode="wrong" disabled class="mode-card group text-left h-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-5 shadow-md transition-all duration-200 flex flex-col justify-between gap-4 disabled:opacity-55 disabled:cursor-not-allowed enabled:hover:border-rose-500/60 enabled:hover:shadow-lg enabled:hover:shadow-rose-500/10">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <span id="wrong-count-badge" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 font-bold text-sm border border-rose-500/20">
+                    0
+                  </span>
+                  <span id="wrong-status-pill" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    Brak błędów
+                  </span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white group-enabled:group-hover:text-rose-600 dark:group-enabled:group-hover:text-rose-400 transition-colors">
+                  Powtórka błędnych
+                </h3>
+                <p id="wrong-mode-desc" class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  Aktywuje się automatycznie po rozwiązaniu quizu, jeśli pojawią się błędne odpowiedzi.
+                </p>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <span id="wrong-mode-cta" class="inline-flex items-center text-sm font-semibold text-slate-400 dark:text-slate-500">
+                  <span>Najpierw rozwiąż quiz</span>
+                </span>
+              </div>
+            </button>
+            <button id="btn-clear-wrong" type="button" class="hidden absolute bottom-4 right-4 text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
+              Wyczyść listę
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WIDOK 2: AKTYWNY QUIZ ==================== -->
+    <section id="view-quiz" class="hidden space-y-5">
+      <!-- Górny pasek postępu i statystyk -->
+      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div class="flex items-center gap-2.5">
+            <span id="quiz-progress-label" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+              Pytanie 1 z 20
+            </span>
+            <span id="quiz-mode-label" class="hidden sm:inline-flex text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              Wszystkie pytania
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-semibold">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span id="stat-correct">0</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              <span id="stat-wrong">0</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Pasek postępu -->
+        <div class="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+          <div id="quiz-progress-bar" class="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 transition-all duration-300" style="width: 5%;"></div>
+        </div>
+      </div>
+
+      <!-- Karta pytania -->
+      <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/95 p-5 sm:p-8 shadow-xl shadow-slate-200/40 dark:shadow-black/30">
+        <!-- Odznaki kategorii -->
+        <div id="question-badges" class="flex flex-wrap items-center gap-2 mb-4"></div>
+
+        <!-- Treść pytania -->
+        <h2 id="question-text" class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-snug mb-6"></h2>
+
+        <!-- Lista 4 odpowiedzi A/B/C/D -->
+        <div id="options-container" class="space-y-3" role="radiogroup" aria-label="Opcje odpowiedzi"></div>
+
+        <!-- Panel wyjaśnienia i źródła (ukryty do czasu wybrania odpowiedzi) -->
+        <div id="feedback-panel" class="hidden mt-6 space-y-4">
+          <div id="feedback-box" class="rounded-2xl p-4 sm:p-5 border">
+            <div class="flex items-start gap-3">
+              <div id="feedback-icon" class="shrink-0 mt-0.5"></div>
+              <div class="min-w-0 space-y-1.5">
+                <h3 id="feedback-title" class="text-sm sm:text-base font-bold"></h3>
+                <p id="feedback-explanation" class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wyraźna ramka ze źródłem w PDF -->
+          <div class="rounded-2xl p-3.5 sm:p-4 bg-slate-100/90 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-violet-500/15 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0 mt-0.5 border border-violet-500/20">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-violet-700 dark:text-violet-300">Źródło w instrukcji laboratoryjnej</div>
+              <p id="feedback-source" class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 mt-0.5"></p>
+            </div>
+          </div>
+
+          <!-- Przycisk przejścia dalej -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
+            <span class="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">
+              Naciśnij <kbd class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-[11px] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">Enter</kbd> lub <kbd class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-[11px] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">&rarr;</kbd>, aby przejść dalej
+            </span>
+            <button id="btn-next" type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm sm:text-base bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white shadow-lg shadow-emerald-600/25 transition-all">
+              <span id="btn-next-label">Następne pytanie</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Podpowiedź skrótów przed udzieleniem odpowiedzi -->
+        <div id="keyboard-hint" class="hidden sm:flex items-center justify-between mt-6 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400">
+          <span>
+            Skróty klawiszowe:
+            <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[11px] border border-slate-200 dark:border-slate-700">A</kbd>–<kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[11px] border border-slate-200 dark:border-slate-700">D</kbd>
+            lub
+            <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[11px] border border-slate-200 dark:border-slate-700">1</kbd>–<kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[11px] border border-slate-200 dark:border-slate-700">4</kbd>
+            wybór odpowiedzi
+          </span>
+          <span id="question-id-tag" class="font-mono text-[11px]"></span>
+        </div>
+      </article>
+    </section>
+
+    <!-- ==================== WIDOK 3: PODSUMOWANIE ==================== -->
+    <section id="view-summary" class="hidden space-y-6">
+      <!-- Karta wyniku -->
+      <div class="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/95 p-6 sm:p-8 shadow-xl shadow-slate-200/40 dark:shadow-black/30">
+        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-violet-500"></div>
+
+        <div class="flex flex-col md:flex-row items-center gap-6 sm:gap-8">
+          <!-- Okrągły wskaźnik procentowy -->
+          <div class="relative w-36 h-36 shrink-0 flex items-center justify-center">
+            <svg class="w-36 h-36 -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="10" class="text-slate-200 dark:text-slate-800" />
+              <circle id="summary-ring" cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="text-emerald-500 transition-all duration-700" />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span id="summary-percent" class="text-3xl font-extrabold text-slate-900 dark:text-white">0%</span>
+              <span id="summary-score-sub" class="text-xs font-semibold text-slate-500 dark:text-slate-400">0 / 20</span>
+            </div>
+          </div>
+
+          <!-- Ocena gotowości i statystyki -->
+          <div class="flex-1 text-center md:text-left space-y-3">
+            <div id="summary-readiness-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"></div>
+            <h2 id="summary-heading" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white"></h2>
+            <p id="summary-message" class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+
+            <!-- Statystyki szczegółowe -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+              <div class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-3 text-center">
+                <div id="summary-correct-num" class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
+                <div class="text-xs font-medium text-slate-600 dark:text-slate-400">Poprawne</div>
+              </div>
+              <div class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-3 text-center">
+                <div id="summary-wrong-num" class="text-xl font-extrabold text-rose-600 dark:text-rose-400">0</div>
+                <div class="text-xs font-medium text-slate-600 dark:text-slate-400">Błędne</div>
+              </div>
+              <div id="summary-photo-stat-box" class="col-span-2 sm:col-span-1 rounded-2xl bg-amber-500/10 border border-amber-500/25 p-3 text-center">
+                <div id="summary-photo-num" class="text-xl font-extrabold text-amber-600 dark:text-amber-400">0 / 0</div>
+                <div class="text-xs font-medium text-slate-600 dark:text-slate-400">Pewniaki ze zdjęć</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Przyciski akcji na końcu quizu -->
+        <div class="mt-7 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-3">
+          <button id="btn-retry-wrong" type="button" class="hidden inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/20 transition-all flex-1 sm:flex-none">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <span id="btn-retry-wrong-label">Powtórz błędne pytania</span>
+          </button>
+
+          <button id="btn-restart-mode" type="button" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 transition-all flex-1 sm:flex-none">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Zacznij od nowa</span>
+          </button>
+
+          <button id="btn-back-menu" type="button" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors flex-1 sm:flex-none">
+            <span>Wybierz inny tryb</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Przegląd wszystkich pytań z sesji -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+          <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Przegląd odpowiedzi</h3>
+          <div class="inline-flex rounded-xl p-1 bg-slate-200/80 dark:bg-slate-800/90 border border-slate-300/60 dark:border-slate-700/80 self-start sm:self-auto" role="tablist">
+            <button type="button" data-review-filter="all" class="review-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">Wszystkie</button>
+            <button type="button" data-review-filter="wrong" class="review-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">Błędne</button>
+            <button type="button" data-review-filter="correct" class="review-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">Poprawne</button>
+          </div>
+        </div>
+
+        <div id="review-list" class="space-y-4"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Niestandardowy modal potwierdzenia wyjścia z trwającego quizu (zamiast confirm()) -->
+  <div id="exit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="exit-modal-title">
+    <div class="w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl space-y-4">
+      <h3 id="exit-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">Przerwać bieżący quiz?</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        Dotychczasowy postęp w tej próbie zostanie utracony (ewentualne błędne odpowiedzi już zapisano do trybu powtórki).
+      </p>
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button id="btn-modal-cancel" type="button" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+          Zostań w quizie
+        </button>
+        <button id="btn-modal-confirm" type="button" class="px-4 py-2.5 rounded-xl text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white transition-colors">
+          Wróć do menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /**
+       * Pomocnicza funkcja formatująca ułamek matematyczny w czystym HTML + Tailwind CSS
+       * (bez żadnych zewnętrznych bibliotek do renderowania wzorów).
+       */
+      function frac(numerator, denominator) {
+        return (
+          '<span class="inline-flex flex-col items-center align-middle mx-1 leading-tight text-[0.9em] font-medium">' +
+          '<span class="border-b border-current px-1 pb-0.5">' + numerator + '</span>' +
+          '<span class="px-1 pt-0.5">' + denominator + '</span>' +
+          '</span>'
+        );
+      }
+
+      /**
+       * Dokładna baza 20 pytań laboratoryjnych (ELFO2).
+       * Każda opcja ma id ('a', 'b', 'c', 'd'), a pole correctId wskazuje poprawną odpowiedź.
+       * Wszystkie treści, wyjaśnienia i źródła pochodzą wyłącznie z dostarczonej instrukcji.
+       */
+      const QUESTIONS = [
+        {
+          id: 1,
+          category: 'Nd:YAG',
+          fromPhoto: true,
+          question: 'Jaka jest podstawowa długość fali emitowanej przez laser Nd:YAG?',
+          options: [
+            { id: 'a', html: '1064,14 nm (w zaokrągleniu 1064 nm)' },
+            { id: 'b', html: '808,6 nm' },
+            { id: 'c', html: '532 nm' },
+            { id: 'd', html: '850 nm' }
+          ],
+          correctId: 'a',
+          explanation: 'Długość fali głównej linii laserowej kryształu Nd:YAG wynosi 1064,14 nm (w instrukcji podawana również jako 1064 nm). 808,6 nm to pasmo najsilniejszej absorpcji (pompowania), a 532 nm to druga harmoniczna.',
+          source: 'ELFO2...pdf, str. 15, rozdz. 3.2 (oraz str. 14, Rys. 3.2.2 i 3.2.3; str. 16, rozdz. 4.2).'
+        },
+        {
+          id: 2,
+          category: 'Nd:YAG',
+          fromPhoto: true,
+          question: 'Jaka jest długość fali drugiej harmonicznej lasera Nd:YAG uzyskiwanej za pomocą nieliniowych elementów optycznych?',
+          options: [
+            { id: 'a', html: '532 nm' },
+            { id: 'b', html: '355 nm' },
+            { id: 'c', html: '266 nm' },
+            { id: 'd', html: '808 nm' }
+          ],
+          correctId: 'a',
+          explanation: 'Zastosowanie kryształu nieliniowego pozwala uzyskać wyjściową długość fali równą poszczególnym harmonicznym: 532 nm (druga harmoniczna), a także 355 nm i 266 nm.',
+          source: 'ELFO2...pdf, str. 15, rozdz. 3.2 i Rys. 3.2.5; str. 16, rozdz. 4.2.'
+        },
+        {
+          id: 3,
+          category: 'Podstawy laserów',
+          fromPhoto: true,
+          question: 'Jaki jest cel pompowania lasera i jakie dwa główne jego rodzaje wyróżniono w rozdziale 2.2 instrukcji?',
+          options: [
+            { id: 'a', html: 'Uzyskanie inwersji obsadzeń; wyróżnia się pompowanie optyczne (światłem) i elektryczne (prądem stałym lub zmiennym).' },
+            { id: 'b', html: 'Zmniejszenie współczynnika odbicia zwierciadeł; wyróżnia się pompowanie termiczne i mechaniczne.' },
+            { id: 'c', html: 'Eliminacja emisji wymuszonej; wyróżnia się pompowanie ciągłe i dyskretne.' },
+            { id: 'd', html: 'Wyrównanie poziomu Fermiego; wyróżnia się pompowanie donorowe i akceptorowe.' }
+          ],
+          correctId: 'a',
+          explanation: 'Energia pompująca z zewnętrznego źródła pozwala uzyskać inwersję obsadzeń. W rozdz. 2.2 wyróżniono pompowanie elektryczne (zwykle lasery gazowe i półprzewodnikowe) oraz optyczne (lasery na ciele stałym, barwnikowe i krzemowe lasery ramanowskie). Na Rys. 1.1.1 wymieniono także wzbudzanie elektronów, niesprężyste kolizje atom-atom/molekuła-molekuła oraz reakcje chemiczne.',
+          source: 'ELFO2...pdf, str. 5, rozdz. 2.2 oraz str. 2, rozdz. 1.1 (Rys. 1.1.1).'
+        },
+        {
+          id: 4,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: true,
+          question: 'Które zestawienie poprawnie opisuje różnice w budowie i emisji między laserem krawędziowym a laserem VCSEL?',
+          options: [
+            { id: 'a', html: 'Laser krawędziowy emituje eliptyczną plamkę (ok. 1 &times; 100 &mu;m) z krawędzi struktury, natomiast VCSEL ma pionową wnękę (~1 &mu;m) ze zwierciadłami Bragga (DBR), emituje prostopadle do złącza i daje bardziej kołową plamkę.' },
+            { id: 'b', html: 'Laser VCSEL emituje eliptyczną plamkę z krawędzi struktury, a laser krawędziowy emituje prostopadle do powierzchni złącza.' },
+            { id: 'c', html: 'Oba lasery mają wnękę o długości ok. 1 &mu;m, ale tylko laser krawędziowy pracuje zawsze na jednym modzie podłużnym.' },
+            { id: 'd', html: 'Laser krawędziowy wymaga zwierciadeł DBR o odbiciu &gt; 99,9%, natomiast VCSEL wykorzystuje wyłącznie szlifowane krawędzie półprzewodnika.' }
+          ],
+          correctId: 'a',
+          explanation: 'Laser krawędziowy emituje światło z krawędzi w postaci eliptycznej plamki o wymiarach 1 &times; 100 &mu;m. Laser VCSEL (Vertical-Cavity Surface-Emitting Laser) ma bardzo krótką wnękę pionową (~1 &mu;m) zapewniającą jeden mod podłużny, oba zwierciadła z siatką Bragga (wysokie odbicie &gt; 99,9% dla niskiego progu) oraz bardziej kołową plamkę.',
+          source: 'ELFO2...pdf, str. 8–10, rozdz. 2.3 (Rys. 2.3.3, 2.3.4, 2.3.6).'
+        },
+        {
+          id: 5,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: true,
+          question: 'Który zestaw cech i ograniczeń jest charakterystyczny dla laserów VCSEL według instrukcji?',
+          options: [
+            { id: 'a', html: 'Niski prąd progowy (&lt; 0,5 mA), małe zużycie mocy, integrowalność w matryce 1D i 2D, najczęstsza długość fali 850 nm; warstwy DBR przewodzą prąd, więc zbyt wiele warstw zwiększa rezystancję i temperaturę.' },
+            { id: 'b', html: 'Bardzo wysoki prąd progowy (&gt; 150 mA), brak możliwości pracy ciągłej oraz niemożność integracji w matryce dwuwymiarowe.' },
+            { id: 'c', html: 'Zwierciadła DBR są idealnymi izolatorami, więc liczba ich warstw nie ma żadnego wpływu na rezystancję ani temperaturę lasera.' },
+            { id: 'd', html: 'Lasery VCSEL produkuje się wyłącznie dla długości fali 1064 nm i charakteryzują się one mniejszą rozbieżnością wiązki im mniejsze jest źródło.' }
+          ],
+          correctId: 'a',
+          explanation: 'Główne cechy VCSEL to: prąd progowy &lt; 0,5 mA, małe zużycie mocy, jeden mod podłużny, duża efektywność, kołowa plamka, tania produkcja, łatwość testowania i integrowalność w matryce 1D i 2D (najczęściej 850 nm, także 1300 nm i 1550 nm). Warstwy DBR przewodzą prąd – wzrost liczby warstw zwiększa rezystancję, co przy źle zaprojektowanych zwierciadłach powoduje wzrost temperatury. (Rozbieżność jest odwrotnie proporcjonalna do wielkości wiązki w źródle – im mniejsze źródło, tym większa rozbieżność).',
+          source: 'ELFO2...pdf, str. 10, rozdz. 2.3.'
+        },
+        {
+          id: 6,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: true,
+          question: 'Czym jest homostruktura w kontekście laserów półprzewodnikowych i jakie ma właściwości według instrukcji?',
+          options: [
+            { id: 'a', html: 'Dioda laserowa wykonana z jednego materiału półprzewodnikowego (np. GaAs); był to pierwszy laser półprzewodnikowy, lecz cechował się wysokim prądem progowym nawet w niskich temperaturach i nie mógł pracować w sposób ciągły.' },
+            { id: 'b', html: 'Struktura złożona z dwóch różnych półprzewodników (np. GaAs i AlGaAs) o różnych przerwach zabronionych, tworząca światłowód optyczny.' },
+            { id: 'c', html: 'Współczesna struktura o grubości warstwy aktywnej 2–20 nm, stosowana do uzyskiwania prądów progowych poniżej 0,5 mA w matrycach 2D.' },
+            { id: 'd', html: 'Kryształ dielektryczny domieszkowany jonami ziem rzadkich, wykorzystywany do generacji drugiej harmonicznej.' }
+          ],
+          correctId: 'a',
+          explanation: 'Pierwszy laser półprzewodnikowy był homostrukturą produkowaną z jednego materiału półprzewodnikowego (np. p<sup>+</sup> GaAs / n<sup>+</sup> GaAs). Posiadała wysoki prąd progowy nawet w niskich temperaturach i nie mogła pracować w sposób ciągły – aby zniwelować te wady, zaproponowano heterostruktury.',
+          source: 'ELFO2...pdf, str. 7, rozdz. 2.3 oraz Rys. 2.3.1.'
+        },
+        {
+          id: 7,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: true,
+          question: 'Jak szerokość przerwy energetycznej (zabronionej) <em>E</em><sub>G</sub> = <em>E</em><sub>c</sub> &minus; <em>E</em><sub>v</sub> półprzewodnika wpływa na długość fali &lambda; emitowanego promieniowania laserowego?',
+          options: [
+            { id: 'a', html: 'Długość fali jest odwrotnie proporcjonalna do przerwy energetycznej zgodnie ze wzorem &lambda; = ' + frac('<em>ch</em>', '<em>E</em><sub>c</sub> &minus; <em>E</em><sub>v</sub>') + ' – większa przerwa oznacza krótszą falę.' },
+            { id: 'b', html: 'Długość fali jest wprost proporcjonalna do przerwy energetycznej zgodnie ze wzorem &lambda; = ' + frac('<em>E</em><sub>c</sub> &minus; <em>E</em><sub>v</sub>', '<em>ch</em>') + ' – większa przerwa oznacza dłuższą falę.' },
+            { id: 'c', html: 'Szerokość przerwy energetycznej decyduje wyłącznie o mocy wyjściowej, a długość fali zależy jedynie od napięcia zasilania.' },
+            { id: 'd', html: 'Długość fali jest stała dla wszystkich półprzewodników i zależy wyłącznie od grubości elektrod.' }
+          ],
+          correctId: 'a',
+          explanation: 'Przerwa energetyczna rozdziela pasmo walencyjne (<em>E</em><sub>v</sub>) i pasmo przewodnictwa (<em>E</em><sub>c</sub>). Gdy zachodzi akcja laserowa, długość fali emitowanego światła określa zależność &lambda; = ' + frac('<em>ch</em>', '<em>E</em><sub>c</sub> &minus; <em>E</em><sub>v</sub>') + ', gdzie <em>c</em> to prędkość światła w próżni.',
+          source: 'ELFO2...pdf, str. 5, rozdz. 2.1 i Rys. 2.1.1; str. 8, rozdz. 2.3.'
+        },
+        {
+          id: 8,
+          category: 'Podstawy laserów',
+          fromPhoto: false,
+          question: 'Jakie trzy warunki muszą być spełnione, aby uzyskać akcję laserową?',
+          options: [
+            { id: 'a', html: 'Otrzymanie wzmocnienia światła (emisja wymuszona), dostarczenie dodatniego sprzężenia zwrotnego oraz osiągnięcie wzmocnienia większego niż straty w ośrodku aktywnym.' },
+            { id: 'b', html: 'Zastosowanie ujemnego sprzężenia zwrotnego, chłodzenie kriogeniczne oraz użycie dwóch całkowicie odbijających zwierciadeł.' },
+            { id: 'c', html: 'Zamiana sygnału optycznego na elektryczny, zapewnienie emisji spontanicznej oraz zrównanie poziomu Fermiego w całym złączu.' },
+            { id: 'd', html: 'Zastosowanie kryształu nieliniowego, pompowanie wyłącznie lampą błyskową oraz praca wielomodowa.' }
+          ],
+          correctId: 'a',
+          explanation: 'Laser jest kombinacją wzmacniacza optycznego (wzmocnienie światła na drodze emisji wymuszonej, bez zamiany na sygnał elektryczny) i rezonatora optycznego. Do akcji laserowej konieczne jest wzmocnienie światła, dodatnie sprzężenie zwrotne oraz przewyższenie strat w ośrodku aktywnym przez wzmocnienie.',
+          source: 'ELFO2...pdf, str. 2, rozdz. 1.1.'
+        },
+        {
+          id: 9,
+          category: 'Podstawy laserów',
+          fromPhoto: false,
+          question: 'Jak zbudowany jest rezonator Fabry-Perot i jakie funkcje pełnią jego zwierciadła?',
+          options: [
+            { id: 'a', html: 'Składa się z pary zwierciadeł na końcach lasera (jednego całkowicie odbijającego i jednego częściowo przepuszczalnego); zapewniają dodatnie sprzężenie zwrotne, określają kierunek propagacji i selekcjonują zbiór długości fal.' },
+            { id: 'b', html: 'Składa się z dwóch całkowicie nieprzezroczystych zwierciadeł, a wiązka opuszczająca laser jest odsprzęgana bokiem przez soczewkę kolimującą.' },
+            { id: 'c', html: 'Zawiera wyłącznie jedno zwierciadło wklęsłe i nie ma wpływu na selekcję długości fal ani kierunek propagacji wiązki.' },
+            { id: 'd', html: 'Zastępuje ośrodek aktywny i samodzielnie generuje fotony poprzez rozpraszanie na defektach sieci.' }
+          ],
+          correctId: 'a',
+          explanation: 'Rezonator Fabry-Perot ma parę zwierciadeł: całkowicie odbijające i częściowo transparentne (przez które część wiązki o odpowiedniej mocy odsprzęgana jest na zewnątrz). Zwierciadła dostarczają wysokiego dodatniego sprzężenia zwrotnego, określają kierunek propagacji fotonów i wybierają zbiór długości fal zależny od długości wnęki i współczynnika załamania ośrodka.',
+          source: 'ELFO2...pdf, str. 3, rozdz. 1.2 (Rys. 1.2.1 i 1.2.2).'
+        },
+        {
+          id: 10,
+          category: 'Podstawy laserów',
+          fromPhoto: false,
+          question: 'Który wzór poprawnie wyraża wzmocnienie progowe <em>g</em><sub>th</sub> wynikające z warunku amplitudowego generacji?',
+          options: [
+            { id: 'a', html: '<em>g</em><sub>th</sub> = &alpha;<sub>0</sub> + ' + frac('1', '2<em>L</em><sub>m</sub>') + ' &middot; ln(' + frac('1', '<em>R</em><sub>1</sub> &middot; <em>R</em><sub>2</sub>') + ')' },
+            { id: 'b', html: '<em>g</em><sub>th</sub> = &alpha;<sub>0</sub> &minus; ' + frac('1', '2<em>L</em><sub>m</sub>') + ' &middot; ln(<em>R</em><sub>1</sub> &middot; <em>R</em><sub>2</sub> &middot; <em>L</em><sub>m</sub>)' },
+            { id: 'c', html: '<em>g</em><sub>th</sub> = ' + frac('<em>R</em><sub>1</sub> &middot; <em>R</em><sub>2</sub>', '2<em>L</em><sub>m</sub> &middot; &alpha;<sub>0</sub>') },
+            { id: 'd', html: '<em>g</em><sub>th</sub> = &alpha;<sub>0</sub> &middot; exp[2(<em>R</em><sub>1</sub> + <em>R</em><sub>2</sub>)<em>L</em><sub>m</sub>]' }
+          ],
+          correctId: 'a',
+          explanation: 'Z warunku amplitudowego <em>R</em><sub>1</sub><em>R</em><sub>2</sub> exp[2(<em>g</em><sub>0</sub> &minus; &alpha;<sub>0</sub>)<em>L</em><sub>m</sub>] = 1 wynika wzór na wzmocnienie progowe: <em>g</em><sub>th</sub> = &alpha;<sub>0</sub> + ' + frac('1', '2<em>L</em><sub>m</sub>') + ' &middot; ln(' + frac('1', '<em>R</em><sub>1</sub><em>R</em><sub>2</sub>') + '). Straty rezonatora wynikają głównie z niecałkowitego odbicia od zwierciadeł (absorpcja, rozpraszanie, transmisja) oraz z dyfrakcji.',
+          source: 'ELFO2...pdf, str. 4, rozdz. 1.3.'
+        },
+        {
+          id: 11,
+          category: 'Podstawy laserów',
+          fromPhoto: false,
+          question: 'Co wynika z fazowego warunku generacji światła w rezonatorze optycznym o długości <em>L</em>?',
+          options: [
+            { id: 'a', html: 'Faza sygnału po pełnym przejściu przez rezonator jest równa fazie początkowej, więc w długości <em>L</em> musi mieścić się całkowita wielokrotność połówek długości fali propagujących się w ośrodku aktywnym.' },
+            { id: 'b', html: 'Faza sygnału po pełnym przejściu przez rezonator musi ulec przesunięciu dokładnie o &pi;/2, aby doszło do interferencji destruktywnej.' },
+            { id: 'c', html: 'Długość rezonatora <em>L</em> musi być mniejsza od ćwierci długości fali, niezależnie od współczynnika załamania ośrodka.' },
+            { id: 'd', html: 'Warunek fazowy określa wyłącznie moc progową i nie wpływa na dyskretny zbiór częstotliwości modów podłużnych.' }
+          ],
+          correctId: 'a',
+          explanation: 'Warunek fazowy ma postać exp[&minus;2<em>j</em>&omega;(' + frac('<em>L</em>', '<em>c</em>') + ')] = exp[&minus;2<em>jq</em>&pi;] (<em>q</em> = 1, 2, 3...), co oznacza zgodność faz po pełnym obiegu oraz warunek, by długość rezonatora <em>L</em> mieściła całkowitą wielokrotność połówek długości fali (&lambda;/2) w ośrodku aktywnym.',
+          source: 'ELFO2...pdf, str. 4, rozdz. 1.3 (oraz str. 3, Rys. 1.2.2).'
+        },
+        {
+          id: 12,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: false,
+          question: 'Jak zachowuje się złącze p-n przy prądzie poniżej prądu progowego oraz jak wzrost temperatury wpływa na wartość prądu progowego diody laserowej?',
+          options: [
+            { id: 'a', html: 'Poniżej progu działa jak dioda LED (dominuje emisja spontaniczna); wraz ze wzrostem temperatury prąd progowy rośnie.' },
+            { id: 'b', html: 'Poniżej progu w ogóle nie emituje światła; wraz ze wzrostem temperatury prąd progowy maleje.' },
+            { id: 'c', html: 'Poniżej progu zachodzi emisja wymuszona; temperatura nie ma żadnego wpływu na położenie progu generacji.' },
+            { id: 'd', html: 'Poniżej progu dioda pracuje na jednym modzie podłużnym; wzrost temperatury przesuwa charakterystykę mocy w lewo.' }
+          ],
+          correctId: 'a',
+          explanation: 'Prąd progowy to prąd, dla którego wzmocnienie optyczne równa się sumie wszystkich strat. Przy małym prądzie w kierunku przewodzenia złącze działa jak dioda LED (emisja spontaniczna). Na Rys. 2.2.2 widać, że w wyższej temperaturze prąd progowy jest większy (charakterystyka przesuwa się w prawo), a w niższej – mniejszy.',
+          source: 'ELFO2...pdf, str. 6, rozdz. 2.2 oraz Rys. 2.2.2.'
+        },
+        {
+          id: 13,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: false,
+          question: 'Jakie zjawiska odpowiadają za straty podczas przetwarzania energii elektrycznej na użyteczne promieniowanie laserowe w diodzie złączowej?',
+          options: [
+            { id: 'a', html: 'Ciepło Joule’a w transporcie nośników, rekombinacja niepromienista, emisja spontaniczna oraz absorpcja/rozpraszanie promieniowania w warstwach biernych (straty dyfrakcyjne) i warstwie czynnej.' },
+            { id: 'b', html: 'Wyłącznie straty na odbiciu od elektrod metalowych i soczewkowanie termiczne w krysztale YAG.' },
+            { id: 'c', html: 'Wyłącznie konwersja częstotliwości na drugą i trzecią harmoniczną oraz dyfuzja donorów poza radiator.' },
+            { id: 'd', html: 'W diodzie laserowej cała energia poza wiązką laserową zamieniana jest wyłącznie na szum laserowy bez generacji ciepła.' }
+          ],
+          correctId: 'a',
+          explanation: 'Energia zasilania dzieli się na użyteczne promieniowanie laserowe, szum laserowy i ciepło. Straty to: ciepło Joule’a (transport nośników), rekombinacja niepromienista, promieniowanie spontaniczne oraz absorpcja/rozpraszanie promieniowania wymuszonego w warstwach biernych (straty dyfrakcyjne) i warstwie czynnej (na swobodnych nośnikach i niedoskonałościach sieci krystalicznej).',
+          source: 'ELFO2...pdf, str. 6–7, rozdz. 2.2 oraz Rys. 2.2.3.'
+        },
+        {
+          id: 14,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: false,
+          question: 'Dlaczego warstwa aktywna w podwójnej heterostrukturze (DH, np. AlGaAs / GaAs / AlGaAs) pełni rolę światłowodu optycznego?',
+          options: [
+            { id: 'a', html: 'Ponieważ ma mniejszą przerwę zabronioną niż warstwy otaczające, a co za tym idzie nieco wyższy współczynnik załamania światła (np. &Delta;<em>n</em> ~ 5%), co ogranicza pole optyczne.' },
+            { id: 'b', html: 'Ponieważ ma znacznie szerszą przerwę zabronioną i niższy współczynnik załamania niż otaczające warstwy AlGaAs.' },
+            { id: 'c', html: 'Ponieważ jej grubość wynosi ponad 100 &mu;m, dzięki czemu pochłania wszystkie mody poprzeczne.' },
+            { id: 'd', html: 'Ponieważ na obu jej granicach nakładane są metalowe elektrody odbijające fotony w kierunku prostopadłym.' }
+          ],
+          correctId: 'a',
+          explanation: 'W podwójnej heterostrukturze (grubość warstwy aktywnej zwykle &le; 0,1 &mu;m) warstwy ograniczające mają szerszą przerwę zabronioną (blokują przepływ nośników) oraz niższy współczynnik załamania. Dzięki nieco wyższemu współczynnikowi załamania warstwa aktywna działa jak światłowód, lepiej ograniczając pole lasera.',
+          source: 'ELFO2...pdf, str. 7–8, rozdz. 2.3 oraz Rys. 2.3.2.'
+        },
+        {
+          id: 15,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: false,
+          question: 'Czym charakteryzują się diody laserowe ze studniami kwantowymi?',
+          options: [
+            { id: 'a', html: 'Bardzo cienką warstwą aktywną (poniżej 100 nm, typowo 2–20 nm) z dyskretnymi poziomami energetycznymi nośników, niskim prądem progowym (10–20 mA, ok. 10&times; niższym niż w klasycznych heterozłączach) i szybką modulacją (&lt; 1 ns).' },
+            { id: 'b', html: 'Grubością warstwy aktywnej rzędu 10–20 &mu;m, ciągłym spektrum energii nośników i wysoką wrażliwością prądu progowego na temperaturę.' },
+            { id: 'c', html: 'Zastąpieniem półprzewodnika szkłem domieszkowanym neodymem o stężeniu ok. 1% atomowego.' },
+            { id: 'd', html: 'Brakiem możliwości sprzęgnięcia z włóknem optycznym ze względu na silnie rozbieżną wiązkę.' }
+          ],
+          correctId: 'a',
+          explanation: 'Redukcja grubości warstwy czynnej poniżej 100 nm (do ok. 2–20 nm, porównywalnie z długością fali de Broglie’a – ok. 120 &Aring; dla GaAs) powoduje skwantowanie ruchu elektronów i dziur (dyskretne poziomy energetyczne). Zapewnia to niski prąd progowy (10–20 mA, 10&times; niższy niż w klasycznych laserach heterozłączowych), mniejszą wrażliwość na temperaturę, mniejsze straty niepromieniste, szybką modulację (&lt; 1 ns) i łatwe sprzęganie ze światłowodami.',
+          source: 'ELFO2...pdf, str. 8–9, rozdz. 2.3 oraz Rys. 2.3.5.'
+        },
+        {
+          id: 16,
+          category: 'Lasery półprzewodnikowe',
+          fromPhoto: false,
+          question: 'Jaki jest odstęp częstotliwościowy między sąsiednimi modami podłużnymi w rezonatorze Fabry-Perot i jak zmienia się widmo diody laserowej ze wzrostem prądu?',
+          options: [
+            { id: 'a', html: 'Odstęp wynosi &Delta;&nu; = ' + frac('<em>c</em>', '2<em>Ln</em><sub>1</sub>') + '; dla <em>I</em> &lt; <em>I</em><sub>th</sub> widać szerokie widmo LED, dla <em>I</em> &gt; <em>I</em><sub>th</sub> wiele modów podłużnych, a dla <em>I</em> &gg; <em>I</em><sub>th</sub> pracę na jednym modzie.' },
+            { id: 'b', html: 'Odstęp wynosi &Delta;&nu; = ' + frac('2<em>Ln</em><sub>1</sub>', '<em>c</em>') + '; dla <em>I</em> &lt; <em>I</em><sub>th</sub> laser pracuje na jednym modzie, a dla <em>I</em> &gg; <em>I</em><sub>th</sub> widmo rozszerza się do charakterystyki LED.' },
+            { id: 'c', html: 'Odstęp wynosi &Delta;&nu; = ' + frac('<em>ch</em>', '<em>E</em><sub>G</sub>') + '; widmo diody laserowej nie zależy od prądu pompującego powyżej progu.' },
+            { id: 'd', html: 'Odstęp wynosi &Delta;&nu; = ' + frac('<em>c</em>', '<em>Ln</em><sub>1</sub>') + '; dla każdego prądu powyżej progu generowane są dokładnie dwa mody o jednakowej amplitudzie.' }
+          ],
+          correctId: 'a',
+          explanation: 'Widmo składa się z modów równoodległych o ' + frac('<em>c</em>', '2<em>Ln</em><sub>1</sub>') + ', przy czym względna zmiana długości rezonatora odpowiada względnej zmianie częstotliwości (' + frac('&Delta;<em>f</em>', '<em>f</em>') + ' = ' + frac('&Delta;<em>L</em>', '<em>L</em>') + '). Ze wzrostem prądu: poniżej <em>I</em><sub>th</sub> obserwuje się widmo LED, niewiele powyżej <em>I</em><sub>th</sub> – wiele modów podłużnych, a dla <em>I</em> &gg; <em>I</em><sub>th</sub> – pojedynczy mod (zbyt duży prąd niszczy laser).',
+          source: 'ELFO2...pdf, str. 11, rozdz. 2.4 oraz Rys. 2.4.2 i 2.4.3.'
+        },
+        {
+          id: 17,
+          category: 'Laser Nd:YAG',
+          fromPhoto: false,
+          question: 'Dlaczego widma jonów ziem rzadkich (lantanowców, np. Nd) wbudowanych w matrycę dielektryczną słabo zależą od rodzaju matrycy, w przeciwieństwie do jonów metali przejściowych?',
+          options: [
+            { id: 'a', html: 'Ponieważ niecałkowicie zapełniona powłoka 4f lantanowców jest silnie ekranowana elektronami 5s i 5p i nie bierze udziału w wiązaniach chemicznych, podczas gdy podpowłoka d metali przejściowych traci ekranowanie i uczestniczy w wiązaniach.' },
+            { id: 'b', html: 'Ponieważ lantanowce nie oddziałują z polem elektromagnetycznym, natomiast metale przejściowe tworzą złącza p-n wewnątrz szkła.' },
+            { id: 'c', html: 'Ponieważ w laserach z lantanowcami stężenie domieszki przekracza 50%, co eliminuje wpływ sieci krystalicznej matrycy.' },
+            { id: 'd', html: 'Ponieważ elektrony powłoki 4f biorą bezpośredni udział w silnych wiązaniach kowalencyjnych z matrycą YAG.' }
+          ],
+          correctId: 'a',
+          explanation: 'W trójdodatnich jonach ziem rzadkich własności optyczne wynikają z powłoki 4f silnie ekranowanej przez 2 elektrony 5s i 6 elektronów 5p – elektrony 4f słabo oddziałują z otoczeniem krystalicznym, więc widma przypominają widma jonów swobodnych. W jonach metali przejściowych powłoka d traci ekranowanie i bierze udział w wiązaniach chemicznych, dając szerokie widma silnie zależne od matrycy.',
+          source: 'ELFO2...pdf, str. 13, rozdz. 3.1.'
+        },
+        {
+          id: 18,
+          category: 'Laser Nd:YAG',
+          fromPhoto: false,
+          question: 'Przy jakiej długości fali kryształ Nd:YAG ma najsilniejszą absorpcję i dlaczego pompowanie diodą laserową często przewyższa pompowanie lampą błyskową?',
+          options: [
+            { id: 'a', html: 'Przy 808,6 nm; pompowanie diodowe zapewnia kompaktową budowę, długą żywotność i dobrą jakość wiązki, unikając niskiej wydajności i silnego soczewkowania termicznego typowego dla lamp błyskowych.' },
+            { id: 'b', html: 'Przy 1064 nm; pompowanie diodowe jest zawsze tańsze i daje wyłącznie większe moce szczytowe niż lampy błyskowe.' },
+            { id: 'c', html: 'Przy 532 nm; lampy błyskowe mają nieskończoną żywotność, ale nie mogą pompować kryształu Nd:YAG w trybie impulsowym.' },
+            { id: 'd', html: 'Przy 1550 nm; diody laserowe eliminują potrzebę stosowania jakiegokolwiek rezonatora optycznego w laserze Nd:YAG.' }
+          ],
+          correctId: 'a',
+          explanation: 'Najsilniejsza absorpcja Nd:YAG przypada przy 808,6 nm (bliska podczerwień), co idealnie nadaje się do pompowania diodami półprzewodnikowymi. Lampy błyskowe są stosunkowo tanie i dają duże moce, lecz prowadzą do małej wydajności energetycznej, umiarkowanej żywotności i silnych efektów termicznych (soczewkowania termicznego). Pompowanie diodami zapewnia kompaktową budowę, długą żywotność i bardzo dobrą jakość wiązki.',
+          source: 'ELFO2...pdf, str. 13, rozdz. 3.2 i Rys. 3.2.1 (oraz str. 14, Rys. 3.2.2).'
+        },
+        {
+          id: 19,
+          category: 'Laser Nd:YAG',
+          fromPhoto: false,
+          question: 'Dlaczego w 4-poziomowym laserze Nd:YAG łatwo jest uzyskać inwersję obsadzeń i próg generacji przy przejściu 1064 nm?',
+          options: [
+            { id: 'a', html: 'Ponieważ poziom końcowy akcji laserowej (<sup>4</sup><em>I</em><sub>11/2</sub>) leży 2111 cm<sup>&minus;1</sup> nad stanem podstawowym (<sup>4</sup><em>I</em><sub>9/2</sub>), więc jego obsadzenie termiczne w temperaturze pokojowej stanowi zaledwie exp(&minus;10) obsadzenia stanu podstawowego i jest praktycznie zaniedbywalne.' },
+            { id: 'b', html: 'Ponieważ akcja laserowa kończy się bezpośrednio na stanie podstawowym <sup>4</sup><em>I</em><sub>9/2</sub>, który jest zawsze całkowicie pusty w temperaturze pokojowej.' },
+            { id: 'c', html: 'Ponieważ czas życia fluorescencji wynosi 0 ns, co natychmiast opróżnia poziom górny <sup>4</sup><em>F</em><sub>3/2</sub>.' },
+            { id: 'd', html: 'Ponieważ przejście laserowe zachodzi między pasmem przewodnictwa a walencyjnym matrycy YAG bez udziału jonów neodymu.' }
+          ],
+          correctId: 'a',
+          explanation: 'Przejście 1064 nm odbywa się z górnych składowych poziomu <sup>4</sup><em>F</em><sub>3/2</sub> do stanu <sup>4</sup><em>I</em><sub>11/2</sub>. Ponieważ poziom <sup>4</sup><em>I</em><sub>11/2</sub> leży 2111 cm<sup>&minus;1</sup> nad stanem podstawowym, jego populacja termiczna w temperaturze pokojowej wynosi exp(&minus;10) populacji stanu podstawowego (nie jest wypełniony termicznie), co ułatwia osiągnięcie inwersji obsadzeń i progu generacji.',
+          source: 'ELFO2...pdf, str. 14 (Rys. 3.2.3) oraz str. 15, rozdz. 3.2.'
+        },
+        {
+          id: 20,
+          category: 'Zakres ćwiczenia',
+          fromPhoto: false,
+          question: 'Które stwierdzenie dotyczące układu mikrolasera Nd:YAG (532 nm) i opracowania wyników w ćwiczeniu laboratoryjnym jest prawdziwe?',
+          options: [
+            { id: 'a', html: 'Wiązka z diody pompującej (808 nm) trafia przez światłowód, kolimator i soczewkę skupiającą na Nd:YAG z kryształem nieliniowym i filtrem optycznym; do aproksymacji prostą w skali log-log NIE należy brać punktów poniżej progu generacji.' },
+            { id: 'b', html: 'Kryształ nieliniowy montuje się zawsze przed diodą pompującą, a do aproksymacji w skali log-log należy wykorzystać wyłącznie punkty poniżej progu generacji.' },
+            { id: 'c', html: 'W części dla laserów półprzewodnikowych mierzy się tylko moc od prądu w temperaturze 40&deg;C dla zakresu 0–700 mA.' },
+            { id: 'd', html: 'W części dla lasera Nd:YAG nie wyznacza się prądu progowego dla promieniowania 532 nm ani sprawności powielania częstotliwości.' }
+          ],
+          correctId: 'a',
+          explanation: 'Zgodnie z Rys. 3.2.5 w mikrolaserze Nd:YAG wiązka z diody (808 nm) przechodzi przez światłowód, kolimator i soczewkę skupiającą do kryształu Nd:YAG i kryształu nieliniowego (między powłokami odbijającymi), a następnie przez filtr optyczny (generacja 532 nm). W rozdz. 4.2 wyraźnie zaznaczono, że przy aproksymacji linią prostą w skali log-log nie należy brać punktów poniżej progu generacji.',
+          source: 'ELFO2...pdf, str. 15, Rys. 3.2.5 oraz str. 16, rozdz. 4.1 i 4.2.'
+        }
+      ];
+
+      const LETTERS = ['A', 'B', 'C', 'D'];
+      const MODE_LABELS = {
+        all: 'Wszystkie pytania',
+        photos: 'Tylko pytania ze zdjęć',
+        extra: 'Dodatkowe z instrukcji',
+        wrong: 'Powtórka błędnych'
+      };
+      const STORAGE_KEY_WRONG = 'elfo2_quiz_wrong_ids_v1';
+      const STORAGE_KEY_THEME = 'elfo2_quiz_theme_v1';
+
+      // Stan aplikacji
+      const state = {
+        view: 'start', // 'start' | 'quiz' | 'summary'
+        mode: 'all',
+        shuffleQuestions: false,
+        shuffleOptions: true,
+        deck: [], // przygotowane pytania dla bieżącej sesji
+        currentIndex: 0,
+        answered: false,
+        correctCount: 0,
+        wrongCount: 0,
+        sessionResults: [], // { question, optionsOrder, selectedId, isCorrect }
+        savedWrongIds: new Set(),
+        reviewFilter: 'all'
+      };
+
+      // Referencje DOM
+      const els = {
+        viewStart: document.getElementById('view-start'),
+        viewQuiz: document.getElementById('view-quiz'),
+        viewSummary: document.getElementById('view-summary'),
+        btnHeaderHome: document.getElementById('btn-header-home'),
+        btnNavMenu: document.getElementById('btn-nav-menu'),
+        btnThemeToggle: document.getElementById('btn-theme-toggle'),
+        toggleShuffleQuestions: document.getElementById('toggle-shuffle-questions'),
+        toggleShuffleOptions: document.getElementById('toggle-shuffle-options'),
+        btnModeWrong: document.getElementById('btn-mode-wrong'),
+        btnClearWrong: document.getElementById('btn-clear-wrong'),
+        wrongCountBadge: document.getElementById('wrong-count-badge'),
+        wrongStatusPill: document.getElementById('wrong-status-pill'),
+        wrongModeDesc: document.getElementById('wrong-mode-desc'),
+        wrongModeCta: document.getElementById('wrong-mode-cta'),
+        quizProgressLabel: document.getElementById('quiz-progress-label'),
+        quizModeLabel: document.getElementById('quiz-mode-label'),
+        quizProgressBar: document.getElementById('quiz-progress-bar'),
+        statCorrect: document.getElementById('stat-correct'),
+        statWrong: document.getElementById('stat-wrong'),
+        questionBadges: document.getElementById('question-badges'),
+        questionText: document.getElementById('question-text'),
+        optionsContainer: document.getElementById('options-container'),
+        feedbackPanel: document.getElementById('feedback-panel'),
+        feedbackBox: document.getElementById('feedback-box'),
+        feedbackIcon: document.getElementById('feedback-icon'),
+        feedbackTitle: document.getElementById('feedback-title'),
+        feedbackExplanation: document.getElementById('feedback-explanation'),
+        feedbackSource: document.getElementById('feedback-source'),
+        btnNext: document.getElementById('btn-next'),
+        btnNextLabel: document.getElementById('btn-next-label'),
+        keyboardHint: document.getElementById('keyboard-hint'),
+        questionIdTag: document.getElementById('question-id-tag'),
+        summaryRing: document.getElementById('summary-ring'),
+        summaryPercent: document.getElementById('summary-percent'),
+        summaryScoreSub: document.getElementById('summary-score-sub'),
+        summaryReadinessBadge: document.getElementById('summary-readiness-badge'),
+        summaryHeading: document.getElementById('summary-heading'),
+        summaryMessage: document.getElementById('summary-message'),
+        summaryCorrectNum: document.getElementById('summary-correct-num'),
+        summaryWrongNum: document.getElementById('summary-wrong-num'),
+        summaryPhotoStatBox: document.getElementById('summary-photo-stat-box'),
+        summaryPhotoNum: document.getElementById('summary-photo-num'),
+        btnRetryWrong: document.getElementById('btn-retry-wrong'),
+        btnRetryWrongLabel: document.getElementById('btn-retry-wrong-label'),
+        btnRestartMode: document.getElementById('btn-restart-mode'),
+        btnBackMenu: document.getElementById('btn-back-menu'),
+        reviewList: document.getElementById('review-list'),
+        exitModal: document.getElementById('exit-modal'),
+        btnModalCancel: document.getElementById('btn-modal-cancel'),
+        btnModalConfirm: document.getElementById('btn-modal-confirm')
+      };
+
+      // Bezpieczny odczyt/zapis w localStorage (odporny na ograniczenia iFrame)
+      function loadPersistentState() {
+        try {
+          const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+          if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.add('dark');
+          }
+          const rawWrong = localStorage.getItem(STORAGE_KEY_WRONG);
+          if (rawWrong) {
+            const parsed = JSON.parse(rawWrong);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(function (id) {
+                if (QUESTIONS.some(function (q) { return q.id === id; })) {
+                  state.savedWrongIds.add(id);
+                }
+              });
+            }
+          }
+        } catch (err) {
+          // Ignorujemy błędy dostępu do localStorage w trybie piaskownicy
+        }
+      }
+
+      function persistWrongIds() {
+        try {
+          localStorage.setItem(STORAGE_KEY_WRONG, JSON.stringify(Array.from(state.savedWrongIds)));
+        } catch (err) {
+          // Brak zapisu lokalnego nie blokuje działania w bieżącej sesji
+        }
+      }
+
+      function toggleTheme() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        try {
+          localStorage.setItem(STORAGE_KEY_THEME, isDark ? 'dark' : 'light');
+        } catch (err) {
+          // Brak zapisu motywu nie wpływa na działanie UI
+        }
+      }
+
+      // Algorytm Fishera-Yatesa do tasowania tablicy bez modyfikacji oryginału
+      function shuffleArray(list) {
+        const arr = list.slice();
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = tmp;
+        }
+        return arr;
+      }
+
+      // Przełączanie aktywnego widoku
+      function setView(viewName) {
+        state.view = viewName;
+        els.viewStart.classList.toggle('hidden', viewName !== 'start');
+        els.viewQuiz.classList.toggle('hidden', viewName !== 'quiz');
+        els.viewSummary.classList.toggle('hidden', viewName !== 'summary');
+
+        if (viewName === 'start') {
+          els.btnNavMenu.classList.add('hidden');
+          els.btnNavMenu.classList.remove('inline-flex');
+          updateWrongModeCard();
+        } else {
+          els.btnNavMenu.classList.remove('hidden');
+          els.btnNavMenu.classList.add('inline-flex');
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Aktualizacja karty trybu „Powtórka błędnych” w panelu startowym
+      function updateWrongModeCard() {
+        const count = state.savedWrongIds.size;
+        els.wrongCountBadge.textContent = String(count);
+
+        if (count > 0) {
+          els.btnModeWrong.disabled = false;
+          els.wrongStatusPill.textContent = count === 1 ? '1 pytanie do poprawy' : count + ' pytań do poprawy';
+          els.wrongStatusPill.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/25';
+          els.wrongModeDesc.textContent = 'Przećwicz ponownie pytania, na które wcześniej padła błędna odpowiedź. Poprawne odpowiedzi usuną je z tej listy.';
+          els.wrongModeCta.className = 'inline-flex items-center text-sm font-semibold text-rose-600 dark:text-rose-400';
+          els.wrongModeCta.innerHTML = '<span>Rozpocznij powtórkę</span><svg class="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+          els.btnClearWrong.classList.remove('hidden');
+        } else {
+          els.btnModeWrong.disabled = true;
+          els.wrongStatusPill.textContent = 'Brak błędów';
+          els.wrongStatusPill.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400';
+          els.wrongModeDesc.textContent = 'Aktywuje się automatycznie po rozwiązaniu quizu, jeśli pojawią się błędne odpowiedzi.';
+          els.wrongModeCta.className = 'inline-flex items-center text-sm font-semibold text-slate-400 dark:text-slate-500';
+          els.wrongModeCta.innerHTML = '<span>Najpierw rozwiąż quiz</span>';
+          els.btnClearWrong.classList.add('hidden');
+        }
+      }
+
+      // Generowanie odznak kategorii dla pytania
+      function buildBadgesHtml(question) {
+        let html = '';
+        if (question.fromPhoto) {
+          html +=
+            '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/35">' +
+            '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/></svg>' +
+            'Ze zdjęć (pewniak)' +
+            '</span>';
+        }
+        html +=
+          '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">' +
+          question.category +
+          '</span>';
+        return html;
+      }
+
+      // Rozpoczęcie quizu w wybranym trybie
+      function startQuiz(mode, customQuestionIds) {
+        state.shuffleQuestions = els.toggleShuffleQuestions.checked;
+        state.shuffleOptions = els.toggleShuffleOptions.checked;
+        state.mode = mode;
+
+        let filtered = [];
+        if (Array.isArray(customQuestionIds) && customQuestionIds.length > 0) {
+          filtered = QUESTIONS.filter(function (q) { return customQuestionIds.includes(q.id); });
+        } else if (mode === 'all') {
+          filtered = QUESTIONS.slice();
+        } else if (mode === 'photos') {
+          filtered = QUESTIONS.filter(function (q) { return q.fromPhoto; });
+        } else if (mode === 'extra') {
+          filtered = QUESTIONS.filter(function (q) { return !q.fromPhoto; });
+        } else if (mode === 'wrong') {
+          filtered = QUESTIONS.filter(function (q) { return state.savedWrongIds.has(q.id); });
+        }
+
+        if (filtered.length === 0) {
+          setView('start');
+          return;
+        }
+
+        if (state.shuffleQuestions) {
+          filtered = shuffleArray(filtered);
+        }
+
+        state.deck = filtered.map(function (q) {
+          return {
+            question: q,
+            optionsOrder: state.shuffleOptions ? shuffleArray(q.options) : q.options.slice()
+          };
+        });
+
+        state.currentIndex = 0;
+        state.answered = false;
+        state.correctCount = 0;
+        state.wrongCount = 0;
+        state.sessionResults = [];
+
+        els.quizModeLabel.textContent = MODE_LABELS[mode] || 'Quiz';
+        setView('quiz');
+        renderCurrentQuestion();
+      }
+
+      // Renderowanie bieżącego pytania
+      function renderCurrentQuestion() {
+        const entry = state.deck[state.currentIndex];
+        const q = entry.question;
+        const total = state.deck.length;
+
+        state.answered = false;
+
+        els.quizProgressLabel.textContent = 'Pytanie ' + (state.currentIndex + 1) + ' z ' + total;
+        const progressPercent = Math.round(((state.currentIndex) / total) * 100);
+        els.quizProgressBar.style.width = Math.max(4, progressPercent) + '%';
+        els.statCorrect.textContent = String(state.correctCount);
+        els.statWrong.textContent = String(state.wrongCount);
+
+        els.questionBadges.innerHTML = buildBadgesHtml(q);
+        els.questionText.innerHTML = q.question;
+        els.questionIdTag.textContent = 'Pytanie #' + q.id;
+
+        els.feedbackPanel.classList.add('hidden');
+        els.keyboardHint.classList.remove('hidden');
+
+        // Budowanie przycisków A/B/C/D
+        els.optionsContainer.innerHTML = '';
+        entry.optionsOrder.forEach(function (opt, idx) {
+          const letter = LETTERS[idx];
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.optionId = opt.id;
+          btn.dataset.optionIndex = String(idx);
+          btn.className =
+            'option-btn w-full text-left rounded-2xl border-2 border-slate-200 dark:border-slate-800 ' +
+            'bg-slate-50/70 dark:bg-slate-950/50 hover:bg-white dark:hover:bg-slate-800/80 ' +
+            'hover:border-emerald-500/60 dark:hover:border-emerald-500/60 ' +
+            'p-3.5 sm:p-4 transition-all duration-150 flex items-start gap-3.5 group focus:outline-none focus:ring-2 focus:ring-emerald-500/50';
+
+          btn.innerHTML =
+            '<span class="option-letter shrink-0 w-8 h-8 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 ' +
+            'text-slate-700 dark:text-slate-200 font-bold text-sm flex items-center justify-center mt-0.5 ' +
+            'group-hover:border-emerald-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">' +
+            letter +
+            '</span>' +
+            '<span class="flex-1 text-sm sm:text-base text-slate-800 dark:text-slate-100 leading-relaxed pt-0.5">' +
+            opt.html +
+            '</span>' +
+            '<span class="option-status shrink-0 w-6 h-6 flex items-center justify-center mt-1 hidden"></span>';
+
+          btn.addEventListener('click', function () {
+            selectAnswer(opt.id);
+          });
+
+          els.optionsContainer.appendChild(btn);
+        });
+      }
+
+      // Obsługa wyboru odpowiedzi
+      function selectAnswer(selectedId) {
+        if (state.answered) return;
+        state.answered = true;
+
+        const entry = state.deck[state.currentIndex];
+        const q = entry.question;
+        const isCorrect = selectedId === q.correctId;
+
+        if (isCorrect) {
+          state.correctCount++;
+          // Jeśli pytanie było wcześniej w błędnych, usuwamy je po poprawnej odpowiedzi
+          if (state.savedWrongIds.has(q.id)) {
+            state.savedWrongIds.delete(q.id);
+            persistWrongIds();
+          }
+        } else {
+          state.wrongCount++;
+          state.savedWrongIds.add(q.id);
+          persistWrongIds();
+        }
+
+        state.sessionResults.push({
+          question: q,
+          optionsOrder: entry.optionsOrder,
+          selectedId: selectedId,
+          isCorrect: isCorrect
+        });
+
+        // Aktualizacja paska postępu i liczników
+        els.statCorrect.textContent = String(state.correctCount);
+        els.statWrong.textContent = String(state.wrongCount);
+        const progressPercent = Math.round(((state.currentIndex + 1) / state.deck.length) * 100);
+        els.quizProgressBar.style.width = progressPercent + '%';
+
+        // Stylizacja przycisków odpowiedzi
+        const buttons = els.optionsContainer.querySelectorAll('.option-btn');
+        buttons.forEach(function (btn) {
+          btn.disabled = true;
+          const optId = btn.dataset.optionId;
+          const letterEl = btn.querySelector('.option-letter');
+          const statusEl = btn.querySelector('.option-status');
+
+          // Usuwamy klasy hover
+          btn.classList.remove(
+            'hover:bg-white',
+            'dark:hover:bg-slate-800/80',
+            'hover:border-emerald-500/60',
+            'dark:hover:border-emerald-500/60',
+            'border-slate-200',
+            'dark:border-slate-800',
+            'bg-slate-50/70',
+            'dark:bg-slate-950/50'
+          );
+
+          if (optId === q.correctId) {
+            btn.classList.add(
+              'border-emerald-500',
+              'bg-emerald-500/10',
+              'dark:bg-emerald-500/15'
+            );
+            letterEl.className = 'option-letter shrink-0 w-8 h-8 rounded-xl bg-emerald-500 text-white font-bold text-sm flex items-center justify-center mt-0.5';
+            statusEl.classList.remove('hidden');
+            statusEl.innerHTML = '<svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          } else if (optId === selectedId && !isCorrect) {
+            btn.classList.add(
+              'border-rose-500',
+              'bg-rose-500/10',
+              'dark:bg-rose-500/15'
+            );
+            letterEl.className = 'option-letter shrink-0 w-8 h-8 rounded-xl bg-rose-500 text-white font-bold text-sm flex items-center justify-center mt-0.5';
+            statusEl.classList.remove('hidden');
+            statusEl.innerHTML = '<svg class="w-5 h-5 text-rose-600 dark:text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+          } else {
+            btn.classList.add(
+              'border-slate-200/70',
+              'dark:border-slate-800/70',
+              'bg-slate-50/40',
+              'dark:bg-slate-950/30',
+              'opacity-55'
+            );
+          }
+        });
+
+        // Wyświetlenie wyjaśnienia i źródła
+        if (isCorrect) {
+          els.feedbackBox.className = 'rounded-2xl p-4 sm:p-5 border border-emerald-500/35 bg-emerald-500/10 dark:bg-emerald-500/10';
+          els.feedbackIcon.innerHTML = '<div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>';
+          els.feedbackTitle.className = 'text-sm sm:text-base font-bold text-emerald-700 dark:text-emerald-300';
+          els.feedbackTitle.textContent = 'Poprawna odpowiedź!';
+        } else {
+          els.feedbackBox.className = 'rounded-2xl p-4 sm:p-5 border border-rose-500/35 bg-rose-500/10 dark:bg-rose-500/10';
+          els.feedbackIcon.innerHTML = '<div class="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>';
+          els.feedbackTitle.className = 'text-sm sm:text-base font-bold text-rose-700 dark:text-rose-300';
+          els.feedbackTitle.textContent = 'Błędna odpowiedź — sprawdź wyjaśnienie:';
+        }
+
+        els.feedbackExplanation.innerHTML = q.explanation;
+        els.feedbackSource.textContent = q.source;
+
+        const isLast = state.currentIndex === state.deck.length - 1;
+        els.btnNextLabel.textContent = isLast ? 'Zobacz podsumowanie' : 'Następne pytanie';
+
+        els.keyboardHint.classList.add('hidden');
+        els.feedbackPanel.classList.remove('hidden');
+      }
+
+      // Przejście do kolejnego pytania lub ekranu podsumowania
+      function nextQuestion() {
+        if (!state.answered) return;
+        if (state.currentIndex < state.deck.length - 1) {
+          state.currentIndex++;
+          renderCurrentQuestion();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          renderSummary();
+          setView('summary');
+        }
+      }
+
+      // Renderowanie ekranu podsumowania
+      function renderSummary() {
+        const total = state.sessionResults.length;
+        const correct = state.correctCount;
+        const wrong = state.wrongCount;
+        const percent = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+        // Okrągły wskaźnik SVG (obwód dla r=52 wynosi 2 * PI * 52 = 326.73)
+        const circumference = 326.73;
+        const offset = circumference - (percent / 100) * circumference;
+
+        els.summaryPercent.textContent = percent + '%';
+        els.summaryScoreSub.textContent = correct + ' / ' + total + ' pkt';
+        els.summaryCorrectNum.textContent = String(correct);
+        els.summaryWrongNum.textContent = String(wrong);
+
+        // Statystyki dla pytań ze zdjęć w tej sesji
+        const photoResults = state.sessionResults.filter(function (r) { return r.question.fromPhoto; });
+        if (photoResults.length > 0) {
+          const photoCorrect = photoResults.filter(function (r) { return r.isCorrect; }).length;
+          els.summaryPhotoStatBox.classList.remove('hidden');
+          els.summaryPhotoNum.textContent = photoCorrect + ' / ' + photoResults.length;
+        } else {
+          els.summaryPhotoStatBox.classList.add('hidden');
+        }
+
+        // Ocena gotowości do wejściówki
+        let ringColor = 'text-emerald-500';
+        let badgeClass = 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30';
+        let badgeText = 'Pełna gotowość';
+        let heading = 'Świetny wynik!';
+        let message = 'Masz bardzo solidnie opanowany materiał z instrukcji ELFO2. Wejściówka powinna pójść bez problemu.';
+
+        if (percent === 100) {
+          badgeText = '100% — Bez błędów';
+          heading = 'Perfekcyjne przygotowanie!';
+          message = 'Wszystkie odpowiedzi poprawne. Jesteś w pełni gotowy do laboratorium z laserów półprzewodnikowych i Nd:YAG.';
+        } else if (percent >= 80) {
+          badgeText = 'Wysoka gotowość';
+          heading = 'Bardzo dobry wynik!';
+          message = 'Świetna znajomość materiału. Szybko przejrzyj drobne potknięcia poniżej, aby na wejściówce mieć pewność w każdym pytaniu.';
+        } else if (percent >= 60) {
+          ringColor = 'text-amber-500';
+          badgeClass = 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30';
+          badgeText = 'Wymaga drobnej powtórki';
+          heading = 'Dobry kierunek!';
+          message = 'Podstawy już masz, ale warto jeszcze raz powtórzyć błędne pytania – szczególnie wzory i różnice między typami laserów.';
+        } else {
+          ringColor = 'text-rose-500';
+          badgeClass = 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30';
+          badgeText = 'Warto powtórzyć materiał';
+          heading = 'Jeszcze chwila nauki przed Tobą';
+          message = 'Przejrzyj wyjaśnienia i wskazane strony w instrukcji PDF, a następnie użyj przycisku „Powtórz błędne pytania”.';
+        }
+
+        els.summaryRing.setAttribute('class', ringColor + ' transition-all duration-700');
+        // Animacja pierścienia po wyrenderowaniu widoku
+        els.summaryRing.style.strokeDashoffset = String(circumference);
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            els.summaryRing.style.strokeDashoffset = String(offset);
+          });
+        });
+
+        els.summaryReadinessBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ' + badgeClass;
+        els.summaryReadinessBadge.textContent = badgeText;
+        els.summaryHeading.textContent = heading;
+        els.summaryMessage.textContent = message;
+
+        // Przycisk powtórki błędnych z tej sesji
+        const sessionWrongIds = state.sessionResults
+          .filter(function (r) { return !r.isCorrect; })
+          .map(function (r) { return r.question.id; });
+
+        if (sessionWrongIds.length > 0) {
+          els.btnRetryWrong.classList.remove('hidden');
+          els.btnRetryWrong.classList.add('inline-flex');
+          els.btnRetryWrongLabel.textContent = 'Powtórz błędne pytania (' + sessionWrongIds.length + ')';
+        } else {
+          els.btnRetryWrong.classList.add('hidden');
+          els.btnRetryWrong.classList.remove('inline-flex');
+        }
+
+        state.reviewFilter = 'all';
+        updateReviewFilterTabs();
+        renderReviewList();
+      }
+
+      function updateReviewFilterTabs() {
+        const tabs = document.querySelectorAll('.review-filter-btn');
+        tabs.forEach(function (tab) {
+          const active = tab.dataset.reviewFilter === state.reviewFilter;
+          if (active) {
+            tab.className = 'review-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm transition-colors';
+          } else {
+            tab.className = 'review-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors';
+          }
+        });
+      }
+
+      // Renderowanie szczegółowego przeglądu odpowiedzi w podsumowaniu
+      function renderReviewList() {
+        const filtered = state.sessionResults.filter(function (item) {
+          if (state.reviewFilter === 'wrong') return !item.isCorrect;
+          if (state.reviewFilter === 'correct') return item.isCorrect;
+          return true;
+        });
+
+        els.reviewList.innerHTML = '';
+
+        if (filtered.length === 0) {
+          els.reviewList.innerHTML =
+            '<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-6 text-center text-sm text-slate-500 dark:text-slate-400">' +
+            'Brak pytań spełniających wybrany filtr.' +
+            '</div>';
+          return;
+        }
+
+        filtered.forEach(function (item) {
+          const q = item.question;
+          const idxInSession = state.sessionResults.indexOf(item) + 1;
+          const selectedOpt = item.optionsOrder.find(function (o) { return o.id === item.selectedId; });
+          const correctOpt = item.optionsOrder.find(function (o) { return o.id === q.correctId; });
+          const selectedLetter = LETTERS[item.optionsOrder.indexOf(selectedOpt)];
+          const correctLetter = LETTERS[item.optionsOrder.indexOf(correctOpt)];
+
+          const card = document.createElement('div');
+          card.className =
+            'rounded-2xl border ' +
+            (item.isCorrect
+              ? 'border-emerald-500/30 bg-white dark:bg-slate-900/90'
+              : 'border-rose-500/35 bg-white dark:bg-slate-900/90') +
+            ' p-5 space-y-3.5 shadow-sm';
+
+          let answersHtml = '';
+          if (item.isCorrect) {
+            answersHtml =
+              '<div class="rounded-xl p-3 bg-emerald-500/10 border border-emerald-500/25 text-sm">' +
+              '<span class="font-bold text-emerald-700 dark:text-emerald-300">Twoja odpowiedź (' + selectedLetter + ') — poprawna: </span>' +
+              '<span class="text-slate-800 dark:text-slate-100">' + selectedOpt.html + '</span>' +
+              '</div>';
+          } else {
+            answersHtml =
+              '<div class="space-y-2">' +
+              '<div class="rounded-xl p-3 bg-rose-500/10 border border-rose-500/25 text-sm">' +
+              '<span class="font-bold text-rose-700 dark:text-rose-300">Twoja odpowiedź (' + selectedLetter + ') — błędna: </span>' +
+              '<span class="text-slate-800 dark:text-slate-100">' + selectedOpt.html + '</span>' +
+              '</div>' +
+              '<div class="rounded-xl p-3 bg-emerald-500/10 border border-emerald-500/25 text-sm">' +
+              '<span class="font-bold text-emerald-700 dark:text-emerald-300">Poprawna odpowiedź (' + correctLetter + '): </span>' +
+              '<span class="text-slate-800 dark:text-slate-100">' + correctOpt.html + '</span>' +
+              '</div>' +
+              '</div>';
+          }
+
+          card.innerHTML =
+            '<div class="flex flex-wrap items-center justify-between gap-2">' +
+            '<div class="flex flex-wrap items-center gap-2">' +
+            '<span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">#' + idxInSession + '</span>' +
+            buildBadgesHtml(q) +
+            '</div>' +
+            (item.isCorrect
+              ? '<span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Poprawnie</span>'
+              : '<span class="text-xs font-bold text-rose-600 dark:text-rose-400">Błędnie</span>') +
+            '</div>' +
+            '<h4 class="text-base font-bold text-slate-900 dark:text-white leading-snug">' + q.question + '</h4>' +
+            answersHtml +
+            '<p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">' + q.explanation + '</p>' +
+            '<div class="text-xs font-medium text-violet-700 dark:text-violet-300 bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/70 rounded-xl px-3 py-2">' +
+            '<strong>Źródło:</strong> ' + q.source +
+            '</div>';
+
+          els.reviewList.appendChild(card);
+        });
+      }
+
+      // Obsługa modalu wyjścia z aktywnego quizu
+      function requestReturnToMenu() {
+        if (state.view === 'quiz' && state.sessionResults.length > 0 && state.sessionResults.length < state.deck.length) {
+          els.exitModal.classList.remove('hidden');
+        } else {
+          setView('start');
+        }
+      }
+
+      function closeExitModal() {
+        els.exitModal.classList.add('hidden');
+      }
+
+      // Rejestracja zdarzeń UI
+      function bindEvents() {
+        els.btnThemeToggle.addEventListener('click', toggleTheme);
+        els.btnHeaderHome.addEventListener('click', requestReturnToMenu);
+        els.btnNavMenu.addEventListener('click', requestReturnToMenu);
+
+        els.btnModalCancel.addEventListener('click', closeExitModal);
+        els.btnModalConfirm.addEventListener('click', function () {
+          closeExitModal();
+          setView('start');
+        });
+        els.exitModal.addEventListener('click', function (e) {
+          if (e.target === els.exitModal) closeExitModal();
+        });
+
+        // Karty wyboru trybu
+        document.querySelectorAll('.mode-card').forEach(function (card) {
+          card.addEventListener('click', function () {
+            if (card.disabled) return;
+            startQuiz(card.dataset.mode);
+          });
+        });
+
+        // Czyszczenie zapisanej listy błędnych pytań
+        els.btnClearWrong.addEventListener('click', function (e) {
+          e.stopPropagation();
+          state.savedWrongIds.clear();
+          persistWrongIds();
+          updateWrongModeCard();
+        });
+
+        // Przycisk „Następne pytanie”
+        els.btnNext.addEventListener('click', nextQuestion);
+
+        // Przyciski na ekranie podsumowania
+        els.btnRetryWrong.addEventListener('click', function () {
+          const sessionWrongIds = state.sessionResults
+            .filter(function (r) { return !r.isCorrect; })
+            .map(function (r) { return r.question.id; });
+          if (sessionWrongIds.length > 0) {
+            startQuiz('wrong', sessionWrongIds);
+          }
+        });
+
+        els.btnRestartMode.addEventListener('click', function () {
+          if (state.mode === 'wrong' && state.savedWrongIds.size === 0) {
+            startQuiz('all');
+          } else {
+            startQuiz(state.mode);
+          }
+        });
+
+        els.btnBackMenu.addEventListener('click', function () {
+          setView('start');
+        });
+
+        // Filtry w przeglądzie odpowiedzi
+        document.querySelectorAll('.review-filter-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            state.reviewFilter = btn.dataset.reviewFilter;
+            updateReviewFilterTabs();
+            renderReviewList();
+          });
+        });
+
+        // Skróty klawiszowe w trakcie quizu
+        document.addEventListener('keydown', function (e) {
+          // Jeśli otwarty jest modal wyjścia, obsługujemy tylko Escape
+          if (!els.exitModal.classList.contains('hidden')) {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              closeExitModal();
+            }
+            return;
+          }
+
+          if (state.view !== 'quiz') return;
+          if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+          const key = e.key.toLowerCase();
+
+          if (!state.answered) {
+            let idx = -1;
+            if (key === 'a' || key === '1') idx = 0;
+            else if (key === 'b' || key === '2') idx = 1;
+            else if (key === 'c' || key === '3') idx = 2;
+            else if (key === 'd' || key === '4') idx = 3;
+
+            if (idx >= 0) {
+              const entry = state.deck[state.currentIndex];
+              if (entry && entry.optionsOrder[idx]) {
+                e.preventDefault();
+                selectAnswer(entry.optionsOrder[idx].id);
+              }
+            }
+          } else {
+            if (e.key === 'Enter' || e.key === 'ArrowRight') {
+              e.preventDefault();
+              nextQuestion();
+            }
+          }
+        });
+      }
+
+      // Inicjalizacja aplikacji
+      loadPersistentState();
+      bindEvents();
+      updateWrongModeCard();
+    })();
+  </script>
+</body>
+</html>
