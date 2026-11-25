@@ -91,7 +91,7 @@ end
 %% Zad2
 clear all
 x0=0;
-f=@(x) x^3-2*x+2;
+f=@(x) x^3-2*x-2;
 fp=@(x) 3*x^2 -2;
 
 [x8,it]=newton2(f,fp,x0,7);
